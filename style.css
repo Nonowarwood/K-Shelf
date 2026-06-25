@@ -1,0 +1,482 @@
+:root {
+  --dynamic-agency-color: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #07090e;
+}
+
+/* BACKGROUND AURORA ADAPTATIF APPLE */
+.apple-aurora {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+  filter: blur(150px);
+  pointer-events: none;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.45;
+  animation: fluidMove 20s infinite alternate ease-in-out;
+}
+
+.blob-agency {
+  width: 800px;
+  height: 800px;
+  background: var(--dynamic-agency-color);
+  top: -20%;
+  left: -10%;
+  transition: background 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.blob-ambient {
+  width: 600px;
+  height: 600px;
+  background: #3b82f6;
+  bottom: -10%;
+  right: -10%;
+  animation-delay: -7s;
+}
+
+@keyframes fluidMove {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(100px, 80px) scale(1.15);
+  }
+}
+
+/* MISE EN PAGE PLEIN ÉCRAN PANNEAUX SÉPARÉS */
+.app-fullscreen {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  padding: 20px;
+  gap: 20px;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* SIDEBAR STRUCTURE */
+.sidebar {
+  width: 330px;
+  height: 100%;
+  padding: 35px 25px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  cursor: pointer;
+  margin-bottom: 35px;
+}
+
+.sidebar-header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -2px;
+  text-transform: lowercase;
+}
+
+.sidebar-header p {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: lowercase;
+}
+
+.search-box {
+  margin-bottom: 30px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.agency-list {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 5px;
+}
+
+.agency-section {
+  margin-bottom: 28px;
+}
+
+.agency-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.artist-item {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: lowercase;
+}
+
+.artist-item:hover {
+  color: #ffffff;
+  padding-left: 6px;
+}
+
+.artist-item.active {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* WIDGET MINI PLAYER APPLE */
+.mini-player {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.player-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.player-icon-wrapper {
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-track-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.track-status {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dynamic-agency-color);
+  font-weight: 700;
+  transition: color 0.4s;
+}
+
+.track-title {
+  font-size: 0.8rem;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-progress {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--dynamic-agency-color);
+  transition:
+    background 0.4s,
+    width 1s linear;
+}
+
+.player-controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.player-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.player-btn:hover {
+  color: #ffffff;
+}
+
+/* BOUTON SPOTIFY DESIGN PREMIUM */
+.spotify-btn {
+  width: 100%;
+  background: #1db954;
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+  text-transform: lowercase;
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.2);
+  transition: all 0.2s ease;
+}
+
+.spotify-btn:hover {
+  background: #1ed760;
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(29, 185, 84, 0.4);
+}
+
+/* PANNEAU DE VISUALISATION PRINCIPAL */
+.main-content {
+  flex: 1;
+  height: 100%;
+  padding: 50px 55px;
+  overflow-y: auto;
+}
+
+.breadcrumbs {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: lowercase;
+  margin-bottom: 14px;
+}
+
+.artist-main-title,
+.welcome-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 5.5rem;
+  font-weight: 800;
+  color: var(--dynamic-agency-color);
+  letter-spacing: -4px;
+  line-height: 0.85;
+  text-transform: lowercase;
+  margin-bottom: 12px;
+  transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.welcome-title {
+  color: #ffffff;
+}
+.album-total-count,
+.welcome-desc {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: lowercase;
+  margin-bottom: 45px;
+}
+
+/* GRILLE ET ALBUM CARDS */
+.albums-display-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 45px;
+  padding-right: 10px;
+}
+
+.album-card {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.album-media-wrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.album-artwork {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.album-card:hover .album-media-wrapper {
+  transform: translateY(-5px);
+  border-color: var(--dynamic-agency-color);
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.4),
+    0 0 25px var(--dynamic-agency-color);
+}
+
+.album-card:hover .album-artwork {
+  transform: scale(1.04);
+}
+
+.album-artwork-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.album-meta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.album-title-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.3;
+  text-transform: lowercase;
+}
+
+/* INTERACTIVITÉ SUR LE BADGE DE STATUT */
+.status-badge {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+  transform: scale(1.08);
+  filter: brightness(1.2);
+}
+
+.status-badge.owned {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+}
+
+.status-badge.wishlist {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+.agency-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--dynamic-agency-color);
+  transition: color 0.4s;
+}
+
+/* DASHBOARD STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 800px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 30px;
+}
+
+.stat-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 4rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -2px;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.animate-fade {
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}

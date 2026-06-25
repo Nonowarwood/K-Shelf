@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Shelf Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700&family=Syne:wght=700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="apple-aurora">
+        <div class="aurora-blob blob-agency"></div>
+        <div class="aurora-blob blob-ambient"></div>
+    </div>
+
+    <div class="app-fullscreen">
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header" onclick="showDashboard()">
+                <h1>k-shelf.</h1>
+                <p>ma collection virtuelle</p>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="album-search" placeholder="rechercher un album, un artiste..." oninput="handleSearch()"/>
+            </div>
+
+            <nav class="agency-list" id="sidebar-nav">
+                </nav>
+
+            <div class="mini-player">
+                <div class="player-body">
+                    <div class="player-icon-wrapper">🎵</div>
+                    <div class="player-track-info">
+                        <span class="track-status">Lecteur Hors-Ligne</span>
+                        <span class="track-title" id="player-title">Aucun morceau sélectionné</span>
+                    </div>
+                </div>
+                <div class="player-progress">
+                    <div class="progress-bar"></div>
+                </div>
+                <div class="player-controls">
+                    <button class="player-btn">⏮</button>
+                    <button class="player-btn play">▶</button>
+                    <button class="player-btn">⏭</button>
+                </div>
+                <button id="spotify-connect-btn" class="spotify-btn" onclick="loginSpotify()">
+                    connexion spotify
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content glass-panel" id="main-content">
+            </main>
+    </div>
+<audio id="local-audio-player"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
