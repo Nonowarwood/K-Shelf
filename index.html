@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K-Shelf Collection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- AURORA BACKGROUND -->
+  <div class="apple-aurora">
+    <div class="aurora-blob blob-agency"></div>
+    <div class="aurora-blob blob-ambient"></div>
+  </div>
+
+  <!-- APP SHELL -->
+  <div class="app-fullscreen">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar glass-panel">
+      <div class="sidebar-header" onclick="showDashboard()">
+        <h1>k-shelf.</h1>
+        <p>ma collection virtuelle</p>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="album-search" placeholder="rechercher un album, un artiste..." oninput="handleSearch()"/>
+      </div>
+
+      <nav class="agency-list" id="sidebar-nav"></nav>
+
+      <!-- MINI PLAYER -->
+      <div class="mini-player">
+        <div class="player-body">
+          <div class="player-icon-wrapper">
+            <img id="player-cover" src="" alt="Cover" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:8px;">
+            <span id="player-emoji">🎵</span>
+          </div>
+          <div class="player-track-info">
+            <span class="track-status" id="track-status">Lecteur Hors-Ligne</span>
+            <span class="track-title" id="player-title">Aucun morceau sélectionné</span>
+          </div>
+        </div>
+        <div class="player-progress">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="player-controls">
+          <button class="player-btn" id="btn-prev">⏮</button>
+          <button class="player-btn play" id="btn-play">▶</button>
+          <button class="player-btn" id="btn-next">⏭</button>
+        </div>
+        <button id="spotify-connect-btn" class="spotify-btn" onclick="loginSpotify()">
+          connexion spotify
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content glass-panel" id="main-content"></main>
+
+  </div>
+
+  <!-- MODAL AJOUT ALBUM -->
+  <div id="add-modal-overlay" class="add-modal-overlay" onclick="closeAddModal(event)">
+    <div class="add-modal glass-panel">
+      <button class="modal-close" onclick="closeAddModal()">✕</button>
+      <h2 class="add-modal-title">Ajouter un album</h2>
+
+      <div class="add-form">
+        <div class="add-form-group">
+          <label>Titre de l'album *</label>
+          <input type="text" id="add-title" placeholder="NewJeans - How Sweet (Minji ver.)">
+        </div>
+        <div class="add-form-row">
+          <div class="add-form-group">
+            <label>Artiste *</label>
+            <input type="text" id="add-artist" placeholder="NewJeans">
+          </div>
+          <div class="add-form-group">
+            <label>Agency *</label>
+            <select id="add-agency">
+              <option value="HYBE">HYBE</option>
+              <option value="SM Entertainment">SM Entertainment</option>
+              <option value="JYP Entertainment">JYP Entertainment</option>
+              <option value="YG Entertainment">YG Entertainment</option>
+              <option value="The Black Label">The Black Label</option>
+              <option value="Autres / Indés">Autres / Indés</option>
+            </select>
+          </div>
+        </div>
+        <div class="add-form-group">
+          <label>URL de la cover</label>
+          <input type="text" id="add-img" placeholder="https://...">
+        </div>
+        <div class="add-form-group">
+          <label>Statut</label>
+          <div class="add-status-toggle">
+            <button class="status-toggle-btn active" id="toggle-owned" onclick="setAddStatus('owned')">● Possédé</button>
+            <button class="status-toggle-btn" id="toggle-wishlist" onclick="setAddStatus('wishlist')">○ Wishlist</button>
+          </div>
+        </div>
+        <div id="add-preview" class="add-preview" style="display:none">
+          <img id="add-preview-img" src="" alt="preview">
+        </div>
+        <div id="add-error" class="add-error" style="display:none"></div>
+        <button class="add-submit-btn" onclick="submitAddAlbum()">Ajouter à ma collection</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL FICHE ALBUM (injecté dynamiquement) -->
+
+  <audio id="local-audio-player"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
