@@ -1165,3 +1165,264 @@ body {
   letter-spacing: 0.5px;
   color: var(--dynamic-agency-color);
 }
+
+/* ==========================================
+   BINDER PHOTOCARDS
+   ========================================== */
+
+.binder-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+
+.binder-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.binder-filter-btn {
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  color: #808799;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.binder-filter-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.binder-filter-btn.active {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.25);
+  color: #fff;
+}
+
+.binder-page-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.binder-nav-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.binder-nav-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1);
+}
+
+.binder-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.binder-page-label {
+  font-size: 0.8rem;
+  color: #808799;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Page du binder */
+.binder-page {
+  background: rgba(255,255,255,0.015);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 28px;
+  max-width: 680px;
+}
+
+.binder-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* Slot vide */
+.binder-slot.empty {
+  aspect-ratio: 55 / 85;
+  border: 2px dashed rgba(255,255,255,0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.01);
+}
+
+.binder-slot.empty:hover {
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.04);
+}
+
+.binder-slot-add {
+  font-size: 1.5rem;
+  color: rgba(255,255,255,0.2);
+  transition: color 0.2s;
+}
+
+.binder-slot.empty:hover .binder-slot-add {
+  color: rgba(255,255,255,0.5);
+}
+
+/* Slot rempli */
+.binder-slot.filled {
+  aspect-ratio: 55 / 85;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background: #141923;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+
+.binder-slot.filled:hover {
+  transform: translateY(-4px) scale(1.02);
+  z-index: 2;
+}
+
+.binder-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.binder-card-empty-img {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1f2e, #0d1117);
+  font-size: 2rem;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  color: rgba(255,255,255,0.15);
+}
+
+/* Infos et actions sur la card */
+.binder-card-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 8px 8px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.binder-slot.filled:hover .binder-card-info {
+  opacity: 1;
+}
+
+.binder-card-member {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.binder-card-artist {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--dynamic-agency-color);
+}
+
+.binder-card-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.binder-slot.filled:hover .binder-card-actions {
+  opacity: 1;
+}
+
+.binder-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+}
+
+.binder-status-dot.owned   { background: #34d399; }
+.binder-status-dot.wishlist { background: #f59e0b; }
+
+.binder-remove-btn {
+  background: rgba(0,0,0,0.6);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.binder-remove-btn:hover {
+  background: rgba(248,113,113,0.8);
+  color: #fff;
+}
+
+/* Input file photocard */
+.pc-file-input {
+  padding: 8px 0;
+  background: none;
+  border: none;
+  color: #808799;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.pc-img-preview {
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
