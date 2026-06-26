@@ -402,10 +402,11 @@ body {
   padding-top: 100%;
   border-radius: 16px;
   overflow: hidden;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
+  background: #141923;
+  /* pas de border — c'est elle qui crée les bandes blanches */
   box-shadow: 0 12px 40px rgba(0,0,0,0.3);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  isolation: isolate;
 }
 
 .album-card:hover .album-media-wrapper {
@@ -414,19 +415,20 @@ body {
 
 .album-artwork {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  display: block;
+  border-radius: 0;
+  vertical-align: bottom;
+  line-height: 0;
 }
 
 .album-artwork-placeholder {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -896,23 +898,7 @@ body {
   pointer-events: none;
 }
 
-/* Fix lignes blanches sur les covers */
-.album-media-wrapper {
-  overflow: hidden;
-  background: #141923;
-  image-rendering: auto;
-}
-
-.album-artwork {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 0;
-  vertical-align: bottom;
-  line-height: 0;
-}
+/* covers : règles consolidées plus haut */
 
 /* ==========================================
    MODAL AJOUT ALBUM
