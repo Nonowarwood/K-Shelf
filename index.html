@@ -112,6 +112,48 @@
 
   <!-- MODAL FICHE ALBUM (injecté dynamiquement) -->
 
+  <!-- MODAL AJOUT PHOTOCARD -->
+  <div id="add-photocard-modal" class="add-modal-overlay" onclick="if(event.target===this)closeAddPhotocard()">
+    <div class="add-modal glass-panel">
+      <button class="modal-close" onclick="closeAddPhotocard()">✕</button>
+      <h2 class="add-modal-title">Ajouter une photocard</h2>
+      <div class="add-form">
+        <div class="add-form-row">
+          <div class="add-form-group">
+            <label>Artiste *</label>
+            <input type="text" id="pc-artist" placeholder="NewJeans">
+          </div>
+          <div class="add-form-group">
+            <label>Membre</label>
+            <input type="text" id="pc-member" placeholder="Minji">
+          </div>
+        </div>
+        <div class="add-form-group">
+          <label>Album d'origine</label>
+          <input type="text" id="pc-album" placeholder="How Sweet">
+        </div>
+        <div class="add-form-group">
+          <label>Image — upload</label>
+          <input type="file" id="pc-img-file" accept="image/*" class="pc-file-input">
+        </div>
+        <div class="add-form-group">
+          <label>ou URL de l'image</label>
+          <input type="text" id="pc-img-url" placeholder="https://...">
+        </div>
+        <img id="pc-img-preview" src="" alt="preview" class="pc-img-preview" style="display:none">
+        <div class="add-form-group">
+          <label>Statut</label>
+          <div class="add-status-toggle">
+            <button class="status-toggle-btn active" id="pc-toggle-owned" onclick="setPcStatus('owned')">● Possédée</button>
+            <button class="status-toggle-btn" id="pc-toggle-wishlist" onclick="setPcStatus('wishlist')">○ Wishlist</button>
+          </div>
+        </div>
+        <div id="pc-error" class="add-error" style="display:none"></div>
+        <button class="add-submit-btn" onclick="submitAddPhotocard()">Ajouter au binder</button>
+      </div>
+    </div>
+  </div>
+
   <audio id="local-audio-player"></audio>
   <script src="script.js"></script>
 </body>
