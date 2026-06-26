@@ -195,15 +195,15 @@ function renderAlbumGrid(agency, artist, albums) {
       : "";
 
     cardsHtml += `
-            <div class="album-card">
+            <div class="album-card" onclick="openAlbumModal('${album.title.replace(/'/g, "\\'")}', '${artist.replace(/'/g, "\\'")}', '${agency.replace(/'/g, "\\'")}', '${(album.img||"").replace(/'/g, "\\'")}', '${album.status}')">
                 <div class="album-media-wrapper">${mediaContent}</div>
                 <div class="album-meta-header">
                     <h4 class="album-title-text">${album.title}</h4>
-                    <span class="status-badge ${album.status}" onclick="toggleAlbumStatus('${safeAgency}', '${safeArtist}', '${safeTitle}')">${statusLabel}</span>
+                    <span class="status-badge ${album.status}" onclick="event.stopPropagation(); toggleAlbumStatus('${safeAgency}', '${safeArtist}', '${safeTitle}')">${statusLabel}</span>
                 </div>
                 <div class="album-card-footer">
                   <span class="agency-tag">${agency}</span>
-                  ${spotifyBtn}
+                  ${spotifyBtn ? `<span onclick="event.stopPropagation()">${spotifyBtn}</span>` : ""}
                 </div>
             </div>
         `;
@@ -263,15 +263,15 @@ function handleSearch() {
       : "";
 
     cardsHtml += `
-            <div class="album-card">
+            <div class="album-card" onclick="openAlbumModal('${album.title.replace(/'/g, "\\'")}', '${album.artist.replace(/'/g, "\\'")}', '${album.agency.replace(/'/g, "\\'")}', '${(album.img||"").replace(/'/g, "\\'")}', '${album.status}')">
                 <div class="album-media-wrapper">${mediaContent}</div>
                 <div class="album-meta-header">
                     <h4 class="album-title-text">${album.title}</h4>
-                    <span class="status-badge ${album.status}" onclick="toggleAlbumStatus('${safeAgency}', '${safeArtist}', '${safeTitle}')">${statusLabel}</span>
+                    <span class="status-badge ${album.status}" onclick="event.stopPropagation(); toggleAlbumStatus('${safeAgency}', '${safeArtist}', '${safeTitle}')">${statusLabel}</span>
                 </div>
                 <div class="album-card-footer">
                   <span class="agency-tag">${album.artist}</span>
-                  ${spotifyBtnSearch}
+                  ${spotifyBtnSearch ? `<span onclick="event.stopPropagation()">${spotifyBtnSearch}</span>` : ""}
                 </div>
             </div>
         `;
@@ -698,3 +698,179 @@ showDashboard();
 window.showDashboard = showDashboard;
 window.selectArtist = selectArtist;
 window.handleSearch = handleSearch;
+
+// ==========================================
+// MODAL FICHE ALBUM
+// ==========================================
+
+function msToMinSec(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const min = Math.floor(totalSec / 60);
+  const sec = totalSec % 60;
+  return `${min}:${sec.toString().padStart(2, "0")}`;
+}
+
+function totalDuration(tracks) {
+  const totalMs = tracks.reduce((acc, t) => acc + (t.duration_ms || 0), 0);
+  const totalMin = Math.floor(totalMs / 60000);
+  return `${totalMin} min`;
+}
+
+async function fetchSpotifyAlbumData(artistName, albumTitle) {
+  if (!spotifyAccessToken) return null;
+
+  const cleanTitle = albumTitle
+    .replace(/\s*\(.*?\)\s*/g, "")
+    .replace(/\s*\[.*?\]\s*/g, "")
+    .replace(new RegExp(`^${artistName}\\s*[-–]\\s*`, "i"), "")
+    .trim();
+
+  const queries = [
+    `album:"${cleanTitle}" artist:"${artistName}"`,
+    `album:${cleanTitle} artist:${artistName}`,
+    `${cleanTitle} ${artistName}`,
+    `${cleanTitle}`,
+  ];
+
+  let albumData = null;
+  for (const q of queries) {
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&type=album&limit=1`,
+        { headers: { Authorization: `Bearer ${spotifyAccessToken}` } }
+      );
+      const data = await res.json();
+      const found = data.albums?.items?.[0];
+      if (found) { albumData = found; break; }
+    } catch(e) {}
+  }
+
+  if (!albumData) return null;
+
+  // Fetch tracks
+  try {
+    const tracksRes = await fetch(
+      `https://api.spotify.com/v1/albums/${albumData.id}/tracks?limit=50`,
+      { headers: { Authorization: `Bearer ${spotifyAccessToken}` } }
+    );
+    const tracksData = await tracksRes.json();
+    albumData.trackList = tracksData.items || [];
+  } catch(e) { albumData.trackList = []; }
+
+  // Fetch artist bio (popularity + genres)
+  try {
+    const artistId = albumData.artists?.[0]?.id;
+    if (artistId) {
+      const artistRes = await fetch(
+        `https://api.spotify.com/v1/artists/${artistId}`,
+        { headers: { Authorization: `Bearer ${spotifyAccessToken}` } }
+      );
+      albumData.artistData = await artistRes.json();
+    }
+  } catch(e) {}
+
+  return albumData;
+}
+
+async function openAlbumModal(title, artist, agency, img, status) {
+  // Créer le modal
+  const overlay = document.createElement("div");
+  overlay.id = "album-modal-overlay";
+  overlay.innerHTML = `
+    <div class="album-modal" id="album-modal">
+      <button class="modal-close" onclick="closeAlbumModal()">✕</button>
+      <div class="modal-loading">
+        <div class="modal-spinner"></div>
+        <span>Chargement de la fiche…</span>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add("visible"), 10);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeAlbumModal(); });
+
+  // Fetch les données Spotify
+  const spotifyData = await fetchSpotifyAlbumData(artist, title);
+
+  const coverUrl = spotifyData?.images?.[0]?.url || img || "";
+  const releaseDate = spotifyData?.release_date || "—";
+  const releaseYear = releaseDate.split("-")[0];
+  const totalTracks = spotifyData?.total_tracks || spotifyData?.trackList?.length || "—";
+  const label = spotifyData?.label || agency;
+  const duration = spotifyData?.trackList?.length ? totalDuration(spotifyData.trackList) : "—";
+  const spotifyUrl = spotifyData?.external_urls?.spotify || "";
+  const genres = spotifyData?.artistData?.genres?.slice(0, 3).join(", ") || "";
+  const popularity = spotifyData?.artistData?.popularity;
+  const statusLabel = status === "owned" ? "● possédé" : "○ wishlist";
+  const statusClass = status === "owned" ? "owned" : "wishlist";
+
+  const tracklistHtml = spotifyData?.trackList?.length
+    ? spotifyData.trackList.map((t, i) => `
+        <div class="modal-track">
+          <span class="modal-track-num">${i + 1}</span>
+          <span class="modal-track-name">${t.name}</span>
+          <span class="modal-track-dur">${msToMinSec(t.duration_ms)}</span>
+        </div>
+      `).join("")
+    : `<p class="modal-no-spotify">Connecte-toi à Spotify pour voir la tracklist</p>`;
+
+  const cleanTitle = title
+    .replace(/\s*\(.*?\)\s*/g, "")
+    .replace(/\s*\[.*?\]\s*/g, "")
+    .replace(new RegExp(`^${artist}\\s*[-–]\\s*`, "i"), "")
+    .trim();
+
+  document.getElementById("album-modal").innerHTML = `
+    <button class="modal-close" onclick="closeAlbumModal()">✕</button>
+    <div class="modal-inner">
+      <div class="modal-left">
+        <div class="modal-cover-wrapper">
+          ${coverUrl ? `<img src="${coverUrl}" class="modal-cover" alt="${title}">` : `<div class="modal-cover-placeholder">💿</div>`}
+        </div>
+        <div class="modal-meta-block">
+          <span class="status-badge ${statusClass}">${statusLabel}</span>
+          ${spotifyUrl ? `<a class="modal-spotify-link" href="${spotifyUrl}" target="_blank">Ouvrir sur Spotify ↗</a>` : ""}
+          ${spotifyData ? `<button class="modal-play-btn" onclick="playAlbumOnSpotify('${artist.replace(/'/g,"\\'")}', '${title.replace(/'/g,"\\'")}')">▶ Écouter</button>` : ""}
+        </div>
+      </div>
+      <div class="modal-right">
+        <div class="modal-header">
+          <p class="modal-agency">${agency}</p>
+          <h2 class="modal-title">${cleanTitle}</h2>
+          <p class="modal-artist">${artist}</p>
+        </div>
+        <div class="modal-stats">
+          <div class="modal-stat">
+            <span class="modal-stat-value">${releaseYear}</span>
+            <span class="modal-stat-label">Sortie</span>
+          </div>
+          <div class="modal-stat">
+            <span class="modal-stat-value">${totalTracks}</span>
+            <span class="modal-stat-label">Titres</span>
+          </div>
+          <div class="modal-stat">
+            <span class="modal-stat-value">${duration}</span>
+            <span class="modal-stat-label">Durée</span>
+          </div>
+          ${popularity != null ? `<div class="modal-stat"><span class="modal-stat-value">${popularity}<span style="font-size:1rem">/100</span></span><span class="modal-stat-label">Popularité</span></div>` : ""}
+        </div>
+        ${label ? `<p class="modal-label-line">Label · ${label}</p>` : ""}
+        ${genres ? `<p class="modal-genres">${genres}</p>` : ""}
+        <div class="modal-tracklist">
+          <h3 class="modal-section-title">Tracklist</h3>
+          <div class="modal-tracks-container">${tracklistHtml}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function closeAlbumModal() {
+  const overlay = document.getElementById("album-modal-overlay");
+  if (!overlay) return;
+  overlay.classList.remove("visible");
+  setTimeout(() => overlay.remove(), 300);
+}
+
+window.openAlbumModal = openAlbumModal;
+window.closeAlbumModal = closeAlbumModal;
