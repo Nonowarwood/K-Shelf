@@ -10,7 +10,6 @@ const agencyThemes = {
   "Autres / Indés": "#34d399",
 };
 
-// 💾 Ta base de données complète avec l'option "mp3" pour chaque premier album !
 const defaultCollectionData = {
   HYBE: {
     NewJeans: [
@@ -83,7 +82,9 @@ function saveCollection() {
 }
 
 function toggleAlbumStatus(agency, artist, albumTitle) {
-  const albums = collectionData[agency][artist];
+  const albums = collectionData[agency]?.[artist];
+  if (!albums) return;
+  
   const album = albums.find((a) => a.title === albumTitle);
   if (album) {
     album.status = album.status === "owned" ? "wishlist" : "owned";
@@ -104,7 +105,9 @@ function initSidebar() {
             <div class="artist-list">
     `;
     for (const artist in collectionData[agency]) {
-      html += `<div class="artist-item" data-artist="${artist}" onclick="selectArtist('${agency}', '${artist}')">${artist}</div>`;
+      const safeArtist = encodeURIComponent(artist);
+      const safeAgency = encodeURIComponent(agency);
+      html += `<div class="artist-item" data-artist="${artist}" onclick="selectArtist('${safeAgency}', '${safeArtist}')">${artist}</div>`;
     }
     html += `</div></div>`;
   }
@@ -140,7 +143,10 @@ function showDashboard() {
     `;
 }
 
-function selectArtist(agency, artist) {
+function selectArtist(encodedAgency, encodedArtist) {
+  const agency = decodeURIComponent(encodedAgency);
+  const artist = decodeURIComponent(encodedArtist);
+
   document.querySelectorAll(".artist-item").forEach((el) => el.classList.remove("active"));
   const activeItem = document.querySelector(`[data-artist="${artist}"]`);
   if (activeItem) activeItem.classList.add("active");
@@ -155,9 +161,16 @@ function selectArtist(agency, artist) {
     currentTrackIndex = 0;
     loadTrack(currentTrackIndex);
   } else {
-    playerTitle.innerText = "Aucun MP3 associé à cet artiste";
-    trackStatus.innerText = "Lecteur Hors-Ligne";
+    currentPlaylist = [];
+    audioPlayer.pause();
     audioPlayer.src = "";
+    playerTitle.innerText = "Aucun morceau sélectionné";
+    trackStatus.innerText = "Lecteur Hors-Ligne";
+    progressBar.style.width = "0%";
+    playBtn.innerText = "▶";
+    
+    document.getElementById("player-cover").style.display = "none";
+    document.getElementById("player-emoji").style.display = "inline";
   }
 
   renderAlbumGrid(agency, artist, albums);
@@ -173,12 +186,16 @@ function renderAlbumGrid(agency, artist, albums) {
       : `<div class="album-artwork-placeholder">💿</div>`;
     const statusLabel = album.status === "owned" ? "● possédé" : "○ wishlist";
 
+    const safeTitle = encodeURIComponent(album.title);
+    const safeArtist = encodeURIComponent(artist);
+    const safeAgency = encodeURIComponent(agency);
+
     cardsHtml += `
             <div class="album-card">
                 <div class="album-media-wrapper">${mediaContent}</div>
                 <div class="album-meta-header">
                     <h4 class="album-title-text">${album.title}</h4>
-                    <span class="status-badge ${album.status}" onclick="toggleAlbumStatus('${agency}', '${artist}', '${album.title.replace(/'/g, "\\'")}')">${statusLabel}</span>
+                    <span class="status-badge ${album.status}" onclick="toggleAlbumStatus('${safeAgency}', '${safeArtist}', '${safeTitle}')">${statusLabel}</span>
                 </div>
                 <span class="agency-tag">${agency}</span>
             </div>
@@ -196,6 +213,14 @@ function renderAlbumGrid(agency, artist, albums) {
         </div>
     `;
 }
+
+window.toggleAlbumStatus = function(encodedAgency, encodedArtist, encodedTitle) {
+  toggleAlbumStatus(
+    decodeURIComponent(encodedAgency),
+    decodeURIComponent(encodedArtist),
+    decodeURIComponent(encodedTitle)
+  );
+};
 
 function handleSearch() {
   const query = document.getElementById("album-search").value.toLowerCase().trim();
@@ -222,12 +247,16 @@ function handleSearch() {
     const mediaContent = album.img ? `<img src="${album.img}" alt="${album.title}" class="album-artwork" loading="lazy">` : `<div class="album-artwork-placeholder">💿</div>`;
     const statusLabel = album.status === "owned" ? "● possédé" : "○ wishlist";
 
+    const safeTitle = encodeURIComponent(album.title);
+    const safeArtist = encodeURIComponent(album.artist);
+    const safeAgency = encodeURIComponent(album.agency);
+
     cardsHtml += `
             <div class="album-card">
                 <div class="album-media-wrapper">${mediaContent}</div>
                 <div class="album-meta-header">
                     <h4 class="album-title-text">${album.title}</h4>
-                    <span class="status-badge ${album.status}" onclick="toggleAlbumStatus('${album.agency}', '${album.artist}', '${album.title.replace(/'/g, "\\'")}')">${statusLabel}</span>
+                    <span class="status-badge ${album.status}" onclick="toggleAlbumStatus('${safeAgency}', '${safeArtist}', '${safeTitle}')">${statusLabel}</span>
                 </div>
                 <span class="agency-tag">${album.artist}</span>
             </div>
@@ -252,8 +281,27 @@ function handleSearch() {
 function loadTrack(index) {
   if (currentPlaylist.length === 0) return;
   const track = currentPlaylist[index];
+  
   audioPlayer.src = track.mp3;
-  playerTitle.innerText = track.title;
+  
+  let songTitle = track.title;
+  if (track.title.includes(" - ")) {
+    songTitle = track.title.split(" - ")[1];
+  }
+  playerTitle.innerText = songTitle;
+  
+  const playerCover = document.getElementById("player-cover");
+  const playerEmoji = document.getElementById("player-emoji");
+  
+  if (track.img) {
+    playerCover.src = track.img;
+    playerCover.style.display = "block";
+    if (playerEmoji) playerEmoji.style.display = "none";
+  } else {
+    playerCover.style.display = "none";
+    if (playerEmoji) playerEmoji.style.display = "inline";
+  }
+  
   trackStatus.innerText = "Prêt à écouter 🎧";
   progressBar.style.width = "0%";
   playBtn.innerText = "▶";
@@ -317,4 +365,3 @@ showDashboard();
 window.showDashboard = showDashboard;
 window.selectArtist = selectArtist;
 window.handleSearch = handleSearch;
-window.toggleAlbumStatus = toggleAlbumStatus;
