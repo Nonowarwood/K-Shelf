@@ -567,7 +567,7 @@ function startNowPlayingPolling() {
   nowPlayingInterval = setInterval(fetchNowPlaying, 5000);
 }
 
-async function spotifyControl(endpoint, method="POST") {
+async function spotifyControl(endpoint, method="PUT") {
   if (!spotifyAccessToken) return false;
   try {
     const r = await fetch(`https://api.spotify.com/v1/me/player/${endpoint}`, { method, headers:{ Authorization:`Bearer ${spotifyAccessToken}` } });
@@ -585,11 +585,11 @@ async function spotifyTogglePlay() {
 }
 async function spotifyNext() {
   if (!spotifyAccessToken) { nextTrack(); return; }
-  if (await spotifyControl("next")) setTimeout(fetchNowPlaying, 300);
+  if (await spotifyControl("next", "POST")) setTimeout(fetchNowPlaying, 300);
 }
 async function spotifyPrev() {
   if (!spotifyAccessToken) { prevTrack(); return; }
-  if (await spotifyControl("previous")) setTimeout(fetchNowPlaying, 300);
+  if (await spotifyControl("previous", "POST")) setTimeout(fetchNowPlaying, 300);
 }
 
 async function searchSpotifyAlbum(q) {
