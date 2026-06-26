@@ -558,6 +558,16 @@ async function searchSpotifyAlbum(q) {
   return (await r.json()).albums?.items?.[0] || null;
 }
 
+async function getActiveDevice() {
+  try {
+    const r = await fetch("https://api.spotify.com/v1/me/player/devices", {
+      headers: { Authorization: `Bearer ${spotifyAccessToken}` }
+    });
+    const data = await r.json();
+    return data.devices?.find(d => d.is_active) || data.devices?.[0] || null;
+  } catch(e) { return null; }
+}
+
 async function playAlbumOnSpotify(artistName, albumTitle) {
   if (!spotifyAccessToken) { alert("Connecte-toi à Spotify d'abord !"); return; }
   const clean = albumTitle.replace(/\s*\(.*?\)\s*/g,"").replace(/\s*\[.*?\]\s*/g,"").replace(new RegExp(`^${artistName}\\s*[-–]\\s*`,"i"),"").trim();
@@ -565,10 +575,21 @@ async function playAlbumOnSpotify(artistName, albumTitle) {
   let album = null;
   for (const q of queries) { try { album = await searchSpotifyAlbum(q); if (album) break; } catch(e){} }
   if (!album) { alert(`Album introuvable sur Spotify : "${clean}"`); return; }
+
+  // Vérifier qu'un appareil est actif
+  const device = await getActiveDevice();
+  if (!device) {
+    // Aucun appareil — ouvrir l'album directement sur Spotify Web
+    window.open(album.external_urls?.spotify || `https://open.spotify.com/search/${encodeURIComponent(clean)}`, "_blank");
+    return;
+  }
+
   try {
+    const body = { context_uri: album.uri };
+    if (!device.is_active) body.device_id = device.id;
     await fetch("https://api.spotify.com/v1/me/player/play", {
       method:"PUT", headers:{ Authorization:`Bearer ${spotifyAccessToken}`, "Content-Type":"application/json" },
-      body: JSON.stringify({ context_uri: album.uri })
+      body: JSON.stringify(body)
     });
     setTimeout(fetchNowPlaying, 800);
   } catch(e) { console.error(e); }
