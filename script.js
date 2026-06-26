@@ -196,23 +196,26 @@ function albumCardHtml(album, artist, agency) {
   const media = album.img
     ? `<img src="${album.img}" alt="${album.title}" class="album-artwork" loading="lazy">`
     : `<div class="album-artwork-placeholder">💿</div>`;
-  const safeT = album.title.replace(/'/g, "\\'");
-  const safeA = artist.replace(/'/g, "\\'");
   const spotifyOverlay = spotifyAccessToken
-    ? `<div class="card-spotify-overlay" onclick="event.stopPropagation(); playAlbumOnSpotify('${safeA}','${safeT}')">
+    ? `<div class="card-spotify-overlay">
         <span>▶ Spotify</span>
        </div>`
     : "";
 
   return `
-    <div class="album-card" onclick="openAlbumModal('${safeT}','${safeA}','${agency.replace(/'/g,"\\'")}','${(album.img||"").replace(/'/g,"\\'")}','${album.status}')">
+    <div class="album-card"
+      data-title="${safeTitle}"
+      data-artist="${safeArtist}"
+      data-agency="${safeAgency}"
+      data-img="${encodeURIComponent(album.img||'')}"
+      data-status="${album.status}">
       <div class="album-media-wrapper">
         ${media}
         ${spotifyOverlay}
       </div>
       <div class="album-meta-header">
         <h4 class="album-title-text">${album.title}</h4>
-        <span class="status-badge ${album.status}" onclick="event.stopPropagation(); toggleAlbumStatus('${safeAgency}','${safeArtist}','${safeTitle}')">${statusLabel}</span>
+        <span class="status-badge ${album.status}" data-toggle="status">${statusLabel}</span>
       </div>
       <span class="agency-tag">${agency}</span>
     </div>`;
@@ -264,6 +267,39 @@ function handleSearch() {
 // ==========================================
 // TOGGLE STATUS
 // ==========================================
+// Délégation d'événements pour les album-cards (évite les bugs de quotes inline)
+document.getElementById("main-content").addEventListener("click", function(e) {
+  const card = e.target.closest(".album-card");
+  if (!card) return;
+
+  // Clic sur le badge statut
+  if (e.target.closest("[data-toggle='status']")) {
+    e.stopPropagation();
+    const agency = decodeURIComponent(card.dataset.agency);
+    const artist = decodeURIComponent(card.dataset.artist);
+    const title  = decodeURIComponent(card.dataset.title);
+    toggleAlbumStatus(card.dataset.agency, card.dataset.artist, card.dataset.title);
+    return;
+  }
+
+  // Clic sur l'overlay Spotify
+  if (e.target.closest(".card-spotify-overlay")) {
+    e.stopPropagation();
+    const artist = decodeURIComponent(card.dataset.artist);
+    const title  = decodeURIComponent(card.dataset.title);
+    playAlbumOnSpotify(artist, title);
+    return;
+  }
+
+  // Clic sur la card → ouvrir la fiche
+  const title  = decodeURIComponent(card.dataset.title);
+  const artist = decodeURIComponent(card.dataset.artist);
+  const agency = decodeURIComponent(card.dataset.agency);
+  const img    = decodeURIComponent(card.dataset.img || "");
+  const status = card.dataset.status;
+  openAlbumModal(title, artist, agency, img, status);
+});
+
 window.toggleAlbumStatus = function(encodedAgency, encodedArtist, encodedTitle) {
   const agency = decodeURIComponent(encodedAgency);
   const artist = decodeURIComponent(encodedArtist);
@@ -511,6 +547,7 @@ async function fetchNowPlaying() {
     const track = data.item;
     if (!track) return;
     const isPlaying = data.is_playing;
+    _spotifyIsPlaying = isPlaying;
     playerTitle.innerText = track.name;
     trackStatus.innerText = isPlaying ? `▶ ${track.artists.map(a=>a.name).join(", ")}` : `⏸ ${track.artists.map(a=>a.name).join(", ")}`;
     const cover = track.album?.images?.[0]?.url;
@@ -539,9 +576,11 @@ async function spotifyControl(endpoint, method="POST") {
   } catch(e) { return false; }
 }
 
+let _spotifyIsPlaying = false; // état réel maintenu par fetchNowPlaying
+
 async function spotifyTogglePlay() {
   if (!spotifyAccessToken) { togglePlay(); return; }
-  const ok = await spotifyControl(playBtn.innerText === "⏸" ? "pause" : "play");
+  const ok = await spotifyControl(_spotifyIsPlaying ? "pause" : "play");
   if (ok) setTimeout(fetchNowPlaying, 300);
 }
 async function spotifyNext() {
