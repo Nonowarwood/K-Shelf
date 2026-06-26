@@ -1426,3 +1426,123 @@ body {
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.08);
 }
+
+/* ==========================================
+   TILT 3D + AURA RAINBOW PHOTOCARDS
+   ========================================== */
+
+/* Perspective sur le slot pour le tilt 3D */
+.binder-slot.filled {
+  perspective: 600px;
+  transform-style: preserve-3d;
+  overflow: visible; /* pour que l'aura déborde */
+}
+
+/* Wrapper tiltable */
+.binder-card-tilt {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease-out;
+  position: relative;
+}
+
+/* Sheen holographique sur les favoris */
+.holographic-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  transition: background 0.05s;
+  z-index: 2;
+}
+
+/* Aura rainbow autour des cartes favorites */
+.rainbow-aura {
+  position: absolute;
+  inset: -8px;
+  border-radius: 16px;
+  z-index: -1;
+  background: conic-gradient(
+    from 0deg,
+    #ff0080, #ff8c00, #ffe000,
+    #00e676, #00b0ff, #b040ff,
+    #ff0080
+  );
+  opacity: 0.75;
+  animation: rainbowSpin 3s linear infinite;
+  filter: blur(6px);
+}
+
+@keyframes rainbowSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Intensifier l'aura au hover */
+.binder-slot.filled.is-favorite:hover .rainbow-aura {
+  opacity: 1;
+  filter: blur(8px);
+  inset: -10px;
+}
+
+/* Bouton favori ★ */
+.binder-fav-btn {
+  background: rgba(0,0,0,0.6);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.binder-fav-btn:hover,
+.binder-fav-btn.active {
+  color: #ffd700;
+  background: rgba(0,0,0,0.75);
+  transform: scale(1.15);
+}
+
+/* Assurer que l'overflow visible ne casse pas le binder-slot empty */
+.binder-slot.empty {
+  overflow: hidden;
+}
+
+/* Le slot filled doit avoir overflow visible pour l'aura mais le tilt doit clipper l'image */
+.binder-slot.filled {
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+}
+
+.binder-slot.filled .binder-card-tilt {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.binder-slot.filled.is-favorite .binder-card-tilt {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+
+/* Info et actions positionnées sur le tilt */
+.binder-card-info,
+.binder-card-actions {
+  position: absolute;
+  z-index: 3;
+}
+
+/* Toggle favori dans le modal */
+.status-toggle-btn:has(+ .status-toggle-btn),
+#pc-toggle-favorite.active {
+  background: rgba(255, 215, 0, 0.12);
+  border-color: rgba(255, 215, 0, 0.35);
+  color: #ffd700;
+}
