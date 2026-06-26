@@ -67,6 +67,17 @@ const defaultCollectionData = {
   },
 };
 
+// Photocards data (sauvegardé en localStorage)
+let photocardsData = JSON.parse(localStorage.getItem("kshelf_photocards")) || [
+  { id: "pc1", artist: "NewJeans", member: "Minji", album: "How Sweet", img: "", status: "owned", page: 0, slot: 0 },
+  { id: "pc2", artist: "NewJeans", member: "Hanni", album: "How Sweet", img: "", status: "owned", page: 0, slot: 1 },
+  { id: "pc3", artist: "LE Sserafim", member: "Kazuha", album: "SPAGHETTI", img: "", status: "wishlist", page: 0, slot: 2 },
+];
+
+function savePhotocards() {
+  localStorage.setItem("kshelf_photocards", JSON.stringify(photocardsData));
+}
+
 // Lightsticks data
 const lightsticksData = [
   { name: "NewJeans Powerpuff Lightstick", img: "https://media.asiaworldmusic.fr/84302-large_default/newjeans-powerpuff-girls-x-nj-official-light-stick.jpg", artist: "NewJeans" },
@@ -116,6 +127,7 @@ function initSidebar() {
   html += `<div class="agency-section">
     <div class="artist-list">
       <div class="artist-item lightstick-nav" onclick="showLightsticks()">✦ lightsticks</div>
+      <div class="artist-item lightstick-nav" onclick="showBinder()">✦ photocards</div>
     </div>
   </div>`;
   // Bouton ajout
@@ -448,6 +460,212 @@ function submitAddAlbum() {
   document.getElementById("add-modal-overlay").classList.remove("visible");
   selectArtist(encodeURIComponent(agency), encodeURIComponent(artist));
 }
+
+// ==========================================
+// BINDER PHOTOCARDS
+// ==========================================
+const SLOTS_PER_PAGE = 9;
+let binderCurrentPage = 0;
+let binderArtistFilter = "all";
+let pendingSlot = null; // { page, slot } en attente d'ajout
+
+function getBinderArtists() {
+  const artists = [...new Set(photocardsData.map(pc => pc.artist))];
+  return artists;
+}
+
+function getFilteredCards() {
+  if (binderArtistFilter === "all") return photocardsData;
+  return photocardsData.filter(pc => pc.artist === binderArtistFilter);
+}
+
+function getTotalBinderPages() {
+  // Pages basées sur les slots utilisés — au moins 1 page toujours visible
+  const maxPage = photocardsData.reduce((max, pc) => Math.max(max, pc.page), 0);
+  return maxPage + 1;
+}
+
+function showBinder(artistFilter = binderArtistFilter) {
+  binderArtistFilter = artistFilter;
+  document.querySelectorAll(".artist-item").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".lightstick-nav").forEach((el, i) => { if (i === 1) el.classList.add("active"); });
+  document.documentElement.style.setProperty("--dynamic-agency-color", "rgba(255,255,255,0.3)");
+
+  const artists = getBinderArtists();
+  const totalPages = getTotalBinderPages();
+  if (binderCurrentPage >= totalPages) binderCurrentPage = totalPages - 1;
+
+  // Construire les filtres artiste
+  const filterBtns = [
+    `<button class="binder-filter-btn ${binderArtistFilter === 'all' ? 'active' : ''}" onclick="showBinder('all')">Tous</button>`,
+    ...artists.map(a => `<button class="binder-filter-btn ${binderArtistFilter === a ? 'active' : ''}" onclick="showBinder('${a.replace(/'/g,"\'")}')">${a}</button>`)
+  ].join("");
+
+  // Construire la page du binder
+  const slots = Array(SLOTS_PER_PAGE).fill(null);
+  photocardsData.forEach(pc => {
+    if (pc.page === binderCurrentPage) {
+      if (binderArtistFilter === "all" || pc.artist === binderArtistFilter) {
+        if (pc.slot >= 0 && pc.slot < SLOTS_PER_PAGE) slots[pc.slot] = pc;
+      }
+    }
+  });
+
+  const slotsHtml = slots.map((pc, i) => {
+    if (pc) {
+      const imgContent = pc.img
+        ? `<img src="${pc.img}" alt="${pc.member}" class="binder-card-img">`
+        : `<div class="binder-card-empty-img"><span>${pc.member ? pc.member[0] : "?"}</span></div>`;
+      return `
+        <div class="binder-slot filled" data-slot="${i}" data-pcid="${pc.id}">
+          ${imgContent}
+          <div class="binder-card-info">
+            <span class="binder-card-member">${pc.member || "—"}</span>
+            <span class="binder-card-artist">${pc.artist}</span>
+          </div>
+          <div class="binder-card-actions">
+            <span class="binder-status-dot ${pc.status}" title="${pc.status === 'owned' ? 'Possédée' : 'Wishlist'}"></span>
+            <button class="binder-remove-btn" onclick="removePhotocard('${pc.id}')" title="Supprimer">✕</button>
+          </div>
+        </div>`;
+    } else {
+      return `
+        <div class="binder-slot empty" data-slot="${i}" onclick="openAddPhotocard(${binderCurrentPage}, ${i})">
+          <div class="binder-slot-add">+</div>
+        </div>`;
+    }
+  }).join("");
+
+  document.getElementById("main-content").innerHTML = `
+    <div class="artist-view-header animate-fade">
+      <div class="breadcrumbs">collection</div>
+      <h2 class="artist-main-title">photocards.</h2>
+      <p class="album-total-count">${photocardsData.length} photocard(s) · page ${binderCurrentPage + 1}/${totalPages}</p>
+    </div>
+    <div class="binder-toolbar animate-fade">
+      <div class="binder-filters">${filterBtns}</div>
+      <div class="binder-page-nav">
+        <button class="binder-nav-btn" onclick="binderChangePage(-1)" ${binderCurrentPage === 0 ? "disabled" : ""}>‹</button>
+        <span class="binder-page-label">${binderCurrentPage + 1} / ${totalPages}</span>
+        <button class="binder-nav-btn" onclick="binderChangePage(1)">›</button>
+      </div>
+    </div>
+    <div class="binder-page animate-fade">
+      <div class="binder-grid">
+        ${slotsHtml}
+      </div>
+    </div>`;
+}
+
+function binderChangePage(dir) {
+  const totalPages = getTotalBinderPages();
+  const next = binderCurrentPage + dir;
+  if (next < 0) return;
+  // Permettre d'aller sur une nouvelle page vide
+  binderCurrentPage = Math.min(next, totalPages); // +1 = nouvelle page vide
+  showBinder();
+}
+
+function removePhotocard(id) {
+  photocardsData = photocardsData.filter(pc => pc.id !== id);
+  savePhotocards();
+  showBinder();
+}
+
+window.showBinder       = showBinder;
+window.binderChangePage = binderChangePage;
+window.removePhotocard  = removePhotocard;
+
+// ==========================================
+// AJOUT PHOTOCARD
+// ==========================================
+function openAddPhotocard(page, slot) {
+  pendingSlot = { page, slot };
+  const modal = document.getElementById("add-photocard-modal");
+  modal.querySelector("#pc-member").value = "";
+  modal.querySelector("#pc-artist").value = "";
+  modal.querySelector("#pc-album").value = "";
+  modal.querySelector("#pc-img-url").value = "";
+  modal.querySelector("#pc-img-preview").style.display = "none";
+  modal.querySelector("#pc-error").style.display = "none";
+  document.getElementById("pc-toggle-owned").classList.add("active");
+  document.getElementById("pc-toggle-wishlist").classList.remove("active");
+  pcAddStatus = "owned";
+  modal.classList.add("visible");
+}
+
+function closeAddPhotocard() {
+  document.getElementById("add-photocard-modal").classList.remove("visible");
+  pendingSlot = null;
+}
+
+let pcAddStatus = "owned";
+function setPcStatus(s) {
+  pcAddStatus = s;
+  document.getElementById("pc-toggle-owned").classList.toggle("active", s === "owned");
+  document.getElementById("pc-toggle-wishlist").classList.toggle("active", s === "wishlist");
+}
+
+function submitAddPhotocard() {
+  const member = document.getElementById("pc-member").value.trim();
+  const artist = document.getElementById("pc-artist").value.trim();
+  const album  = document.getElementById("pc-album").value.trim();
+  const imgUrl = document.getElementById("pc-img-url").value.trim();
+  const errEl  = document.getElementById("pc-error");
+  const fileInput = document.getElementById("pc-img-file");
+
+  if (!artist) {
+    errEl.textContent = "L'artiste est obligatoire.";
+    errEl.style.display = "block"; return;
+  }
+
+  const id = "pc_" + Date.now();
+  const { page, slot } = pendingSlot;
+
+  const doAdd = (imgSrc) => {
+    photocardsData.push({ id, artist, member, album, img: imgSrc, status: pcAddStatus, page, slot });
+    savePhotocards();
+    closeAddPhotocard();
+    showBinder();
+  };
+
+  // Upload fichier local → base64
+  if (fileInput.files && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => doAdd(e.target.result);
+    reader.readAsDataURL(fileInput.files[0]);
+  } else {
+    doAdd(imgUrl);
+  }
+}
+
+window.openAddPhotocard  = openAddPhotocard;
+window.closeAddPhotocard = closeAddPhotocard;
+window.setPcStatus       = setPcStatus;
+window.submitAddPhotocard = submitAddPhotocard;
+
+// Preview image URL
+document.addEventListener("input", function(e) {
+  if (e.target && e.target.id === "pc-img-url") {
+    const url = e.target.value.trim();
+    const preview = document.getElementById("pc-img-preview");
+    if (preview) { preview.src = url; preview.style.display = url ? "block" : "none"; }
+  }
+});
+
+// Preview fichier upload
+document.addEventListener("change", function(e) {
+  if (e.target && e.target.id === "pc-img-file") {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const preview = document.getElementById("pc-img-preview");
+      if (preview) { preview.src = ev.target.result; preview.style.display = "block"; }
+    };
+    reader.readAsDataURL(file);
+  }
+});
 
 window.openAddModal   = openAddModal;
 window.closeAddModal  = closeAddModal;
