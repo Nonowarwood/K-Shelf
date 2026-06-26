@@ -604,34 +604,57 @@ async function spotifyPrev() {
 // ==========================================
 // LIER UN ALBUM A SPOTIFY (recherche + lecture)
 // ==========================================
+async function searchSpotifyAlbum(query) {
+  const res = await fetch(
+    `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=album&limit=1`,
+    { headers: { Authorization: `Bearer ${spotifyAccessToken}` } }
+  );
+  const data = await res.json();
+  return data.albums?.items?.[0] || null;
+}
+
 async function playAlbumOnSpotify(artistName, albumTitle) {
   if (!spotifyAccessToken) {
     alert("Connecte-toi à Spotify d'abord !");
     return;
   }
 
-  // Extraire le vrai titre de l'album (avant la parenthèse de version)
+  // Nettoyer le titre : enlever les versions entre parenthèses/crochets
   const cleanTitle = albumTitle
-    .replace(/\s*\(.*?\)\s*/g, "")  // enlève (Moon ver.) etc.
-    .replace(/\s*\[.*?\]\s*/g, "")  // enlève [EUROPE] etc.
+    .replace(/\s*\(.*?\)\s*/g, "")
+    .replace(/\s*\[.*?\]\s*/g, "")
     .trim();
 
-  const query = encodeURIComponent(`album:${cleanTitle} artist:${artistName}`);
+  // Nettoyer l'artiste : enlever les préfixes redondants du type "NEWJEANS - "
+  // ex: "NEWJEANS - GET UP" → cleanTitle = "GET UP", artistName = "NewJeans"
+  const titleWithoutArtist = cleanTitle
+    .replace(new RegExp(`^${artistName}\\s*[-–]\\s*`, "i"), "")
+    .trim();
+
+  // Fallback en cascade : du plus strict au plus large
+  const queries = [
+    `album:"${titleWithoutArtist}" artist:"${artistName}"`,   // 1. strict avec guillemets
+    `album:${titleWithoutArtist} artist:${artistName}`,        // 2. strict sans guillemets
+    `${titleWithoutArtist} ${artistName}`,                     // 3. recherche libre
+    `${titleWithoutArtist}`,                                   // 4. titre seul
+  ];
+
+  let album = null;
+  for (const query of queries) {
+    try {
+      album = await searchSpotifyAlbum(query);
+      if (album) break;
+    } catch (err) {
+      console.error("Search error:", err);
+    }
+  }
+
+  if (!album) {
+    alert(`Album introuvable sur Spotify : "${titleWithoutArtist}" — essaie de le chercher directement dans Spotify.`);
+    return;
+  }
 
   try {
-    const res = await fetch(
-      `https://api.spotify.com/v1/search?q=${query}&type=album&limit=1`,
-      { headers: { Authorization: `Bearer ${spotifyAccessToken}` } }
-    );
-    const data = await res.json();
-    const album = data.albums?.items?.[0];
-
-    if (!album) {
-      alert(`Album introuvable sur Spotify : "${cleanTitle}"`);
-      return;
-    }
-
-    // Lancer la lecture de l'album
     await fetch("https://api.spotify.com/v1/me/player/play", {
       method: "PUT",
       headers: {
@@ -640,10 +663,9 @@ async function playAlbumOnSpotify(artistName, albumTitle) {
       },
       body: JSON.stringify({ context_uri: album.uri }),
     });
-
     setTimeout(fetchNowPlaying, 800);
   } catch (err) {
-    console.error("Spotify album search error:", err);
+    console.error("Spotify play error:", err);
   }
 }
 
