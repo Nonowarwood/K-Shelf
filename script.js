@@ -71,7 +71,7 @@ const defaultCollectionData = {
 let photocardsData = JSON.parse(localStorage.getItem("kshelf_photocards")) || [
   { id: "pc1", artist: "NewJeans", member: "Minji", album: "How Sweet", img: "", status: "owned", page: 0, slot: 0 },
   { id: "pc2", artist: "NewJeans", member: "Hanni", album: "How Sweet", img: "", status: "owned", page: 0, slot: 1 },
-  { id: "pc3", artist: "LE Sserafim", member: "Kazuha", album: "SPAGHETTI", img: "", status: "wishlist", page: 0, slot: 2 },
+  { id: "pc3", artist: "LE Sserafim", member: "Kazuha", album: "SPAGHETTI", img: "", status: "favorite", page: 0, slot: 2 },
 ];
 
 function savePhotocards() {
@@ -516,15 +516,20 @@ function showBinder(artistFilter = binderArtistFilter) {
       const imgContent = pc.img
         ? `<img src="${pc.img}" alt="${pc.member}" class="binder-card-img">`
         : `<div class="binder-card-empty-img"><span>${pc.member ? pc.member[0] : "?"}</span></div>`;
+      const isFav = pc.status === "favorite";
       return `
-        <div class="binder-slot filled" data-slot="${i}" data-pcid="${pc.id}">
-          ${imgContent}
+        <div class="binder-slot filled ${isFav ? 'is-favorite' : ''}" data-slot="${i}" data-pcid="${pc.id}">
+          ${isFav ? '<div class="rainbow-aura"></div>' : ''}
+          <div class="binder-card-tilt">
+            ${imgContent}
+            ${isFav ? '<div class="holographic-sheen"></div>' : ''}
+          </div>
           <div class="binder-card-info">
             <span class="binder-card-member">${pc.member || "—"}</span>
             <span class="binder-card-artist">${pc.artist}</span>
           </div>
           <div class="binder-card-actions">
-            <span class="binder-status-dot ${pc.status}" title="${pc.status === 'owned' ? 'Possédée' : 'Wishlist'}"></span>
+            <button class="binder-fav-btn ${isFav ? 'active' : ''}" onclick="togglePcFavorite('${pc.id}')" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}">★</button>
             <button class="binder-remove-btn" onclick="removePhotocard('${pc.id}')" title="Supprimer">✕</button>
           </div>
         </div>`;
@@ -555,6 +560,7 @@ function showBinder(artistFilter = binderArtistFilter) {
         ${slotsHtml}
       </div>
     </div>`;
+  setTimeout(initTilt, 50);
 }
 
 function binderChangePage(dir) {
@@ -572,7 +578,35 @@ function removePhotocard(id) {
   showBinder();
 }
 
+function initTilt() {
+  document.querySelectorAll(".binder-slot.filled").forEach(card => {
+    card.addEventListener("mousemove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / (rect.width / 2);
+      const dy = (e.clientY - cy) / (rect.height / 2);
+      const rotX = -dy * 18;
+      const rotY = dx * 18;
+      const tilt = card.querySelector(".binder-card-tilt");
+      if (tilt) tilt.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.04,1.04,1.04)`;
+      // Déplacer le sheen holographique
+      const sheen = card.querySelector(".holographic-sheen");
+      if (sheen) {
+        const px = ((e.clientX - rect.left) / rect.width) * 100;
+        const py = ((e.clientY - rect.top) / rect.height) * 100;
+        sheen.style.background = `radial-gradient(circle at ${px}% ${py}%, rgba(255,255,255,0.35) 0%, transparent 60%)`;
+      }
+    });
+    card.addEventListener("mouseleave", () => {
+      const tilt = card.querySelector(".binder-card-tilt");
+      if (tilt) tilt.style.transform = "rotateX(0) rotateY(0) scale3d(1,1,1)";
+    });
+  });
+}
+
 window.showBinder       = showBinder;
+window.initTilt         = initTilt;
 window.binderChangePage = binderChangePage;
 window.removePhotocard  = removePhotocard;
 
@@ -589,7 +623,7 @@ function openAddPhotocard(page, slot) {
   modal.querySelector("#pc-img-preview").style.display = "none";
   modal.querySelector("#pc-error").style.display = "none";
   document.getElementById("pc-toggle-owned").classList.add("active");
-  document.getElementById("pc-toggle-wishlist").classList.remove("active");
+  document.getElementById("pc-toggle-favorite").classList.remove("active");
   pcAddStatus = "owned";
   modal.classList.add("visible");
 }
@@ -603,7 +637,7 @@ let pcAddStatus = "owned";
 function setPcStatus(s) {
   pcAddStatus = s;
   document.getElementById("pc-toggle-owned").classList.toggle("active", s === "owned");
-  document.getElementById("pc-toggle-wishlist").classList.toggle("active", s === "wishlist");
+  document.getElementById("pc-toggle-favorite").classList.toggle("active", s === "favorite");
 }
 
 function submitAddPhotocard() {
@@ -638,6 +672,15 @@ function submitAddPhotocard() {
     doAdd(imgUrl);
   }
 }
+
+function togglePcFavorite(id) {
+  const pc = photocardsData.find(p => p.id === id);
+  if (!pc) return;
+  pc.status = pc.status === "favorite" ? "owned" : "favorite";
+  savePhotocards();
+  showBinder();
+}
+window.togglePcFavorite = togglePcFavorite;
 
 window.openAddPhotocard  = openAddPhotocard;
 window.closeAddPhotocard = closeAddPhotocard;
