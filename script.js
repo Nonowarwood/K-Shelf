@@ -80,9 +80,7 @@ function savePhotocards() {
 
 // Lightsticks data
 const lightsticksData = [
-  { name: "NewJeans Powerpuff Lightstick", img: "https://media.asiaworldmusic.fr/84302-large_default/newjeans-powerpuff-girls-x-nj-official-light-stick.jpg", artist: "NewJeans" },
-  { name: "LE SSERAFIM Lightstick", img: "https://media.asiaworldmusic.fr/75594-large_default/le-sserafim-official-light-stick.jpg", artist: "LE Sserafim" },
-  { name: "TWICE Candy Bong Z2", img: "https://media.asiaworldmusic.fr/79072-large_default/twice-official-light-stick-candy-bong-z2.jpg", artist: "TWICE" },
+  { name: "TWICE Candy Bong Z2", img: "https://thfvnext.bing.com/th/id/OIP.tQWyLkSzpFbsYi-I4MZz_wHaHa?w=174&h=180&c=7&r=0&o=7&cb=thfvnextfalcon3&pid=1.7&rm=3", artist: "TWICE" },
 ];
 
 let collectionData = JSON.parse(localStorage.getItem("kshelf_save")) || defaultCollectionData;
