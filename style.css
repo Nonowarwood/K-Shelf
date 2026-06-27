@@ -1330,23 +1330,7 @@ body {
   aspect-ratio: 55 / 85;
 }
 
-/* Aura rainbow — favoris uniquement */
-.rainbow-aura {
-  position: absolute;
-  inset: -7px;
-  border-radius: 15px;
-  z-index: 0;
-  background: conic-gradient(
-    from 0deg,
-    #ff006680, #ff8c0080, #ffe00080,
-    #00e67680, #00b0ff80, #b040ff80,
-    #ff006680
-  );
-  animation: rainbowSpin 4s linear infinite;
-  filter: blur(6px);
-  pointer-events: none;
-}
-@keyframes rainbowSpin { to { transform: rotate(360deg); } }
+/* aura par groupe → voir section AURA COLORÉE en bas */
 
 /* ---- SLOT VIDE ---- */
 .binder-slot.empty {
@@ -1527,4 +1511,194 @@ body {
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ==========================================
+   TOPBAR PROFIL
+   ========================================== */
+
+.topbar {
+  position: fixed;
+  top: 16px;
+  right: 24px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: rgba(13,17,23,0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  color: #fff;
+  font-family: inherit;
+}
+
+.profile-btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.14);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.profile-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-name-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ---- MODAL PROFIL ---- */
+.profile-modal {
+  max-width: 400px;
+}
+
+.profile-modal-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.profile-modal-icon {
+  font-size: 2.5rem;
+  margin-bottom: 4px;
+}
+
+.profile-modal-sub {
+  font-size: 0.85rem;
+  color: #808799;
+}
+
+.google-signin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  background: #fff;
+  border: none;
+  border-radius: 10px;
+  color: #1a1a1a;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.google-signin-btn:hover {
+  background: rgba(255,255,255,0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.profile-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.profile-avatar-large:hover { border-color: rgba(255,255,255,0.3); }
+
+.profile-avatar-upload-label {
+  font-size: 0.72rem;
+  color: #808799;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.profile-avatar-upload-label:hover { color: #fff; }
+
+.signout-btn {
+  width: 100%;
+  padding: 11px;
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.15);
+  border-radius: 10px;
+  color: #f87171;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.signout-btn:hover {
+  background: rgba(248,113,113,0.15);
+  border-color: rgba(248,113,113,0.3);
+}
+
+/* ==========================================
+   AURA COLORÉE PAR GROUPE (favoris)
+   ========================================== */
+
+.group-aura {
+  position: absolute;
+  inset: -8px;
+  border-radius: 16px;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse at center,
+    var(--aura-color) 0%,
+    transparent 70%
+  );
+  opacity: 0.55;
+  filter: blur(10px);
+  pointer-events: none;
+  animation: auraPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes auraPulse {
+  from { opacity: 0.45; transform: scale(0.97); }
+  to   { opacity: 0.7;  transform: scale(1.03); }
+}
+
+.binder-slot-wrapper.is-favorite:hover .group-aura {
+  opacity: 0.85;
+  filter: blur(12px);
 }
