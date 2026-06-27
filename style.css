@@ -1166,150 +1166,197 @@ body {
   color: var(--dynamic-agency-color);
 }
 
+
 /* ==========================================
-   BINDER PHOTOCARDS
+   BINDER PHOTOCARDS — REFONTE
    ========================================== */
 
 .binder-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .binder-filters {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .binder-filter-btn {
-  padding: 6px 14px;
+  padding: 5px 14px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 20px;
   color: #808799;
   font-family: inherit;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
-
-.binder-filter-btn:hover {
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-}
-
-.binder-filter-btn.active {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.25);
-  color: #fff;
-}
+.binder-filter-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.binder-filter-btn.active { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); color: #fff; }
 
 .binder-page-nav {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
+  gap: 10px;
 }
 
 .binder-nav-btn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 8px;
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
 }
-
-.binder-nav-btn:hover:not(:disabled) {
-  background: rgba(255,255,255,0.1);
-}
-
-.binder-nav-btn:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
+.binder-nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
+.binder-nav-btn:disabled { opacity: 0.25; cursor: default; }
 
 .binder-page-label {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #808799;
   font-weight: 600;
-  min-width: 40px;
+  min-width: 44px;
   text-align: center;
 }
 
-/* Page du binder */
-.binder-page {
-  background: rgba(255,255,255,0.015);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 20px;
-  padding: 28px;
-  max-width: 680px;
+.binder-add-page-btn {
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px dashed rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #808799;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.binder-add-page-btn:hover { background: rgba(255,255,255,0.09); color: #fff; border-color: rgba(255,255,255,0.3); }
+
+/* ---- BINDER BOOK (spirale + page crème) ---- */
+.binder-book {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  max-width: 720px;
+  border-radius: 4px 20px 20px 4px;
+  box-shadow:
+    0 2px 0 rgba(0,0,0,0.4),
+    0 30px 60px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  overflow: visible;
+}
+
+/* Spirale gauche */
+.binder-spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  width: 36px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+  border-radius: 6px 0 0 6px;
+  padding: 24px 0;
+  gap: 0;
+  box-shadow: inset -3px 0 8px rgba(0,0,0,0.4);
+}
+
+.binder-ring {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 4px solid #444;
+  background: linear-gradient(135deg, #555 0%, #222 50%, #555 100%);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.6),
+    inset 0 1px 2px rgba(255,255,255,0.1);
+  position: relative;
+}
+.binder-ring::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a1a1a, #333);
+}
+
+/* Page crème translucide */
+.binder-page-sheet {
+  flex: 1;
+  background: linear-gradient(135deg, #f5f0e8 0%, #ede8dc 40%, #f0ebe0 100%);
+  border-radius: 0 18px 18px 0;
+  padding: 32px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Texture subtile sur la page */
+.binder-page-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 19px,
+      rgba(180,160,130,0.12) 19px,
+      rgba(180,160,130,0.12) 20px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 19px,
+      rgba(180,160,130,0.08) 19px,
+      rgba(180,160,130,0.08) 20px
+    );
+  pointer-events: none;
+}
+
+/* Ombre de page à gauche */
+.binder-page-sheet::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 18px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(0,0,0,0.08), transparent);
+  pointer-events: none;
 }
 
 .binder-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+  position: relative;
+  z-index: 1;
 }
 
-/* Slot vide */
-.binder-slot.empty {
-  aspect-ratio: 55 / 85;
-  border: 2px dashed rgba(255,255,255,0.1);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: rgba(255,255,255,0.01);
-  overflow: hidden;
-}
-
-.binder-slot.empty:hover {
-  border-color: rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.04);
-}
-
-.binder-slot-add {
-  font-size: 1.5rem;
-  color: rgba(255,255,255,0.2);
-  transition: color 0.2s;
-}
-
-.binder-slot.empty:hover .binder-slot-add {
-  color: rgba(255,255,255,0.5);
-}
-
-/* Slot rempli */
-/* styles binder-slot.filled → voir section TILT 3D plus bas */
-
-
-/* ==========================================
-   TILT 3D + AURA RAINBOW PHOTOCARDS
-   ========================================== */
-
-/* Wrapper externe : contient l'aura + le slot, pas de overflow clip */
+/* ---- WRAPPER SLOT (gère l'aura sans clip) ---- */
 .binder-slot-wrapper {
   position: relative;
   aspect-ratio: 55 / 85;
 }
 
-/* Aura rainbow — positionnée sur le wrapper, pas sur la carte */
+/* Aura rainbow — autour du wrapper */
 .rainbow-aura {
   position: absolute;
-  inset: -10px;
-  border-radius: 18px;
+  inset: -8px;
+  border-radius: 16px;
   z-index: 0;
   background: conic-gradient(
     from 0deg,
@@ -1317,36 +1364,49 @@ body {
     #00e676, #00b0ff, #b040ff,
     #ff0080
   );
-  opacity: 0.8;
+  opacity: 0.85;
   animation: rainbowSpin 3s linear infinite;
-  filter: blur(8px);
+  filter: blur(7px);
   pointer-events: none;
 }
+@keyframes rainbowSpin { to { transform: rotate(360deg); } }
+.binder-slot-wrapper.is-favorite:hover .rainbow-aura { opacity: 1; filter: blur(9px); }
 
-@keyframes rainbowSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+/* ---- SLOT VIDE ---- */
+.binder-slot.empty {
+  position: absolute;
+  inset: 0;
+  border: 2px dashed rgba(150,130,100,0.35);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(150,130,100,0.05);
+  z-index: 1;
 }
-
-.binder-slot-wrapper.is-favorite:hover .rainbow-aura {
-  opacity: 1;
-  filter: blur(10px);
-  inset: -12px;
+.binder-slot.empty:hover {
+  border-color: rgba(150,130,100,0.6);
+  background: rgba(150,130,100,0.1);
 }
+.binder-slot-add {
+  font-size: 1.3rem;
+  color: rgba(130,110,80,0.4);
+  transition: color 0.2s;
+}
+.binder-slot.empty:hover .binder-slot-add { color: rgba(130,110,80,0.75); }
 
-/* Le slot filled — perspective pour le tilt, z-index au-dessus de l'aura */
+/* ---- SLOT REMPLI ---- */
 .binder-slot.filled {
   position: absolute;
   inset: 0;
-  border-radius: 10px;
   z-index: 1;
   perspective: 700px;
-  background: transparent;
-  box-shadow: none;
+  border-radius: 10px;
   overflow: visible;
 }
 
-/* Tiltable : contient image + infos + actions */
 .binder-card-tilt {
   width: 100%;
   height: 100%;
@@ -1356,14 +1416,17 @@ body {
   transition: transform 0.1s ease-out;
   position: relative;
   will-change: transform;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.15),
+    0 8px 24px rgba(0,0,0,0.3);
 }
 
 .binder-slot.filled.is-favorite .binder-card-tilt {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.2),
+    0 12px 32px rgba(0,0,0,0.4);
 }
 
-/* Image */
 .binder-card-img {
   width: 100%;
   height: 100%;
@@ -1377,31 +1440,31 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1f2e, #0d1117);
+  background: linear-gradient(135deg, #e8e0d0, #d5cdbf);
   font-size: 2rem;
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  color: rgba(255,255,255,0.15);
+  color: rgba(100,80,60,0.2);
 }
 
-/* Sheen holographique — DANS le tilt, suit le transform */
-.holographic-sheen {
+/* Couche prismatique à facettes */
+.prismatic-layer {
   position: absolute;
   inset: 0;
+  border-radius: 10px;
+  opacity: 0;
   pointer-events: none;
-  mix-blend-mode: overlay;
+  mix-blend-mode: color-dodge;
+  transition: opacity 0.15s;
   z-index: 2;
-  transition: background 0.04s;
 }
 
-/* Infos membre/artiste — dans le tilt, tiltent avec la carte */
+/* Infos membre/artiste */
 .binder-card-info {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 22px 8px 8px;
-  background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 100%);
+  bottom: 0; left: 0; right: 0;
+  padding: 20px 8px 7px;
+  background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%);
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -1409,97 +1472,70 @@ body {
   transition: opacity 0.2s;
   z-index: 3;
 }
-
-.binder-slot.filled:hover .binder-card-info {
-  opacity: 1;
-}
+.binder-slot.filled:hover .binder-card-info { opacity: 1; }
 
 .binder-card-member {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .binder-card-artist {
-  font-size: 0.58rem;
+  font-size: 0.57rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--dynamic-agency-color);
+  color: rgba(255,255,255,0.55);
 }
 
-/* Actions (★ + ✕) — dans le tilt aussi */
+/* Actions */
 .binder-card-actions {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 6px; right: 6px;
   display: flex;
-  align-items: center;
   gap: 4px;
   opacity: 0;
   transition: opacity 0.2s;
   z-index: 4;
 }
+.binder-slot.filled:hover .binder-card-actions { opacity: 1; }
 
-.binder-slot.filled:hover .binder-card-actions {
-  opacity: 1;
-}
-
-/* Bouton favori ★ */
 .binder-fav-btn {
-  background: rgba(0,0,0,0.65);
+  width: 20px; height: 20px;
+  background: rgba(0,0,0,0.6);
   border: none;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  color: rgba(255,255,255,0.5);
-  font-size: 0.65rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s;
-}
-
-.binder-fav-btn:hover,
-.binder-fav-btn.active {
-  color: #ffd700;
-  background: rgba(0,0,0,0.8);
-  transform: scale(1.15);
-}
-
-/* Bouton supprimer ✕ */
-.binder-remove-btn {
-  background: rgba(0,0,0,0.65);
-  border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.45);
   font-size: 0.6rem;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   transition: all 0.15s;
 }
+.binder-fav-btn:hover, .binder-fav-btn.active { color: #ffd700; background: rgba(0,0,0,0.8); transform: scale(1.15); }
 
-.binder-remove-btn:hover {
-  background: rgba(248,113,113,0.85);
-  color: #fff;
+.binder-remove-btn {
+  width: 20px; height: 20px;
+  background: rgba(0,0,0,0.6);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.55rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
 }
+.binder-remove-btn:hover { background: rgba(248,113,113,0.85); color: #fff; }
 
-/* Bouton favori dans le modal ajout */
+/* Favori dans le modal */
 #pc-toggle-favorite.active {
   background: rgba(255,215,0,0.12);
   border-color: rgba(255,215,0,0.35);
   color: #ffd700;
 }
 
-/* Input file photocard */
+/* Inputs modal photocard */
 .pc-file-input {
   padding: 8px 0;
   background: none;
@@ -1512,8 +1548,8 @@ body {
 }
 
 .pc-img-preview {
-  width: 80px;
-  height: 120px;
+  width: 70px;
+  height: 108px;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.08);
