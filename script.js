@@ -530,7 +530,7 @@ function showBinder(artistFilter = binderArtistFilter) {
           <div class="binder-slot filled ${isFav ? 'is-favorite' : ''}" data-slot="${i}" data-pcid="${pc.id}">
             <div class="binder-card-tilt">
               ${imgContent}
-              <div class="prismatic-layer"></div>
+              ${isFav ? '<div class="holo-layer"></div>' : ''}
               <div class="binder-card-info">
                 <span class="binder-card-member">${pc.member || "—"}</span>
                 <span class="binder-card-artist">${pc.artist}</span>
@@ -602,45 +602,65 @@ function removePhotocard(id) {
 function initTilt() {
   document.querySelectorAll(".binder-slot.filled").forEach(card => {
     const tilt = card.querySelector(".binder-card-tilt");
-    const prism = card.querySelector(".prismatic-layer");
+    const holo = card.querySelector(".holo-layer"); // null si pas favori
     if (!tilt) return;
 
     card.addEventListener("mousemove", (e) => {
       const rect = card.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width;
-      const py = (e.clientY - rect.top) / rect.height;
+      const px = (e.clientX - rect.left) / rect.width;   // 0→1
+      const py = (e.clientY - rect.top)  / rect.height;  // 0→1
       const dx = px - 0.5;
       const dy = py - 0.5;
 
-      tilt.style.transform = `rotateX(${-dy * 22}deg) rotateY(${dx * 22}deg) scale3d(1.04,1.04,1.04)`;
+      // Tilt 3D
+      tilt.style.transform =
+        `rotateX(${-dy * 20}deg) rotateY(${dx * 20}deg) scale3d(1.04,1.04,1.04)`;
 
-      if (prism) {
-        const hue = Math.round(px * 360);
-        const hue2 = (hue + 120) % 360;
-        const hue3 = (hue + 240) % 360;
-        const isFav = card.closest(".is-favorite");
-        prism.style.opacity = isFav ? "1" : "0.6";
-        prism.style.background = `
-          linear-gradient(
-            ${Math.round(px * 180)}deg,
-            hsla(${hue},100%,65%,0.55) 0%,
-            hsla(${hue2},100%,65%,0.4) 35%,
-            hsla(${hue3},100%,65%,0.55) 70%,
-            hsla(${hue},100%,65%,0.3) 100%
-          ),
-          repeating-linear-gradient(
-            ${Math.round(py * 90 + 45)}deg,
-            transparent 0px,
-            transparent 3px,
-            rgba(255,255,255,0.08) 3px,
-            rgba(255,255,255,0.08) 4px
-          )`;
+      // Effet holo prismatique — FAVORIS SEULEMENT
+      if (holo) {
+        // Hue pivote selon position X, saturation selon Y
+        const hue    = Math.round(px * 360);
+        const hue60  = (hue + 60)  % 360;
+        const hue180 = (hue + 180) % 360;
+        const hue270 = (hue + 270) % 360;
+        const angle  = Math.round(dx * 30 + py * 60 + 110); // angle dynamique
+
+        // Couche 1 : dégradé arc-en-ciel en mouvement
+        const rainbow = `linear-gradient(
+          ${angle}deg,
+          hsla(${hue},100%,65%,0.0)   0%,
+          hsla(${hue},100%,65%,0.5)  20%,
+          hsla(${hue60},100%,65%,0.4) 35%,
+          hsla(${hue180},100%,65%,0.5) 55%,
+          hsla(${hue270},100%,65%,0.4) 75%,
+          hsla(${hue},100%,65%,0.0)  100%
+        )`;
+
+        // Couche 2 : micro-grille de facettes
+        const facets = `repeating-linear-gradient(
+          ${angle + 45}deg,
+          transparent           0px,
+          transparent           2px,
+          rgba(255,255,255,0.06) 2px,
+          rgba(255,255,255,0.06) 3px
+        )`;
+
+        // Couche 3 : spot lumineux au curseur
+        const spot = `radial-gradient(
+          ellipse 60% 40% at ${Math.round(px*100)}% ${Math.round(py*100)}%,
+          rgba(255,255,255,0.18) 0%,
+          transparent 70%
+        )`;
+
+        holo.style.background = [rainbow, facets, spot].join(", ");
+        holo.style.mixBlendMode = "color-dodge";
+        holo.style.opacity = "1";
       }
     });
 
     card.addEventListener("mouseleave", () => {
       tilt.style.transform = "rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
-      if (prism) prism.style.opacity = "0";
+      if (holo) holo.style.opacity = "0";
     });
   });
 }
