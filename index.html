@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <title>K-Shelf</title>
-  <link rel="icon" type="image/png" href="favicon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>K-Shelf Collection</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💿</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -17,6 +16,17 @@
     <div class="aurora-blob blob-ambient"></div>
   </div>
 
+  <!-- TOPBAR PROFIL -->
+  <div class="topbar" id="topbar">
+    <button class="profile-btn" id="profile-btn" onclick="openProfileModal()">
+      <div class="profile-avatar" id="profile-avatar-btn">
+        <span id="profile-avatar-letter">?</span>
+        <img id="profile-avatar-img" src="" alt="" style="display:none">
+      </div>
+      <span class="profile-name-label" id="profile-name-label">Se connecter</span>
+    </button>
+  </div>
+
   <!-- APP SHELL -->
   <div class="app-fullscreen">
 
@@ -26,14 +36,10 @@
         <h1>k-shelf.</h1>
         <p>ma collection virtuelle</p>
       </div>
-
       <div class="search-box">
         <input type="text" id="album-search" placeholder="rechercher un album, un artiste..." oninput="handleSearch()"/>
       </div>
-
       <nav class="agency-list" id="sidebar-nav"></nav>
-
-      <!-- MINI PLAYER -->
       <div class="mini-player">
         <div class="player-body">
           <div class="player-icon-wrapper">
@@ -53,9 +59,7 @@
           <button class="player-btn play" id="btn-play">▶</button>
           <button class="player-btn" id="btn-next">⏭</button>
         </div>
-        <button id="spotify-connect-btn" class="spotify-btn" onclick="loginSpotify()">
-          connexion spotify
-        </button>
+        <button id="spotify-connect-btn" class="spotify-btn" onclick="loginSpotify()">connexion spotify</button>
       </div>
     </aside>
 
@@ -64,12 +68,61 @@
 
   </div>
 
+  <!-- MODAL PROFIL -->
+  <div id="profile-modal-overlay" class="add-modal-overlay" onclick="if(event.target===this)closeProfileModal()">
+    <div class="add-modal glass-panel profile-modal">
+      <button class="modal-close" onclick="closeProfileModal()">✕</button>
+
+      <!-- État non connecté -->
+      <div id="profile-logged-out">
+        <div class="profile-modal-hero">
+          <div class="profile-modal-icon">👤</div>
+          <h2 class="add-modal-title" style="margin-bottom:8px">Bienvenue sur K-Shelf</h2>
+          <p class="profile-modal-sub">Connecte-toi pour personnaliser ton profil</p>
+        </div>
+        <button class="google-signin-btn" onclick="signInWithGoogle()">
+          <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+          </svg>
+          Continuer avec Google
+        </button>
+      </div>
+
+      <!-- État connecté -->
+      <div id="profile-logged-in" style="display:none">
+        <div class="profile-modal-hero">
+          <div class="profile-avatar-large" id="profile-avatar-large">
+            <span id="profile-large-letter"></span>
+            <img id="profile-large-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
+          </div>
+          <label class="profile-avatar-upload-label" for="profile-photo-input">Changer la photo</label>
+          <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+        </div>
+        <div class="add-form">
+          <div class="add-form-group">
+            <label>Pseudo</label>
+            <input type="text" id="profile-pseudo-input" placeholder="ton pseudo...">
+          </div>
+          <div class="add-form-group">
+            <label>Email Google</label>
+            <input type="text" id="profile-email-display" disabled style="opacity:0.4; cursor:default;">
+          </div>
+          <button class="add-submit-btn" onclick="saveProfile()">Sauvegarder</button>
+          <button class="signout-btn" onclick="signOutUser()">Se déconnecter</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- MODAL AJOUT ALBUM -->
   <div id="add-modal-overlay" class="add-modal-overlay" onclick="closeAddModal(event)">
     <div class="add-modal glass-panel">
       <button class="modal-close" onclick="closeAddModal()">✕</button>
       <h2 class="add-modal-title">Ajouter un album</h2>
-
       <div class="add-form">
         <div class="add-form-group">
           <label>Titre de l'album *</label>
@@ -157,6 +210,9 @@
   </div>
 
   <audio id="local-audio-player"></audio>
+
+  <!-- FIREBASE -->
+  <script type="module" src="firebase.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
