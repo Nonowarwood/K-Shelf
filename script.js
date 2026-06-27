@@ -80,7 +80,9 @@ function savePhotocards() {
 
 // Lightsticks data
 const lightsticksData = [
-  { name: "TWICE Candy Bong Z2", img: "https://thfvnext.bing.com/th/id/OIP.HtDM0-JCyUfFxvlUR6jeoAHaHa?w=180&h=180&c=7&r=0&o=7&cb=thfvnextfalcon3&pid=1.7&rm=3", artist: "TWICE" },
+  { name: "NewJeans Powerpuff Lightstick", img: "https://media.asiaworldmusic.fr/84302-large_default/newjeans-powerpuff-girls-x-nj-official-light-stick.jpg", artist: "NewJeans" },
+  { name: "LE SSERAFIM Lightstick", img: "https://media.asiaworldmusic.fr/75594-large_default/le-sserafim-official-light-stick.jpg", artist: "LE Sserafim" },
+  { name: "TWICE Candy Bong Z2", img: "https://media.asiaworldmusic.fr/79072-large_default/twice-official-light-stick-candy-bong-z2.jpg", artist: "TWICE" },
 ];
 
 let collectionData = JSON.parse(localStorage.getItem("kshelf_save")) || defaultCollectionData;
@@ -477,10 +479,19 @@ function getFilteredCards() {
   return photocardsData.filter(pc => pc.artist === binderArtistFilter);
 }
 
+// Nombre de pages créées manuellement
+let binderTotalPages = parseInt(localStorage.getItem("kshelf_binder_pages") || "1");
+
 function getTotalBinderPages() {
-  // Pages basées sur les slots utilisés — au moins 1 page toujours visible
-  const maxPage = photocardsData.reduce((max, pc) => Math.max(max, pc.page), 0);
-  return maxPage + 1;
+  const maxFromCards = photocardsData.reduce((max, pc) => Math.max(max, pc.page), 0) + 1;
+  return Math.max(binderTotalPages, maxFromCards);
+}
+
+function addNewBinderPage() {
+  binderTotalPages = getTotalBinderPages() + 1;
+  localStorage.setItem("kshelf_binder_pages", binderTotalPages);
+  binderCurrentPage = binderTotalPages - 1;
+  showBinder();
 }
 
 function showBinder(artistFilter = binderArtistFilter) {
@@ -492,27 +503,25 @@ function showBinder(artistFilter = binderArtistFilter) {
   const artists = getBinderArtists();
   const totalPages = getTotalBinderPages();
   if (binderCurrentPage >= totalPages) binderCurrentPage = totalPages - 1;
+  if (binderCurrentPage < 0) binderCurrentPage = 0;
 
-  // Construire les filtres artiste
   const filterBtns = [
     `<button class="binder-filter-btn ${binderArtistFilter === 'all' ? 'active' : ''}" onclick="showBinder('all')">Tous</button>`,
-    ...artists.map(a => `<button class="binder-filter-btn ${binderArtistFilter === a ? 'active' : ''}" onclick="showBinder('${a.replace(/'/g,"\'")}')">${a}</button>`)
+    ...artists.map(a => `<button class="binder-filter-btn ${binderArtistFilter === a ? 'active' : ''}" onclick="showBinder('${a.replace(/'/g, "\'")}')">${a}</button>`)
   ].join("");
 
-  // Construire la page du binder
   const slots = Array(SLOTS_PER_PAGE).fill(null);
   photocardsData.forEach(pc => {
-    if (pc.page === binderCurrentPage) {
-      if (binderArtistFilter === "all" || pc.artist === binderArtistFilter) {
-        if (pc.slot >= 0 && pc.slot < SLOTS_PER_PAGE) slots[pc.slot] = pc;
-      }
+    if (pc.page === binderCurrentPage && pc.slot >= 0 && pc.slot < SLOTS_PER_PAGE) {
+      if (binderArtistFilter === "all" || pc.artist === binderArtistFilter)
+        slots[pc.slot] = pc;
     }
   });
 
   const slotsHtml = slots.map((pc, i) => {
     if (pc) {
       const imgContent = pc.img
-        ? `<img src="${pc.img}" alt="${pc.member}" class="binder-card-img">`
+        ? `<img src="${pc.img}" alt="${pc.member || ''}" class="binder-card-img">`
         : `<div class="binder-card-empty-img"><span>${pc.member ? pc.member[0] : "?"}</span></div>`;
       const isFav = pc.status === "favorite";
       return `
@@ -521,22 +530,24 @@ function showBinder(artistFilter = binderArtistFilter) {
           <div class="binder-slot filled ${isFav ? 'is-favorite' : ''}" data-slot="${i}" data-pcid="${pc.id}">
             <div class="binder-card-tilt">
               ${imgContent}
-              ${isFav ? '<div class="holographic-sheen"></div>' : ''}
+              <div class="prismatic-layer"></div>
               <div class="binder-card-info">
                 <span class="binder-card-member">${pc.member || "—"}</span>
                 <span class="binder-card-artist">${pc.artist}</span>
               </div>
               <div class="binder-card-actions">
-                <button class="binder-fav-btn ${isFav ? 'active' : ''}" onclick="togglePcFavorite('${pc.id}')" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}">★</button>
-                <button class="binder-remove-btn" onclick="removePhotocard('${pc.id}')" title="Supprimer">✕</button>
+                <button class="binder-fav-btn ${isFav ? 'active' : ''}" onclick="togglePcFavorite('${pc.id}')">★</button>
+                <button class="binder-remove-btn" onclick="removePhotocard('${pc.id}')">✕</button>
               </div>
             </div>
           </div>
         </div>`;
     } else {
       return `
-        <div class="binder-slot empty" data-slot="${i}" onclick="openAddPhotocard(${binderCurrentPage}, ${i})">
-          <div class="binder-slot-add">+</div>
+        <div class="binder-slot-wrapper">
+          <div class="binder-slot empty" onclick="openAddPhotocard(${binderCurrentPage}, ${i})">
+            <div class="binder-slot-add">+</div>
+          </div>
         </div>`;
     }
   }).join("");
@@ -545,30 +556,40 @@ function showBinder(artistFilter = binderArtistFilter) {
     <div class="artist-view-header animate-fade">
       <div class="breadcrumbs">collection</div>
       <h2 class="artist-main-title">photocards.</h2>
-      <p class="album-total-count">${photocardsData.length} photocard(s) · page ${binderCurrentPage + 1}/${totalPages}</p>
+      <p class="album-total-count">${photocardsData.length} photocard(s) · ${totalPages} page(s)</p>
     </div>
     <div class="binder-toolbar animate-fade">
       <div class="binder-filters">${filterBtns}</div>
       <div class="binder-page-nav">
         <button class="binder-nav-btn" onclick="binderChangePage(-1)" ${binderCurrentPage === 0 ? "disabled" : ""}>‹</button>
         <span class="binder-page-label">${binderCurrentPage + 1} / ${totalPages}</span>
-        <button class="binder-nav-btn" onclick="binderChangePage(1)">›</button>
+        <button class="binder-nav-btn" onclick="binderChangePage(1)" ${binderCurrentPage >= totalPages - 1 ? "disabled" : ""}>›</button>
+        <button class="binder-add-page-btn" onclick="addNewBinderPage()">+ page</button>
       </div>
     </div>
-    <div class="binder-page animate-fade">
-      <div class="binder-grid">
-        ${slotsHtml}
+    <div class="binder-book animate-fade">
+      <div class="binder-spine">
+        <div class="binder-ring"></div>
+        <div class="binder-ring"></div>
+        <div class="binder-ring"></div>
+        <div class="binder-ring"></div>
+        <div class="binder-ring"></div>
+        <div class="binder-ring"></div>
+      </div>
+      <div class="binder-page-sheet">
+        <div class="binder-grid">
+          ${slotsHtml}
+        </div>
       </div>
     </div>`;
-  setTimeout(initTilt, 50);
+  setTimeout(initTilt, 60);
 }
 
 function binderChangePage(dir) {
   const totalPages = getTotalBinderPages();
   const next = binderCurrentPage + dir;
-  if (next < 0) return;
-  // Permettre d'aller sur une nouvelle page vide
-  binderCurrentPage = Math.min(next, totalPages); // +1 = nouvelle page vide
+  if (next < 0 || next >= totalPages) return;
+  binderCurrentPage = next;
   showBinder();
 }
 
@@ -581,23 +602,45 @@ function removePhotocard(id) {
 function initTilt() {
   document.querySelectorAll(".binder-slot.filled").forEach(card => {
     const tilt = card.querySelector(".binder-card-tilt");
+    const prism = card.querySelector(".prismatic-layer");
     if (!tilt) return;
+
     card.addEventListener("mousemove", (e) => {
       const rect = card.getBoundingClientRect();
-      const dx = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-      const dy = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
-      const rotX = -dy * 15;
-      const rotY = dx * 15;
-      tilt.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.03,1.03,1.03)`;
-      const sheen = tilt.querySelector(".holographic-sheen");
-      if (sheen) {
-        const px = ((e.clientX - rect.left) / rect.width) * 100;
-        const py = ((e.clientY - rect.top) / rect.height) * 100;
-        sheen.style.background = `radial-gradient(circle at ${px}% ${py}%, rgba(255,255,255,0.4) 0%, transparent 55%)`;
+      const px = (e.clientX - rect.left) / rect.width;
+      const py = (e.clientY - rect.top) / rect.height;
+      const dx = px - 0.5;
+      const dy = py - 0.5;
+
+      tilt.style.transform = `rotateX(${-dy * 22}deg) rotateY(${dx * 22}deg) scale3d(1.04,1.04,1.04)`;
+
+      if (prism) {
+        const hue = Math.round(px * 360);
+        const hue2 = (hue + 120) % 360;
+        const hue3 = (hue + 240) % 360;
+        const isFav = card.closest(".is-favorite");
+        prism.style.opacity = isFav ? "1" : "0.6";
+        prism.style.background = `
+          linear-gradient(
+            ${Math.round(px * 180)}deg,
+            hsla(${hue},100%,65%,0.55) 0%,
+            hsla(${hue2},100%,65%,0.4) 35%,
+            hsla(${hue3},100%,65%,0.55) 70%,
+            hsla(${hue},100%,65%,0.3) 100%
+          ),
+          repeating-linear-gradient(
+            ${Math.round(py * 90 + 45)}deg,
+            transparent 0px,
+            transparent 3px,
+            rgba(255,255,255,0.08) 3px,
+            rgba(255,255,255,0.08) 4px
+          )`;
       }
     });
+
     card.addEventListener("mouseleave", () => {
       tilt.style.transform = "rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
+      if (prism) prism.style.opacity = "0";
     });
   });
 }
