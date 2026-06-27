@@ -1167,15 +1167,16 @@ body {
 }
 
 
+
 /* ==========================================
-   BINDER PHOTOCARDS — REFONTE
+   BINDER PHOTOCARDS — APPLE PREMIUM
    ========================================== */
 
 .binder-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -1188,7 +1189,7 @@ body {
 
 .binder-filter-btn {
   padding: 5px 14px;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 20px;
   color: #808799;
@@ -1199,7 +1200,11 @@ body {
   transition: all 0.2s;
 }
 .binder-filter-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
-.binder-filter-btn.active { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); color: #fff; }
+.binder-filter-btn.active {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
+}
 
 .binder-page-nav {
   display: flex;
@@ -1221,8 +1226,8 @@ body {
   justify-content: center;
   transition: all 0.2s;
 }
-.binder-nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
-.binder-nav-btn:disabled { opacity: 0.25; cursor: default; }
+.binder-nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+.binder-nav-btn:disabled { opacity: 0.2; cursor: default; }
 
 .binder-page-label {
   font-size: 0.78rem;
@@ -1234,8 +1239,8 @@ body {
 
 .binder-add-page-btn {
   padding: 5px 12px;
-  background: rgba(255,255,255,0.05);
-  border: 1px dashed rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+  border: 1px dashed rgba(255,255,255,0.12);
   border-radius: 8px;
   color: #808799;
   font-family: inherit;
@@ -1244,167 +1249,137 @@ body {
   cursor: pointer;
   transition: all 0.2s;
 }
-.binder-add-page-btn:hover { background: rgba(255,255,255,0.09); color: #fff; border-color: rgba(255,255,255,0.3); }
+.binder-add-page-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border-color: rgba(255,255,255,0.25);
+}
 
-/* ---- BINDER BOOK (spirale + page crème) ---- */
+/* ---- BOOK LAYOUT ---- */
 .binder-book {
   display: flex;
   align-items: stretch;
-  gap: 0;
-  max-width: 720px;
-  border-radius: 4px 20px 20px 4px;
+  max-width: 700px;
+  border-radius: 6px 20px 20px 6px;
   box-shadow:
-    0 2px 0 rgba(0,0,0,0.4),
-    0 30px 60px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.08);
-  overflow: visible;
+    0 40px 80px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(255,255,255,0.04);
+  overflow: hidden;
 }
 
-/* Spirale gauche */
+/* Spirale minimaliste */
 .binder-spine {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
-  width: 36px;
+  justify-content: space-evenly;
+  width: 28px;
   flex-shrink: 0;
-  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
-  border-radius: 6px 0 0 6px;
-  padding: 24px 0;
-  gap: 0;
-  box-shadow: inset -3px 0 8px rgba(0,0,0,0.4);
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.03) 100%
+  );
+  border-right: 1px solid rgba(255,255,255,0.05);
+  padding: 28px 0;
 }
 
 .binder-ring {
-  width: 26px;
-  height: 26px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  border: 4px solid #444;
-  background: linear-gradient(135deg, #555 0%, #222 50%, #555 100%);
+  border: 2px solid rgba(255,255,255,0.18);
+  background: transparent;
   box-shadow:
-    0 2px 4px rgba(0,0,0,0.6),
-    inset 0 1px 2px rgba(255,255,255,0.1);
-  position: relative;
-}
-.binder-ring::after {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #1a1a1a, #333);
+    0 0 0 1px rgba(0,0,0,0.3),
+    inset 0 1px 2px rgba(255,255,255,0.08);
+  flex-shrink: 0;
 }
 
-/* Page crème translucide */
+/* Page glassmorphism */
 .binder-page-sheet {
   flex: 1;
-  background: linear-gradient(135deg, #f5f0e8 0%, #ede8dc 40%, #f0ebe0 100%);
-  border-radius: 0 18px 18px 0;
-  padding: 32px 28px;
+  background: rgba(10, 13, 20, 0.75);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  padding: 28px 24px;
   position: relative;
-  overflow: hidden;
 }
 
-/* Texture subtile sur la page */
 .binder-page-sheet::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 19px,
-      rgba(180,160,130,0.12) 19px,
-      rgba(180,160,130,0.12) 20px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 19px,
-      rgba(180,160,130,0.08) 19px,
-      rgba(180,160,130,0.08) 20px
-    );
-  pointer-events: none;
-}
-
-/* Ombre de page à gauche */
-.binder-page-sheet::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 18px;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(0,0,0,0.08), transparent);
-  pointer-events: none;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255,255,255,0.08) 30%,
+    rgba(255,255,255,0.08) 70%,
+    transparent
+  );
 }
 
 .binder-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  position: relative;
-  z-index: 1;
+  gap: 14px;
 }
 
-/* ---- WRAPPER SLOT (gère l'aura sans clip) ---- */
+/* ---- WRAPPER (gère aura sans clip) ---- */
 .binder-slot-wrapper {
   position: relative;
   aspect-ratio: 55 / 85;
 }
 
-/* Aura rainbow — autour du wrapper */
+/* Aura rainbow — favoris uniquement */
 .rainbow-aura {
   position: absolute;
-  inset: -8px;
-  border-radius: 16px;
+  inset: -7px;
+  border-radius: 15px;
   z-index: 0;
   background: conic-gradient(
     from 0deg,
-    #ff0080, #ff8c00, #ffe000,
-    #00e676, #00b0ff, #b040ff,
-    #ff0080
+    #ff006680, #ff8c0080, #ffe00080,
+    #00e67680, #00b0ff80, #b040ff80,
+    #ff006680
   );
-  opacity: 0.85;
-  animation: rainbowSpin 3s linear infinite;
-  filter: blur(7px);
+  animation: rainbowSpin 4s linear infinite;
+  filter: blur(6px);
   pointer-events: none;
 }
 @keyframes rainbowSpin { to { transform: rotate(360deg); } }
-.binder-slot-wrapper.is-favorite:hover .rainbow-aura { opacity: 1; filter: blur(9px); }
 
 /* ---- SLOT VIDE ---- */
 .binder-slot.empty {
   position: absolute;
   inset: 0;
-  border: 2px dashed rgba(150,130,100,0.35);
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
-  background: rgba(150,130,100,0.05);
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  background: rgba(255,255,255,0.02);
   z-index: 1;
 }
 .binder-slot.empty:hover {
-  border-color: rgba(150,130,100,0.6);
-  background: rgba(150,130,100,0.1);
+  border-color: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
 }
 .binder-slot-add {
-  font-size: 1.3rem;
-  color: rgba(130,110,80,0.4);
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.15);
   transition: color 0.2s;
 }
-.binder-slot.empty:hover .binder-slot-add { color: rgba(130,110,80,0.75); }
+.binder-slot.empty:hover .binder-slot-add { color: rgba(255,255,255,0.4); }
 
 /* ---- SLOT REMPLI ---- */
 .binder-slot.filled {
   position: absolute;
   inset: 0;
   z-index: 1;
-  perspective: 700px;
+  perspective: 800px;
   border-radius: 10px;
-  overflow: visible;
 }
 
 .binder-card-tilt {
@@ -1413,18 +1388,12 @@ body {
   border-radius: 10px;
   overflow: hidden;
   transform-style: preserve-3d;
-  transition: transform 0.1s ease-out;
+  transition: transform 0.08s linear;
   position: relative;
   will-change: transform;
   box-shadow:
-    0 2px 4px rgba(0,0,0,0.15),
-    0 8px 24px rgba(0,0,0,0.3);
-}
-
-.binder-slot.filled.is-favorite .binder-card-tilt {
-  box-shadow:
-    0 4px 8px rgba(0,0,0,0.2),
-    0 12px 32px rgba(0,0,0,0.4);
+    0 1px 3px rgba(0,0,0,0.3),
+    0 6px 20px rgba(0,0,0,0.4);
 }
 
 .binder-card-img {
@@ -1432,6 +1401,7 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 10px;
 }
 
 .binder-card-empty-img {
@@ -1440,37 +1410,39 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e8e0d0, #d5cdbf);
+  background: linear-gradient(135deg, #1a1f2e, #0d1117);
   font-size: 2rem;
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  color: rgba(100,80,60,0.2);
+  color: rgba(255,255,255,0.1);
+  border-radius: 10px;
 }
 
-/* Couche prismatique à facettes */
-.prismatic-layer {
+/* Couche holo — FAVORIS SEULEMENT, par-dessus l'image */
+.holo-layer {
   position: absolute;
   inset: 0;
   border-radius: 10px;
-  opacity: 0;
   pointer-events: none;
-  mix-blend-mode: color-dodge;
-  transition: opacity 0.15s;
+  opacity: 0;
+  transition: opacity 0.2s;
   z-index: 2;
+  /* Le background est injecté dynamiquement par JS */
 }
 
-/* Infos membre/artiste */
+/* Infos */
 .binder-card-info {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  padding: 20px 8px 7px;
-  background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%);
+  padding: 22px 8px 8px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
   display: flex;
   flex-direction: column;
   gap: 1px;
   opacity: 0;
   transition: opacity 0.2s;
   z-index: 3;
+  border-radius: 0 0 10px 10px;
 }
 .binder-slot.filled:hover .binder-card-info { opacity: 1; }
 
@@ -1487,7 +1459,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.5);
 }
 
 /* Actions */
@@ -1504,38 +1476,40 @@ body {
 
 .binder-fav-btn {
   width: 20px; height: 20px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.55);
   border: none;
   border-radius: 50%;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.35);
   font-size: 0.6rem;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.15s;
+  backdrop-filter: blur(4px);
 }
-.binder-fav-btn:hover, .binder-fav-btn.active { color: #ffd700; background: rgba(0,0,0,0.8); transform: scale(1.15); }
+.binder-fav-btn:hover { color: #ffd700; }
+.binder-fav-btn.active { color: #ffd700; background: rgba(0,0,0,0.7); }
 
 .binder-remove-btn {
   width: 20px; height: 20px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.55);
   border: none;
   border-radius: 50%;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.35);
   font-size: 0.55rem;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.15s;
+  backdrop-filter: blur(4px);
 }
-.binder-remove-btn:hover { background: rgba(248,113,113,0.85); color: #fff; }
+.binder-remove-btn:hover { background: rgba(248,113,113,0.8); color: #fff; }
 
 /* Favori dans le modal */
 #pc-toggle-favorite.active {
-  background: rgba(255,215,0,0.12);
-  border-color: rgba(255,215,0,0.35);
+  background: rgba(255,215,0,0.1);
+  border-color: rgba(255,215,0,0.3);
   color: #ffd700;
 }
 
-/* Inputs modal photocard */
 .pc-file-input {
   padding: 8px 0;
   background: none;
