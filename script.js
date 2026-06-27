@@ -524,9 +524,15 @@ function showBinder(artistFilter = binderArtistFilter) {
         ? `<img src="${pc.img}" alt="${pc.member || ''}" class="binder-card-img">`
         : `<div class="binder-card-empty-img"><span>${pc.member ? pc.member[0] : "?"}</span></div>`;
       const isFav = pc.status === "favorite";
+      // Aura colorée par groupe (agency color)
+      const agencyOfCard = Object.keys(collectionData).find(ag =>
+        collectionData[ag][pc.artist] !== undefined
+      ) || "Autres / Indés";
+      const auraColor = agencyThemes[agencyOfCard] || "#ffffff";
+
       return `
         <div class="binder-slot-wrapper ${isFav ? 'is-favorite' : ''}">
-          ${isFav ? '<div class="rainbow-aura"></div>' : ''}
+          ${isFav ? `<div class="group-aura" style="--aura-color:${auraColor}"></div>` : ''}
           <div class="binder-slot filled ${isFav ? 'is-favorite' : ''}" data-slot="${i}" data-pcid="${pc.id}">
             <div class="binder-card-tilt">
               ${imgContent}
