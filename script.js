@@ -518,19 +518,21 @@ function showBinder(artistFilter = binderArtistFilter) {
         : `<div class="binder-card-empty-img"><span>${pc.member ? pc.member[0] : "?"}</span></div>`;
       const isFav = pc.status === "favorite";
       return `
-        <div class="binder-slot filled ${isFav ? 'is-favorite' : ''}" data-slot="${i}" data-pcid="${pc.id}">
+        <div class="binder-slot-wrapper ${isFav ? 'is-favorite' : ''}">
           ${isFav ? '<div class="rainbow-aura"></div>' : ''}
-          <div class="binder-card-tilt">
-            ${imgContent}
-            ${isFav ? '<div class="holographic-sheen"></div>' : ''}
-          </div>
-          <div class="binder-card-info">
-            <span class="binder-card-member">${pc.member || "—"}</span>
-            <span class="binder-card-artist">${pc.artist}</span>
-          </div>
-          <div class="binder-card-actions">
-            <button class="binder-fav-btn ${isFav ? 'active' : ''}" onclick="togglePcFavorite('${pc.id}')" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}">★</button>
-            <button class="binder-remove-btn" onclick="removePhotocard('${pc.id}')" title="Supprimer">✕</button>
+          <div class="binder-slot filled ${isFav ? 'is-favorite' : ''}" data-slot="${i}" data-pcid="${pc.id}">
+            <div class="binder-card-tilt">
+              ${imgContent}
+              ${isFav ? '<div class="holographic-sheen"></div>' : ''}
+              <div class="binder-card-info">
+                <span class="binder-card-member">${pc.member || "—"}</span>
+                <span class="binder-card-artist">${pc.artist}</span>
+              </div>
+              <div class="binder-card-actions">
+                <button class="binder-fav-btn ${isFav ? 'active' : ''}" onclick="togglePcFavorite('${pc.id}')" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}">★</button>
+                <button class="binder-remove-btn" onclick="removePhotocard('${pc.id}')" title="Supprimer">✕</button>
+              </div>
+            </div>
           </div>
         </div>`;
     } else {
@@ -580,27 +582,24 @@ function removePhotocard(id) {
 
 function initTilt() {
   document.querySelectorAll(".binder-slot.filled").forEach(card => {
+    const tilt = card.querySelector(".binder-card-tilt");
+    if (!tilt) return;
     card.addEventListener("mousemove", (e) => {
       const rect = card.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = (e.clientX - cx) / (rect.width / 2);
-      const dy = (e.clientY - cy) / (rect.height / 2);
-      const rotX = -dy * 18;
-      const rotY = dx * 18;
-      const tilt = card.querySelector(".binder-card-tilt");
-      if (tilt) tilt.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.04,1.04,1.04)`;
-      // Déplacer le sheen holographique
-      const sheen = card.querySelector(".holographic-sheen");
+      const dx = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+      const dy = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+      const rotX = -dy * 15;
+      const rotY = dx * 15;
+      tilt.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.03,1.03,1.03)`;
+      const sheen = tilt.querySelector(".holographic-sheen");
       if (sheen) {
         const px = ((e.clientX - rect.left) / rect.width) * 100;
         const py = ((e.clientY - rect.top) / rect.height) * 100;
-        sheen.style.background = `radial-gradient(circle at ${px}% ${py}%, rgba(255,255,255,0.35) 0%, transparent 60%)`;
+        sheen.style.background = `radial-gradient(circle at ${px}% ${py}%, rgba(255,255,255,0.4) 0%, transparent 55%)`;
       }
     });
     card.addEventListener("mouseleave", () => {
-      const tilt = card.querySelector(".binder-card-tilt");
-      if (tilt) tilt.style.transform = "rotateX(0) rotateY(0) scale3d(1,1,1)";
+      tilt.style.transform = "rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
     });
   });
 }
