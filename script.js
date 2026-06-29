@@ -76,11 +76,14 @@ let photocardsData = JSON.parse(localStorage.getItem("kshelf_photocards")) || [
 
 function savePhotocards() {
   localStorage.setItem("kshelf_photocards", JSON.stringify(photocardsData));
+  if (window.syncToFirestore) window.syncToFirestore();
 }
 
 // Lightsticks data
 const lightsticksData = [
-  { name: "TWICE Candy Bong Z2", img: "https://thfvnext.bing.com/th/id/OIP.tQWyLkSzpFbsYi-I4MZz_wHaHa?w=174&h=180&c=7&r=0&o=7&cb=thfvnextfalcon3&pid=1.7&rm=3", artist: "TWICE" },
+  { name: "NewJeans Powerpuff Lightstick", img: "https://media.asiaworldmusic.fr/84302-large_default/newjeans-powerpuff-girls-x-nj-official-light-stick.jpg", artist: "NewJeans" },
+  { name: "LE SSERAFIM Lightstick", img: "https://media.asiaworldmusic.fr/75594-large_default/le-sserafim-official-light-stick.jpg", artist: "LE Sserafim" },
+  { name: "TWICE Candy Bong Z2", img: "https://media.asiaworldmusic.fr/79072-large_default/twice-official-light-stick-candy-bong-z2.jpg", artist: "TWICE" },
 ];
 
 let collectionData = JSON.parse(localStorage.getItem("kshelf_save")) || defaultCollectionData;
@@ -101,6 +104,7 @@ const playerTitle = document.getElementById("player-title");
 // ==========================================
 function saveCollection() {
   localStorage.setItem("kshelf_save", JSON.stringify(collectionData));
+  if (window.syncToFirestore) window.syncToFirestore();
 }
 
 // ==========================================
@@ -489,6 +493,7 @@ function addNewBinderPage() {
   binderTotalPages = getTotalBinderPages() + 1;
   localStorage.setItem("kshelf_binder_pages", binderTotalPages);
   binderCurrentPage = binderTotalPages - 1;
+  if (window.syncToFirestore) window.syncToFirestore();
   showBinder();
 }
 
@@ -1068,6 +1073,34 @@ function closeAlbumModal() {
 
 window.openAlbumModal  = openAlbumModal;
 window.closeAlbumModal = closeAlbumModal;
+
+// ==========================================
+// EXPOSITION GLOBALE POUR FIREBASE SYNC
+// ==========================================
+// Firebase.js lit/écrit window.collectionData et window.photocardsData
+Object.defineProperty(window, 'collectionData', {
+  get: () => collectionData,
+  set: (v) => { collectionData = v; },
+  configurable: true
+});
+Object.defineProperty(window, 'photocardsData', {
+  get: () => photocardsData,
+  set: (v) => { photocardsData = v; },
+  configurable: true
+});
+Object.defineProperty(window, 'binderTotalPages', {
+  get: () => binderTotalPages,
+  set: (v) => { binderTotalPages = v; },
+  configurable: true
+});
+
+window._loadLocalData = function() {
+  collectionData   = JSON.parse(localStorage.getItem("kshelf_save"))        || defaultCollectionData;
+  photocardsData   = JSON.parse(localStorage.getItem("kshelf_photocards"))  || [];
+  binderTotalPages = parseInt(localStorage.getItem("kshelf_binder_pages")   || "1");
+  if (window.initSidebar)   window.initSidebar();
+  if (window.showDashboard) window.showDashboard();
+};
 
 // ==========================================
 // INIT
