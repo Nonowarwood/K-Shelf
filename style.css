@@ -1513,15 +1513,19 @@ body {
   border: 1px solid rgba(255,255,255,0.08);
 }
 
+
 /* ==========================================
    TOPBAR PROFIL
    ========================================== */
 
 .topbar {
   position: fixed;
-  top: 24px;
+  top: 16px;
   right: 24px;
-  z-index: 100;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .profile-btn {
@@ -1529,73 +1533,70 @@ body {
   align-items: center;
   gap: 10px;
   padding: 6px 14px 6px 6px;
-  background: rgba(13, 17, 23, 0.45);
-  backdrop-filter: blur(20px) saturate(190%);
-  -webkit-backdrop-filter: blur(20px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 30px;
-  color: #ffffff;
-  font-family: inherit;
+  background: rgba(13,17,23,0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 40px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  color: #fff;
+  font-family: inherit;
 }
 
 .profile-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.14);
   transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
 
 .profile-avatar {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #fff;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .profile-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .profile-name-label {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: #a0a6b5;
-  transition: color 0.2s;
+  color: #fff;
+  white-space: nowrap;
 }
 
-.profile-btn:hover .profile-name-label {
-  color: #ffffff;
-}
-
-/* ==========================================
-   MODAL PROFIL & CONNEXION
-   ========================================== */
-
+/* ---- MODAL PROFIL ---- */
 .profile-modal {
-  max-width: 420px !important;
+  max-width: 400px;
 }
 
 .profile-modal-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
   text-align: center;
-  margin-bottom: 24px;
 }
 
 .profile-modal-icon {
-  font-size: 3rem;
-  margin-bottom: 12px;
+  font-size: 2.5rem;
+  margin-bottom: 4px;
 }
 
 .profile-modal-sub {
@@ -1604,64 +1605,62 @@ body {
 }
 
 .google-signin-btn {
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
+  width: 100%;
   padding: 12px;
-  background: #ffffff;
-  color: #000000;
+  background: #fff;
   border: none;
   border-radius: 10px;
+  color: #1a1a1a;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .google-signin-btn:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255,255,255,0.9);
   transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
 .profile-avatar-large {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
-  margin-bottom: 12px;
   overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
 }
+.profile-avatar-large:hover { border-color: rgba(255,255,255,0.3); }
 
 .profile-avatar-upload-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--dynamic-agency-color, #ffffff);
+  font-size: 0.72rem;
+  color: #808799;
   cursor: pointer;
+  transition: color 0.2s;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  transition: opacity 0.2s;
 }
-
-.profile-avatar-upload-label:hover {
-  opacity: 0.8;
-}
+.profile-avatar-upload-label:hover { color: #fff; }
 
 .signout-btn {
   width: 100%;
   padding: 11px;
-  background: rgba(248, 113, 113, 0.08);
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.15);
   border-radius: 10px;
   color: #f87171;
   font-family: inherit;
@@ -1669,31 +1668,38 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  margin-top: 8px;
 }
-
 .signout-btn:hover {
-  background: rgba(248, 113, 113, 0.15);
-  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248,113,113,0.15);
+  border-color: rgba(248,113,113,0.3);
 }
 
 /* ==========================================
-   AURA COLORÉE (FAVORIS)
-   ========================================= */
+   AURA COLORÉE PAR GROUPE (favoris)
+   ========================================== */
 
 .group-aura {
   position: absolute;
-  inset: -15px;
-  background: radial-gradient(circle, var(--aura-color, #ffffff) 0%, transparent 70%);
-  opacity: 0.3;
-  filter: blur(12px);
-  pointer-events: none;
+  inset: -8px;
+  border-radius: 16px;
   z-index: 0;
-  border-radius: 14px;
-  animation: auraPulse 4s infinite alternate ease-in-out;
+  background: radial-gradient(
+    ellipse at center,
+    var(--aura-color) 0%,
+    transparent 70%
+  );
+  opacity: 0.55;
+  filter: blur(10px);
+  pointer-events: none;
+  animation: auraPulse 3s ease-in-out infinite alternate;
 }
 
 @keyframes auraPulse {
-  0% { transform: scale(0.96); opacity: 0.22; }
-  100% { transform: scale(1.04); opacity: 0.35; }
+  from { opacity: 0.45; transform: scale(0.97); }
+  to   { opacity: 0.7;  transform: scale(1.03); }
+}
+
+.binder-slot-wrapper.is-favorite:hover .group-aura {
+  opacity: 0.85;
+  filter: blur(12px);
 }
