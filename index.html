@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="apple-touch-icon" href="Untitled-design.jpeg">
-  <link rel="icon" type="image/png" href="Untitled-design.jpeg">
-  <title>K-Shelf</title>
+  <title>K-Shelf Collection</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💿</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css">
@@ -20,6 +18,11 @@
 
   <!-- TOPBAR PROFIL -->
   <div class="topbar" id="topbar">
+    <button class="topbar-settings-btn" onclick="openSettings()" title="Paramètres">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
     <button class="profile-btn" id="profile-btn" onclick="openProfileModal()">
       <div class="profile-avatar" id="profile-avatar-btn">
         <span id="profile-avatar-letter">?</span>
@@ -211,11 +214,119 @@
     </div>
   </div>
 
+  <!-- MODAL SETTINGS -->
+  <div id="settings-overlay" class="settings-overlay" onclick="if(event.target===this)closeSettings()">
+    <div class="settings-panel glass-panel">
+      <div class="settings-header">
+        <h2 class="settings-title">paramètres</h2>
+        <button class="modal-close" onclick="closeSettings()">✕</button>
+      </div>
+
+      <!-- THÈMES -->
+      <div class="settings-section">
+        <h3 class="settings-section-title">Thème</h3>
+        <div class="theme-cards">
+
+          <div class="theme-card" data-theme="dark" onclick="applyTheme('dark')">
+            <div class="theme-preview theme-preview-dark">
+              <div class="tp-sidebar"></div>
+              <div class="tp-main">
+                <div class="tp-card"></div>
+                <div class="tp-card"></div>
+                <div class="tp-card"></div>
+              </div>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Dark</span>
+              <span class="theme-card-label">Glassmorphism</span>
+            </div>
+            <div class="theme-check">✓</div>
+          </div>
+
+          <div class="theme-card" data-theme="grid" onclick="applyTheme('grid')">
+            <div class="theme-preview theme-preview-grid">
+              <div class="tp-sidebar"></div>
+              <div class="tp-main tp-grid-lines">
+                <div class="tp-card"></div>
+                <div class="tp-card"></div>
+                <div class="tp-card"></div>
+              </div>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Grid</span>
+              <span class="theme-card-label">Editorial</span>
+            </div>
+            <div class="theme-check">✓</div>
+          </div>
+
+          <div class="theme-card" data-theme="editorial" onclick="applyTheme('editorial')">
+            <div class="theme-preview theme-preview-editorial">
+              <div class="tp-sidebar"></div>
+              <div class="tp-main">
+                <div class="tp-card"></div>
+                <div class="tp-card"></div>
+                <div class="tp-card"></div>
+              </div>
+            </div>
+            <div class="theme-card-info">
+              <span class="theme-card-name">Editorial</span>
+              <span class="theme-card-label">Blanc & Noir</span>
+            </div>
+            <div class="theme-check">✓</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LANGUE -->
+      <div class="settings-section">
+        <h3 class="settings-section-title">Langue</h3>
+        <div class="lang-toggle">
+          <button class="lang-btn active" data-lang="fr" onclick="applyLang('fr')">🇫🇷 Français</button>
+          <button class="lang-btn" data-lang="en" onclick="applyLang('en')">🇬🇧 English</button>
+        </div>
+      </div>
+
+      <!-- COULEUR D'ACCENT -->
+      <div class="settings-section">
+        <h3 class="settings-section-title">Couleur d'accent</h3>
+        <div class="accent-row">
+          <div class="accent-presets">
+            <button class="accent-preset" style="background:#ffffff" onclick="applyAccent('#ffffff')" title="Blanc"></button>
+            <button class="accent-preset" style="background:#ff5500" onclick="applyAccent('#ff5500')" title="Orange"></button>
+            <button class="accent-preset" style="background:#0091ea" onclick="applyAccent('#0091ea')" title="Bleu"></button>
+            <button class="accent-preset" style="background:#34d399" onclick="applyAccent('#34d399')" title="Vert"></button>
+            <button class="accent-preset" style="background:#f59e0b" onclick="applyAccent('#f59e0b')" title="Jaune"></button>
+            <button class="accent-preset" style="background:#b040ff" onclick="applyAccent('#b040ff')" title="Violet"></button>
+            <button class="accent-preset" style="background:#ff006680" onclick="applyAccent('#ff0066')" title="Rose"></button>
+          </div>
+          <label class="accent-custom-label">
+            <input type="color" id="accent-picker" value="#ffffff" oninput="applyAccent(this.value)">
+            <span>Personnaliser</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- ANIMATIONS -->
+      <div class="settings-section">
+        <h3 class="settings-section-title">Animations</h3>
+        <label class="toggle-row">
+          <span class="toggle-label">Activer les animations</span>
+          <div class="toggle-switch">
+            <input type="checkbox" id="anim-toggle" checked onchange="applyAnimations(this.checked)">
+            <span class="toggle-knob"></span>
+          </div>
+        </label>
+      </div>
+
+    </div>
+  </div>
+
   <audio id="local-audio-player"></audio>
 
   <!-- FIREBASE -->
+  <script src="themes.js"></script>
   <script type="module" src="firebase.js"></script>
   <script src="script.js"></script>
-
 </body>
 </html>
