@@ -226,16 +226,21 @@ function startRealtimeSync(user) {
 // ==========================================
 window.syncToFirestore = async function() {
   const user = window._currentUser;
-  if (!user) return;
-  await writeToFirestore(user.uid, {
+  if (!user) {
+    showDebugToast("⚠️ Sync ignorée : non connecté", "#f59e0b");
+    return;
+  }
+  const ok = await writeToFirestore(user.uid, {
     collection:  window.collectionData,
     photocards:  window.photocardsData,
     binderPages: window.binderTotalPages || 1,
     concerts:    window.concertsData || [],
   });
+  if (ok) showDebugToast("☁️ Sauvegardé dans le cloud ✓", "#1db954");
 };
 
 // Notifier script.js que syncToFirestore est maintenant disponible
+showDebugToast("🔧 Firebase prêt", "#4fc3f7");
 if (window._onSyncReady) window._onSyncReady();
 
 // ==========================================
