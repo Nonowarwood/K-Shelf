@@ -162,72 +162,72 @@ let currentSettings = {
 // APPLIQUER UN THÈME
 // ==========================================
 function applyTheme(themeId) {
-  const theme = THEMES[themeId];
-  if (!theme) return;
+  try {
+    const theme = THEMES[themeId];
+    if (!theme) { console.error("Thème inconnu:", themeId); return; }
 
-  const root = document.documentElement;
+    const root = document.documentElement;
 
-  // Appliquer les variables CSS
-  Object.entries(theme.vars).forEach(([k, v]) => root.style.setProperty(k, v));
+    // Appliquer les variables CSS
+    Object.entries(theme.vars).forEach(([k, v]) => root.style.setProperty(k, v));
 
-  // Accent personnalisé override
-  if (currentSettings.accent) {
-    root.style.setProperty("--accent", currentSettings.accent);
-  }
-
-  // Body background + classe thème
-  document.body.style.background = theme.vars["--bg"];
-  document.body.className = document.body.className
-    .replace(/theme-\w+/g, "").trim();
-  if (themeId !== "dark") document.body.classList.add(`theme-${themeId}`);
-
-  // Thème clair : cacher l'aurora, adapter les glass panels
-  const aurora = document.querySelector(".apple-aurora");
-  if (aurora) aurora.style.display = themeId === "dark" ? "block" : "none";
-
-  // Glass panels suivent les variables CSS automatiquement (voir style.css)
-  document.querySelectorAll(".glass-panel").forEach(el => {
-    el.style.background = "";
-    el.style.backdropFilter = "";
-    el.style.webkitBackdropFilter = "";
-    el.style.border = "";
-    el.style.borderRadius = "";
-  });
-  // Tout le reste est piloté par les classes body.theme-* dans style.css
-  // (album-media-wrapper, boutons, titres, etc. utilisent var(--radius-card) etc directement)
-
-  // Topbar
-  const topbar = document.querySelector(".profile-btn");
-  if (topbar) {
-    if (themeId !== "dark") {
-      topbar.style.background = theme.vars["--surface"];
-      topbar.style.border = `1px solid ${theme.vars["--border"]}`;
-      topbar.style.color = theme.vars["--text-primary"];
-    } else {
-      topbar.style.background = "";
-      topbar.style.border = "";
-      topbar.style.color = "";
+    // Accent personnalisé override
+    if (currentSettings.accent) {
+      root.style.setProperty("--accent", currentSettings.accent);
     }
-  }
 
-  currentSettings.theme = themeId;
-  saveSettings();
-  updateSettingsUI();
+    // Body background + classe thème
+    document.body.style.background = theme.vars["--bg"];
+    document.body.className = document.body.className
+      .replace(/theme-\S+/g, "").trim();
+    if (themeId !== "dark") document.body.classList.add(`theme-${themeId}`);
 
-  // Afficher/cacher la section upload bg LemonTang
-  const lemontangSection = document.getElementById("lemontang-bg-section");
-  if (lemontangSection) lemontangSection.style.display = themeId === "lemontang" ? "block" : "none";
+    // Thème clair : cacher l'aurora
+    const aurora = document.querySelector(".apple-aurora");
+    if (aurora) aurora.style.display = themeId === "dark" ? "block" : "none";
 
-  // Réappliquer l'image de fond sauvegardée si on revient sur LemonTang
-  if (themeId === "lemontang") {
-    const savedBg = localStorage.getItem("kshelf_lemontang_bg");
-    if (savedBg) {
-      document.documentElement.style.setProperty("--lemontang-bg-image", `url(${savedBg})`);
+    // Glass panels suivent les variables CSS automatiquement
+    document.querySelectorAll(".glass-panel").forEach(el => {
+      el.style.background = "";
+      el.style.backdropFilter = "";
+      el.style.webkitBackdropFilter = "";
+      el.style.border = "";
+      el.style.borderRadius = "";
+    });
+
+    // Topbar (tous les boutons, pas juste le premier)
+    document.querySelectorAll(".profile-btn, .topbar-settings-btn").forEach(el => {
+      if (themeId !== "dark") {
+        el.style.background = theme.vars["--surface"];
+        el.style.border = `1px solid ${theme.vars["--border"]}`;
+        el.style.color = theme.vars["--text-primary"];
+      } else {
+        el.style.background = "";
+        el.style.border = "";
+        el.style.color = "";
+      }
+    });
+
+    currentSettings.theme = themeId;
+    saveSettings();
+    updateSettingsUI();
+
+    // Afficher/cacher la section upload bg LemonTang
+    const lemontangSection = document.getElementById("lemontang-bg-section");
+    if (lemontangSection) lemontangSection.style.display = themeId === "lemontang" ? "block" : "none";
+
+    // Réappliquer l'image de fond sauvegardée si on revient sur LemonTang
+    if (themeId === "lemontang") {
+      const savedBg = localStorage.getItem("kshelf_lemontang_bg");
+      if (savedBg) root.style.setProperty("--lemontang-bg-image", `url(${savedBg})`);
     }
-  }
 
-  // Forcer re-render du contenu actif
-  if (window.showDashboard) window.showDashboard();
+    // Forcer re-render du contenu actif
+    if (window.showDashboard) window.showDashboard();
+
+  } catch (err) {
+    console.error("Erreur applyTheme:", err);
+  }
 }
 
 // ==========================================
