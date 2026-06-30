@@ -147,8 +147,17 @@ async function initUserData(user) {
       localStorage.setItem("kshelf_binder_pages", data.binderPages);
     }
     if (data.concerts !== null) {
-      window.concertsData = data.concerts;
-      localStorage.setItem("kshelf_concerts", JSON.stringify(data.concerts));
+      // Fusionner avec les vidéos locales (non stockées dans Firestore)
+      const localConcerts = JSON.parse(localStorage.getItem("kshelf_concerts") || "[]");
+      const merged = data.concerts.map(remoteConcert => {
+        const local = localConcerts.find(l => l.id === remoteConcert.id);
+        return {
+          ...remoteConcert,
+          videos: local?.videos || [], // restaurer les vidéos depuis le localStorage local
+        };
+      });
+      window.concertsData = merged;
+      localStorage.setItem("kshelf_concerts", JSON.stringify(merged));
     }
     if (data.pseudo) {
       localStorage.setItem(`kshelf_pseudo_${user.uid}`, data.pseudo);
@@ -163,10 +172,10 @@ async function initUserData(user) {
       window.collectionData = window.defaultCollectionData || {};
     }
     const result = await writeToFirestore(user.uid, {
-      collection:  window.collectionData,
-      photocards:  window.photocardsData  || [],
+      collection:  sanitizeForFirestore(window.collectionData),
+      photocards:  sanitizeForFirestore(window.photocardsData  || []),
       binderPages: window.binderTotalPages || 1,
-      concerts:    window.concertsData     || [],
+      concerts:    prepareConcertsForSync(window.concertsData),
     });
     showDebugToast(result ? "✅ Sauvegarde OK !" : "❌ Erreur sauvegarde", result ? "#1db954" : "#f87171");
   }
@@ -224,19 +233,51 @@ function startRealtimeSync(user) {
 // ==========================================
 // SYNC SORTANTE — appelée depuis script.js
 // ==========================================
+function sanitizeForFirestore(data) {
+  // Nettoie récursivement : supprime undefined, garde seulement les types valides
+  // Exclut les vidéos base64 (trop lourdes) mais garde les photos
+  if (Array.isArray(data)) {
+    return data.map(item => sanitizeForFirestore(item)).filter(item => item !== undefined);
+  }
+  if (data !== null && typeof data === "object") {
+    const clean = {};
+    for (const [k, v] of Object.entries(data)) {
+      if (v === undefined) continue;
+      // Exclure les vidéos base64 (data:video/...) — trop lourdes pour Firestore
+      if (typeof v === "string" && v.startsWith("data:video/")) continue;
+      clean[k] = sanitizeForFirestore(v);
+    }
+    return clean;
+  }
+  return data;
+}
+
+function prepareConcertsForSync(concerts) {
+  // Concerts sans vidéos (gardées uniquement en localStorage)
+  return (concerts || []).map(c => {
+    const { videos, ...rest } = c;
+    return sanitizeForFirestore(rest);
+  });
+}
+
 window.syncToFirestore = async function() {
   const user = window._currentUser;
   if (!user) {
     showDebugToast("⚠️ Sync ignorée : non connecté", "#f59e0b");
     return;
   }
-  const ok = await writeToFirestore(user.uid, {
-    collection:  window.collectionData,
-    photocards:  window.photocardsData,
-    binderPages: window.binderTotalPages || 1,
-    concerts:    window.concertsData || [],
-  });
-  if (ok) showDebugToast("☁️ Sauvegardé dans le cloud ✓", "#1db954");
+  try {
+    const ok = await writeToFirestore(user.uid, {
+      collection:  sanitizeForFirestore(window.collectionData),
+      photocards:  sanitizeForFirestore(window.photocardsData),
+      binderPages: window.binderTotalPages || 1,
+      concerts:    prepareConcertsForSync(window.concertsData),
+    });
+    if (ok) showDebugToast("☁️ Sauvegardé dans le cloud ✓", "#1db954");
+  } catch(e) {
+    showDebugToast("❌ Sync: " + e.message?.slice(0,40), "#f87171");
+    console.error("syncToFirestore error:", e);
+  }
 };
 
 // Notifier script.js que syncToFirestore est maintenant disponible
