@@ -52,6 +52,7 @@ async function readFromFirestore(uid) {
       collection:  raw.collection  ? JSON.parse(raw.collection)  : null,
       photocards:  raw.photocards  ? JSON.parse(raw.photocards)  : null,
       binderPages: raw.binderPages ?? null,
+      concerts:    raw.concerts    ? JSON.parse(raw.concerts)    : null,
       pseudo:      raw.pseudo      ?? null,
       photoURL:    raw.photoURL    ?? null,
     };
@@ -67,6 +68,7 @@ async function writeToFirestore(uid, payload) {
     if (payload.collection  !== undefined) toWrite.collection  = JSON.stringify(payload.collection);
     if (payload.photocards  !== undefined) toWrite.photocards  = JSON.stringify(payload.photocards);
     if (payload.binderPages !== undefined) toWrite.binderPages = payload.binderPages;
+    if (payload.concerts    !== undefined) toWrite.concerts    = JSON.stringify(payload.concerts);
     if (payload.pseudo      !== undefined) toWrite.pseudo      = payload.pseudo;
     if (payload.photoURL    !== undefined) toWrite.photoURL    = payload.photoURL;
     await setDoc(userDocRef(uid), toWrite, { merge: true });
@@ -142,6 +144,10 @@ async function initUserData(user) {
       window.binderTotalPages = data.binderPages;
       localStorage.setItem("kshelf_binder_pages", data.binderPages);
     }
+    if (data.concerts !== null) {
+      window.concertsData = data.concerts;
+      localStorage.setItem("kshelf_concerts", JSON.stringify(data.concerts));
+    }
     if (data.pseudo) {
       localStorage.setItem(`kshelf_pseudo_${user.uid}`, data.pseudo);
     }
@@ -158,6 +164,7 @@ async function initUserData(user) {
       collection:  window.collectionData,
       photocards:  window.photocardsData  || [],
       binderPages: window.binderTotalPages || 1,
+      concerts:    window.concertsData     || [],
     });
     showDebugToast(result ? "✅ Sauvegarde OK !" : "❌ Erreur sauvegarde", result ? "#1db954" : "#f87171");
   }
@@ -179,6 +186,7 @@ function startRealtimeSync(user) {
       const remoteCollection  = raw.collection  ? JSON.parse(raw.collection)  : null;
       const remotePhotocards  = raw.photocards  ? JSON.parse(raw.photocards)  : null;
       const remoteBinderPages = raw.binderPages ?? null;
+      const remoteConcerts    = raw.concerts    ? JSON.parse(raw.concerts)    : null;
 
       // Mettre à jour seulement si différent (évite les boucles)
       if (remoteCollection && JSON.stringify(remoteCollection) !== JSON.stringify(window.collectionData)) {
@@ -197,6 +205,14 @@ function startRealtimeSync(user) {
         window.binderTotalPages = remoteBinderPages;
         localStorage.setItem("kshelf_binder_pages", remoteBinderPages);
       }
+      if (remoteConcerts && JSON.stringify(remoteConcerts) !== JSON.stringify(window.concertsData)) {
+        console.log("🔄 Sync concerts depuis un autre appareil");
+        window.concertsData = remoteConcerts;
+        localStorage.setItem("kshelf_concerts", JSON.stringify(remoteConcerts));
+        if (window.location && document.querySelector(".artist-main-title")?.textContent === "concerts.") {
+          if (window.showConcerts) window.showConcerts();
+        }
+      }
     } catch(e) {
       console.error("❌ Sync parse error:", e);
     }
@@ -213,6 +229,7 @@ window.syncToFirestore = async function() {
     collection:  window.collectionData,
     photocards:  window.photocardsData,
     binderPages: window.binderTotalPages || 1,
+    concerts:    window.concertsData || [],
   });
 };
 
