@@ -55,6 +55,7 @@ async function readFromFirestore(uid) {
       concerts:    raw.concerts    ? JSON.parse(raw.concerts)    : null,
       pseudo:      raw.pseudo      ?? null,
       photoURL:    raw.photoURL    ?? null,
+      profileExtra: raw.profileExtra ?? null,
     };
   } catch(e) {
     console.error("❌ Firestore read error:", e);
@@ -153,6 +154,13 @@ async function initUserData(user) {
     }
     if (data.pseudo) {
       localStorage.setItem(`kshelf_pseudo_${user.uid}`, data.pseudo);
+    }
+    if (data.profileExtra) {
+      try {
+        const extra = JSON.parse(data.profileExtra);
+        localStorage.setItem("kshelf_profile_extra", JSON.stringify(extra));
+        if (window.profileExtra !== undefined) window.profileExtra = extra;
+      } catch(e) {}
     }
     if (data.photoURL) {
       localStorage.setItem(`kshelf_photo_${user.uid}`, data.photoURL);
@@ -323,7 +331,23 @@ window.saveProfile = async function() {
   const pseudo = document.getElementById("profile-pseudo-input")?.value.trim();
   if (!pseudo) return;
   localStorage.setItem(`kshelf_pseudo_${user.uid}`, pseudo);
-  const ok = await writeToFirestore(user.uid, { pseudo });
+
+  // Sauvegarder les données extra du profil
+  const getVal = (id) => document.getElementById(id)?.value.trim() || "";
+  if (window.profileExtra !== undefined) {
+    window.profileExtra.favGroup  = getVal("profile-fav-group");
+    window.profileExtra.favAlbum  = getVal("profile-fav-album");
+    window.profileExtra.youtube   = getVal("profile-youtube");
+    window.profileExtra.tiktok    = getVal("profile-tiktok");
+    window.profileExtra.pinterest = getVal("profile-pinterest");
+    window.profileExtra.kpopping  = getVal("profile-kpopping");
+    localStorage.setItem("kshelf_profile_extra", JSON.stringify(window.profileExtra));
+  }
+
+  const ok = await writeToFirestore(user.uid, {
+    pseudo,
+    profileExtra: JSON.stringify(window.profileExtra || {}),
+  });
   showDebugToast(ok ? "✅ Profil sauvegardé" : "❌ Erreur sauvegarde profil", ok ? "#1db954" : "#f87171");
   updateProfileUI(user);
   closeProfileModal();
@@ -374,5 +398,9 @@ window.uploadProfilePhoto = async function(input) {
 // ==========================================
 // MODAL PROFIL
 // ==========================================
-window.openProfileModal  = () => document.getElementById("profile-modal-overlay")?.classList.add("visible");
+window.openProfileModal  = () => {
+  document.getElementById("profile-modal-overlay")?.classList.add("visible");
+  // Charger les données extra dans le formulaire
+  setTimeout(() => { if (window.loadProfileExtraIntoForm) window.loadProfileExtraIntoForm(); }, 50);
+};
 window.closeProfileModal = () => document.getElementById("profile-modal-overlay")?.classList.remove("visible");
