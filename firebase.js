@@ -147,18 +147,9 @@ async function initUserData(user) {
       localStorage.setItem("kshelf_binder_pages", data.binderPages);
     }
     if (data.concerts !== null) {
-      // Fusionner avec les médias locaux (photos/vidéos non stockés dans Firestore)
-      const localConcerts = JSON.parse(localStorage.getItem("kshelf_concerts") || "[]");
-      const merged = data.concerts.map(remoteConcert => {
-        const local = localConcerts.find(l => l.id === remoteConcert.id);
-        return {
-          ...remoteConcert,
-          photos: local?.photos || [], // restaurer les photos depuis le localStorage
-          videos: [],
-        };
-      });
-      window.concertsData = merged;
-      localStorage.setItem("kshelf_concerts", JSON.stringify(merged));
+      // Les photos sont des URLs stockées dans Firestore, pas besoin de fusion locale
+      window.concertsData = data.concerts;
+      localStorage.setItem("kshelf_concerts", JSON.stringify(data.concerts));
     }
     if (data.pseudo) {
       localStorage.setItem(`kshelf_pseudo_${user.uid}`, data.pseudo);
@@ -254,19 +245,17 @@ function sanitizeForFirestore(data) {
 }
 
 function prepareConcertsForSync(concerts) {
-  // Concerts sans médias base64 (photos/vidéos trop lourdes pour Firestore)
-  // On ne stocke que les métadonnées texte + setlist + note
+  // Les photos sont maintenant des URLs (pas du base64) — on peut les stocker dans Firestore
   return (concerts || []).map(c => sanitizeForFirestore({
-    id:     c.id,
-    artist: c.artist,
-    date:   c.date,
-    venue:  c.venue,
-    tour:   c.tour,
-    review: c.review,
+    id:      c.id,
+    artist:  c.artist,
+    date:    c.date,
+    venue:   c.venue,
+    tour:    c.tour,
+    review:  c.review,
     setlist: c.setlist || [],
-    rating:  c.rating || 0,
-    // photos : on stocke juste le nombre pour info, pas le contenu base64
-    photoCount: (c.photos || []).length,
+    rating:  c.rating  || 0,
+    photos:  (c.photos || []).filter(p => p.startsWith("http")), // URLs seulement
   }));
 }
 
