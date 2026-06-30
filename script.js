@@ -113,31 +113,72 @@ function saveCollection() {
 // ==========================================
 // SIDEBAR
 // ==========================================
+let sidebarTab = localStorage.getItem("kshelf_sidebar_tab") || "albums";
+
+function switchSidebarTab(tab) {
+  sidebarTab = tab;
+  localStorage.setItem("kshelf_sidebar_tab", tab);
+  initSidebar();
+  if (tab === "albums") showDashboard();
+  else if (tab === "photocards") showBinder();
+  else if (tab === "concerts") showConcerts();
+}
+window.switchSidebarTab = switchSidebarTab;
+
 function initSidebar() {
   const nav = document.getElementById("sidebar-nav");
   let html = "";
-  for (const agency in collectionData) {
-    const color = agencyThemes[agency] || "#ffffff";
-    html += `<div class="agency-section">
-      <div class="agency-title" style="color:${color}">${agency}</div>
-      <div class="artist-list">`;
-    for (const artist in collectionData[agency]) {
-      const sa = encodeURIComponent(artist);
-      const sg = encodeURIComponent(agency);
-      html += `<div class="artist-item" data-artist="${artist}" onclick="selectArtist('${sg}','${sa}')">${artist}</div>`;
-    }
-    html += `</div></div>`;
-  }
-  // Lightsticks link
-  html += `<div class="agency-section">
-    <div class="artist-list">
-      <div class="artist-item lightstick-nav" onclick="showLightsticks()">✦ lightsticks</div>
-      <div class="artist-item lightstick-nav" onclick="showBinder()">✦ photocards</div>
-    </div>
+
+  // Switch d'onglets en haut
+  html += `<div class="sidebar-tabs">
+    <button class="sidebar-tab-btn ${sidebarTab === 'albums' ? 'active' : ''}" onclick="switchSidebarTab('albums')">Albums</button>
+    <button class="sidebar-tab-btn ${sidebarTab === 'photocards' ? 'active' : ''}" onclick="switchSidebarTab('photocards')">Photocards</button>
+    <button class="sidebar-tab-btn ${sidebarTab === 'concerts' ? 'active' : ''}" onclick="switchSidebarTab('concerts')">Concerts</button>
   </div>`;
-  // Bouton ajout
+
+  if (sidebarTab === "albums") {
+    for (const agency in collectionData) {
+      const color = agencyThemes[agency] || "#ffffff";
+      html += `<div class="agency-section">
+        <div class="agency-title" style="color:${color}">${agency}</div>
+        <div class="artist-list">`;
+      for (const artist in collectionData[agency]) {
+        const sa = encodeURIComponent(artist);
+        const sg = encodeURIComponent(agency);
+        html += `<div class="artist-item" data-artist="${artist}" onclick="selectArtist('${sg}','${sa}')">${artist}</div>`;
+      }
+      html += `</div></div>`;
+    }
+    html += `<div class="agency-section">
+      <div class="artist-list">
+        <div class="artist-item lightstick-nav" onclick="showLightsticks()">✦ lightsticks</div>
+      </div>
+    </div>`;
+  } else if (sidebarTab === "photocards") {
+    const artists = (typeof getBinderArtists === "function") ? getBinderArtists() : [];
+    html += `<div class="agency-section">
+      <div class="artist-list">
+        <div class="artist-item" onclick="showBinder('all')">Tout le binder</div>`;
+    artists.forEach(a => {
+      html += `<div class="artist-item" onclick="showBinder('${a.replace(/'/g,"\'")}')">${a}</div>`;
+    });
+    html += `</div></div>`;
+  } else if (sidebarTab === "concerts") {
+    html += `<div class="agency-section">
+      <div class="artist-list">
+        <div class="artist-item" onclick="showConcerts()">Tous mes concerts</div>
+      </div>
+    </div>`;
+  }
+
+  // Bouton ajout — contextuel selon l'onglet
+  let addBtnLabel = "+ ajouter un album";
+  let addBtnAction = "openAddModal()";
+  if (sidebarTab === "photocards") { addBtnLabel = "+ ajouter une photocard"; addBtnAction = "openAddPhotocard(binderCurrentPage, findFirstEmptySlot())"; }
+  if (sidebarTab === "concerts")   { addBtnLabel = "+ ajouter un concert";    addBtnAction = "openAddConcert()"; }
+
   html += `<div class="add-album-btn-wrap">
-    <button class="add-album-nav-btn" onclick="openAddModal()">+ ajouter un album</button>
+    <button class="add-album-nav-btn" onclick="${addBtnAction}">${addBtnLabel}</button>
   </div>`;
   nav.innerHTML = html;
 }
@@ -499,6 +540,17 @@ function addNewBinderPage() {
   if (window.syncToFirestore) window.syncToFirestore();
   showBinder();
 }
+
+function findFirstEmptySlot() {
+  const used = new Set(
+    photocardsData.filter(pc => pc.page === binderCurrentPage).map(pc => pc.slot)
+  );
+  for (let i = 0; i < SLOTS_PER_PAGE; i++) {
+    if (!used.has(i)) return i;
+  }
+  return 0; // page pleine, ouvrira sur le slot 0 (l'utilisateur peut changer de page)
+}
+window.findFirstEmptySlot = findFirstEmptySlot;
 
 function showBinder(artistFilter = binderArtistFilter) {
   binderArtistFilter = artistFilter;
@@ -1131,3 +1183,22 @@ showDashboard();
 window.showDashboard = showDashboard;
 window.selectArtist  = selectArtist;
 window.handleSearch  = handleSearch;
+
+// ==========================================
+// CONCERTS — placeholder (fonctionnalité complète à venir)
+// ==========================================
+function showConcerts() {
+  document.querySelectorAll(".artist-item").forEach(el => el.classList.remove("active"));
+  document.documentElement.style.setProperty("--dynamic-agency-color", "rgba(255,255,255,0.3)");
+  document.getElementById("main-content").innerHTML = `
+    <div class="artist-view-header animate-fade">
+      <div class="breadcrumbs">collection</div>
+      <h2 class="artist-main-title">concerts.</h2>
+      <p class="album-total-count">Section en cours de construction 🎤</p>
+    </div>`;
+}
+function openAddConcert() {
+  alert("La fonctionnalité concerts arrive bientôt !");
+}
+window.showConcerts   = showConcerts;
+window.openAddConcert = openAddConcert;
