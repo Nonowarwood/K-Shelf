@@ -1307,7 +1307,7 @@ function openAddConcert(concertId = null) {
         id: existing.id,
         rating: existing.rating || 0,
         photos: [...(existing.photos || [])],
-        videos: [...(existing.videos || [])],
+        videos: [],
         setlist: [...(existing.setlist || [])],
       }
     : { id: null, rating: 0, photos: [], videos: [], setlist: [] };
@@ -1364,12 +1364,6 @@ function openAddConcert(concertId = null) {
           <label>Photos</label>
           <input type="file" id="concert-photos-input" accept="image/*" multiple class="pc-file-input" onchange="handleConcertMediaUpload(this, 'photos')">
           <div id="concert-photos-preview" class="concert-media-preview-grid">${renderMediaPreview(concertFormState.photos, 'photos')}</div>
-        </div>
-
-        <div class="add-form-group">
-          <label>Vidéos</label>
-          <input type="file" id="concert-videos-input" accept="video/*" multiple class="pc-file-input" onchange="handleConcertMediaUpload(this, 'videos')">
-          <div id="concert-videos-preview" class="concert-media-preview-grid">${renderMediaPreview(concertFormState.videos, 'videos')}</div>
         </div>
 
         <div id="concert-error" class="add-error" style="display:none"></div>
@@ -1493,7 +1487,6 @@ function submitConcert() {
     artist, date, venue, tour, review, setlist,
     rating: concertFormState.rating,
     photos: concertFormState.photos,
-    videos: concertFormState.videos,
   };
 
   if (concertFormState.id) {
@@ -1531,7 +1524,6 @@ function openConcertDetail(id) {
   overlay.onclick = (e) => { if (e.target === overlay) closeConcertDetail(); };
 
   const photosHtml = (c.photos || []).map(src => `<img src="${src}" class="concert-gallery-photo" onclick="event.stopPropagation()">`).join("");
-  const videosHtml = (c.videos || []).map(src => `<video src="${src}" class="concert-gallery-video" controls onclick="event.stopPropagation()"></video>`).join("");
   const setlistHtml = (c.setlist || []).map((t, i) => `<div class="modal-track"><span class="modal-track-num">${i+1}</span><span class="modal-track-name">${t}</span></div>`).join("");
 
   overlay.innerHTML = `
@@ -1559,11 +1551,6 @@ function openConcertDetail(id) {
         ${photosHtml ? `<div class="concert-detail-section">
           <h3 class="modal-section-title">Photos</h3>
           <div class="concert-gallery-grid">${photosHtml}</div>
-        </div>` : ""}
-
-        ${videosHtml ? `<div class="concert-detail-section">
-          <h3 class="modal-section-title">Vidéos</h3>
-          <div class="concert-gallery-grid">${videosHtml}</div>
         </div>` : ""}
 
         <div class="concert-detail-actions">
