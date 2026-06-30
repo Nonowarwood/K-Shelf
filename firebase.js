@@ -332,21 +332,27 @@ window.saveProfile = async function() {
   if (!pseudo) return;
   localStorage.setItem(`kshelf_pseudo_${user.uid}`, pseudo);
 
-  // Sauvegarder les données extra du profil
+  // Récupérer les données extra actuelles depuis localStorage (inclut les biases)
+  const currentExtra = JSON.parse(localStorage.getItem("kshelf_profile_extra") || "{}");
   const getVal = (id) => document.getElementById(id)?.value.trim() || "";
-  if (window.profileExtra !== undefined) {
-    window.profileExtra.favGroup  = getVal("profile-fav-group");
-    window.profileExtra.favAlbum  = getVal("profile-fav-album");
-    window.profileExtra.youtube   = getVal("profile-youtube");
-    window.profileExtra.tiktok    = getVal("profile-tiktok");
-    window.profileExtra.pinterest = getVal("profile-pinterest");
-    window.profileExtra.kpopping  = getVal("profile-kpopping");
-    localStorage.setItem("kshelf_profile_extra", JSON.stringify(window.profileExtra));
-  }
+
+  const updatedExtra = {
+    ...currentExtra, // préserve les biases et autres champs
+    favGroup:  getVal("profile-fav-group"),
+    favAlbum:  getVal("profile-fav-album"),
+    youtube:   getVal("profile-youtube"),
+    tiktok:    getVal("profile-tiktok"),
+    pinterest: getVal("profile-pinterest"),
+    kpopping:  getVal("profile-kpopping"),
+    biases:    window.profileExtra?.biases || currentExtra.biases || [],
+  };
+
+  window.profileExtra = updatedExtra;
+  localStorage.setItem("kshelf_profile_extra", JSON.stringify(updatedExtra));
 
   const ok = await writeToFirestore(user.uid, {
     pseudo,
-    profileExtra: JSON.stringify(window.profileExtra || {}),
+    profileExtra: JSON.stringify(updatedExtra),
   });
   showDebugToast(ok ? "✅ Profil sauvegardé" : "❌ Erreur sauvegarde profil", ok ? "#1db954" : "#f87171");
   updateProfileUI(user);
