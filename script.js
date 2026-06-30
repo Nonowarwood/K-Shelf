@@ -1362,7 +1362,7 @@ function openAddConcert(concertId = null) {
 
         <div class="add-form-group">
           <label>Photos</label>
-          <input type="file" id="concert-photos-input" accept="image/*" multiple class="pc-file-input" onchange="handleConcertMediaUpload(this, 'photos')">
+          <input type="file" id="concert-photos-input" accept="image/*" multiple class="pc-file-input">
           <div id="concert-photos-preview" class="concert-media-preview-grid">${renderMediaPreview(concertFormState.photos, 'photos')}</div>
         </div>
 
@@ -1373,6 +1373,14 @@ function openAddConcert(concertId = null) {
     </div>`;
 
   document.body.appendChild(overlay);
+
+  // Attacher les listeners après que le DOM est prêt (iOS Safari fix)
+  const photosInput = document.getElementById("concert-photos-input");
+  if (photosInput) {
+    photosInput.addEventListener("change", function() {
+      handleConcertMediaUpload(this, "photos");
+    });
+  }
 }
 window.openAddConcert = openAddConcert;
 
