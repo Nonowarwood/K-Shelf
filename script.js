@@ -113,7 +113,13 @@ function syncSafe() {
     window.syncToFirestore();
     _syncPending = false;
   } else {
-    _syncPending = true; // sera déclenché par Firebase dès qu'il est prêt
+    _syncPending = true;
+    // Toast visible sur mobile pour diagnostiquer
+    const t = document.createElement("div");
+    t.style.cssText = "position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;z-index:9999;";
+    t.innerText = "⏳ En attente de Firebase...";
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
   }
 }
 
