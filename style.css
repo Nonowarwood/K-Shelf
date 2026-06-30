@@ -2120,3 +2120,23 @@ body.theme-editorial .status-badge.wishlist { background: rgba(0,0,0,0.04); colo
   margin-top: 8px;
   line-height: 1.4;
 }
+/* --- BONUS POUR LE THÈME LEMONTANG --- */
+.theme-lemontang h1, 
+.theme-lemontang h2, 
+.theme-lemontang .sidebar-header h1 {
+    font-family: var(--font-display) !important;
+    color: #fbf213 !important; /* Jaune citron vif */
+    
+    /* Le fameux contour Y2K ultra marqué visible sur l'album */
+    text-shadow: 
+        3px 3px 0px #0f172a,
+       -1px -1px 0px #0f172a,  
+        1px -1px 0px #0f172a,
+       -1px  1px 0px #0f172a,
+        1px  1px 0px #0f172a !important;
+}
+
+/* Effet bulle glossy sur les boutons du thème */
+.theme-lemontang button {
+    box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
