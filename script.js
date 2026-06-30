@@ -1361,8 +1361,11 @@ function openAddConcert(concertId = null) {
         </div>
 
         <div class="add-form-group">
-          <label>Photos</label>
-          <input type="file" id="concert-photos-input" accept="image/*" multiple class="pc-file-input">
+          <label>Photos (URLs)</label>
+          <div class="concert-url-input-row">
+            <input type="text" id="concert-photo-url" placeholder="https://... (URL d'une image)">
+            <button type="button" class="concert-add-url-btn" onclick="addConcertPhotoUrl()">+ Ajouter</button>
+          </div>
           <div id="concert-photos-preview" class="concert-media-preview-grid">${renderMediaPreview(concertFormState.photos, 'photos')}</div>
         </div>
 
@@ -1374,11 +1377,11 @@ function openAddConcert(concertId = null) {
 
   document.body.appendChild(overlay);
 
-  // Attacher les listeners après que le DOM est prêt (iOS Safari fix)
-  const photosInput = document.getElementById("concert-photos-input");
-  if (photosInput) {
-    photosInput.addEventListener("change", function() {
-      handleConcertMediaUpload(this, "photos");
+  // Attacher le listener preview sur le champ URL
+  const urlInput = document.getElementById("concert-photo-url");
+  if (urlInput) {
+    urlInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") { e.preventDefault(); addConcertPhotoUrl(); }
     });
   }
 }
@@ -1452,6 +1455,21 @@ async function handleConcertMediaUpload(input, type) {
   input.value = "";
 }
 window.handleConcertMediaUpload = handleConcertMediaUpload;
+
+function addConcertPhotoUrl() {
+  const input = document.getElementById("concert-photo-url");
+  if (!input) return;
+  const url = input.value.trim();
+  if (!url) return;
+  if (!url.startsWith("http")) {
+    alert("Merci d'entrer une URL valide commençant par http");
+    return;
+  }
+  concertFormState.photos.push(url);
+  document.getElementById("concert-photos-preview").innerHTML = renderMediaPreview(concertFormState.photos, "photos");
+  input.value = "";
+}
+window.addConcertPhotoUrl = addConcertPhotoUrl;
 
 function renderMediaPreview(items, type) {
   return items.map((src, i) => {
