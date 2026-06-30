@@ -17,45 +17,65 @@ const THEMES = {
       "--text-secondary":  "#808799",
       "--text-tertiary":   "#4a5060",
       "--accent":          "#ffffff",
+
+      /* Typo */
       "--font-display":    "'Syne', sans-serif",
       "--font-body":       "'Plus Jakarta Sans', sans-serif",
+      "--font-weight-display": "800",
+      "--letter-spacing-display": "-2px",
+      "--text-transform-display": "none",
+
+      /* Formes */
       "--radius-card":     "16px",
       "--radius-panel":    "24px",
       "--radius-btn":      "10px",
+      "--radius-pill":     "40px",
+      "--btn-border":      "none",
+
       "--blur":            "blur(20px) saturate(190%)",
       "--grid-line":       "none",
-      "--sidebar-bg":      "rgba(13,17,23,0.45)",
-      "--main-bg":         "rgba(13,17,23,0.45)",
+      "--card-shadow":     "0 12px 40px rgba(0,0,0,0.3)",
+      "--card-border":     "none",
     }
   },
   grid: {
     name: "Grid",
-    label: "Editorial",
+    label: "Technical",
     preview: "#e8e6e1",
     vars: {
       "--bg":              "#e8e6e1",
       "--surface":         "#f0ede8",
       "--surface-hover":   "#e0ddd8",
-      "--border":          "rgba(0,0,0,0.12)",
-      "--border-hover":    "rgba(0,0,0,0.3)",
+      "--border":          "rgba(0,0,0,0.15)",
+      "--border-hover":    "rgba(0,0,0,0.4)",
       "--text-primary":    "#0a0a0a",
       "--text-secondary":  "#555555",
       "--text-tertiary":   "#999999",
       "--accent":          "#ff5500",
-      "--font-display":    "'Syne', sans-serif",
-      "--font-body":       "'Plus Jakarta Sans', sans-serif",
+
+      /* Typo — mono technique */
+      "--font-display":    "'JetBrains Mono', monospace",
+      "--font-body":       "'Space Mono', monospace",
+      "--font-weight-display": "700",
+      "--letter-spacing-display": "-1px",
+      "--text-transform-display": "uppercase",
+
+      /* Formes — angles droits partout */
       "--radius-card":     "0px",
       "--radius-panel":    "0px",
       "--radius-btn":      "0px",
+      "--radius-pill":     "2px",
+      "--btn-border":      "1.5px solid currentColor",
+
       "--blur":            "none",
-      "--grid-line":       "1px solid rgba(0,0,0,0.1)",
-      "--sidebar-bg":      "#dedad4",
-      "--main-bg":         "#e8e6e1",
+      "--grid-line":       "1px solid rgba(0,0,0,0.12)",
+      "--card-shadow":     "none",
+      "--card-border":     "1.5px solid rgba(0,0,0,0.15)",
     }
   },
   editorial: {
     name: "Editorial",
-    label: "Blanc & Noir",
+    label: "Serif",
     preview: "#f7f7f5",
     vars: {
       "--bg":              "#f7f7f5",
@@ -67,15 +87,25 @@ const THEMES = {
       "--text-secondary":  "#6b6b6b",
       "--text-tertiary":   "#b0b0b0",
       "--accent":          "#0a0a0a",
-      "--font-display":    "'Syne', sans-serif",
+
+      /* Typo — serif élégante */
+      "--font-display":    "'Fraunces', serif",
       "--font-body":       "'Plus Jakarta Sans', sans-serif",
-      "--radius-card":     "12px",
-      "--radius-panel":    "18px",
+      "--font-weight-display": "500",
+      "--letter-spacing-display": "-1px",
+      "--text-transform-display": "none",
+
+      /* Formes — pills ultra arrondies */
+      "--radius-card":     "28px",
+      "--radius-panel":    "32px",
       "--radius-btn":      "100px",
+      "--radius-pill":     "100px",
+      "--btn-border":      "1px solid rgba(0,0,0,0.08)",
+
       "--blur":            "blur(20px)",
       "--grid-line":       "none",
-      "--sidebar-bg":      "rgba(255,255,255,0.85)",
-      "--main-bg":         "rgba(255,255,255,0.7)",
+      "--card-shadow":     "0 4px 16px rgba(0,0,0,0.06)",
+      "--card-border":     "1px solid rgba(0,0,0,0.06)",
     }
   }
 };
@@ -120,23 +150,16 @@ function applyTheme(themeId) {
   const aurora = document.querySelector(".apple-aurora");
   if (aurora) aurora.style.display = themeId === "dark" ? "block" : "none";
 
-  // Adapter les glass panels selon le thème
+  // Glass panels suivent les variables CSS automatiquement (voir style.css)
   document.querySelectorAll(".glass-panel").forEach(el => {
-    if (themeId === "dark") {
-      el.style.background = "rgba(13,17,23,0.45)";
-      el.style.backdropFilter = "blur(20px) saturate(190%)";
-      el.style.border = "1px solid rgba(255,255,255,0.06)";
-    } else if (themeId === "grid") {
-      el.style.background = theme.vars["--surface"];
-      el.style.backdropFilter = "none";
-      el.style.border = `1px solid ${theme.vars["--border"]}`;
-      el.style.borderRadius = "0";
-    } else if (themeId === "editorial") {
-      el.style.background = "rgba(255,255,255,0.85)";
-      el.style.backdropFilter = "blur(20px)";
-      el.style.border = "1px solid rgba(0,0,0,0.07)";
-    }
+    el.style.background = "";
+    el.style.backdropFilter = "";
+    el.style.webkitBackdropFilter = "";
+    el.style.border = "";
+    el.style.borderRadius = "";
   });
+  // Tout le reste est piloté par les classes body.theme-* dans style.css
+  // (album-media-wrapper, boutons, titres, etc. utilisent var(--radius-card) etc directement)
 
   // Topbar
   const topbar = document.querySelector(".profile-btn");
