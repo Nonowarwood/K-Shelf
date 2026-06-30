@@ -146,9 +146,10 @@ function switchSidebarTab(tab) {
   sidebarTab = tab;
   localStorage.setItem("kshelf_sidebar_tab", tab);
   initSidebar();
-  if (tab === "albums") showDashboard();
+  if (tab === "albums")     showDashboard();
   else if (tab === "photocards") showBinder();
-  else if (tab === "concerts") showConcerts();
+  else if (tab === "concerts")   showConcerts();
+  else if (tab === "favorites")  showFavorites();
 }
 window.switchSidebarTab = switchSidebarTab;
 
@@ -159,8 +160,9 @@ function initSidebar() {
   // Switch d'onglets en haut
   html += `<div class="sidebar-tabs">
     <button class="sidebar-tab-btn ${sidebarTab === 'albums' ? 'active' : ''}" onclick="switchSidebarTab('albums')">Albums</button>
-    <button class="sidebar-tab-btn ${sidebarTab === 'photocards' ? 'active' : ''}" onclick="switchSidebarTab('photocards')">Photocards</button>
+    <button class="sidebar-tab-btn ${sidebarTab === 'photocards' ? 'active' : ''}" onclick="switchSidebarTab('photocards')">Photos</button>
     <button class="sidebar-tab-btn ${sidebarTab === 'concerts' ? 'active' : ''}" onclick="switchSidebarTab('concerts')">Concerts</button>
+    <button class="sidebar-tab-btn ${sidebarTab === 'favorites' ? 'active' : ''}" onclick="switchSidebarTab('favorites')">★</button>
   </div>`;
 
   if (sidebarTab === "albums") {
@@ -196,6 +198,21 @@ function initSidebar() {
         <div class="artist-item" onclick="showConcerts()">Tous mes concerts</div>
       </div>
     </div>`;
+  } else if (sidebarTab === "favorites") {
+    const favAlbums = [];
+    for (const ag in collectionData)
+      for (const ar in collectionData[ag])
+        collectionData[ag][ar].forEach(a => { if (a.status === "favorite") favAlbums.push(a); });
+    const favPcs   = photocardsData.filter(pc => pc.status === "favorite");
+    const favConcs = concertsData.filter(c => c.favorite);
+    html += `<div class="agency-section">
+      <div class="artist-list">
+        <div class="artist-item" onclick="showFavorites()">Tous les favoris</div>
+        <div class="artist-item" onclick="showFavorites('albums')">Albums (${favAlbums.length})</div>
+        <div class="artist-item" onclick="showFavorites('photocards')">Photocards (${favPcs.length})</div>
+        <div class="artist-item" onclick="showFavorites('concerts')">Concerts (${favConcs.length})</div>
+      </div>
+    </div>`;
   }
 
   // Bouton ajout — contextuel selon l'onglet
@@ -203,6 +220,7 @@ function initSidebar() {
   let addBtnAction = "openAddModal()";
   if (sidebarTab === "photocards") { addBtnLabel = "+ ajouter une photocard"; addBtnAction = "openAddPhotocard(binderCurrentPage, findFirstEmptySlot())"; }
   if (sidebarTab === "concerts")   { addBtnLabel = "+ ajouter un concert";    addBtnAction = "openAddConcert()"; }
+  if (sidebarTab === "favorites")  { addBtnLabel = ""; addBtnAction = ""; }
 
   html += `<div class="add-album-btn-wrap">
     <button class="add-album-nav-btn" onclick="${addBtnAction}">${addBtnLabel}</button>
@@ -277,14 +295,12 @@ function albumCardHtml(album, artist, agency) {
   const safeTitle  = encodeURIComponent(album.title);
   const safeArtist = encodeURIComponent(artist);
   const safeAgency = encodeURIComponent(agency);
-  const statusLabel = album.status === "owned" ? "● possédé" : "○ wishlist";
+  const isFav = album.status === "favorite";
   const media = album.img
     ? `<img src="${album.img}" alt="${album.title}" class="album-artwork" loading="lazy">`
     : `<div class="album-artwork-placeholder">💿</div>`;
   const spotifyOverlay = spotifyAccessToken
-    ? `<div class="card-spotify-overlay">
-        <span>▶ Spotify</span>
-       </div>`
+    ? `<div class="card-spotify-overlay"><span>▶ Spotify</span></div>`
     : "";
 
   return `
@@ -293,14 +309,14 @@ function albumCardHtml(album, artist, agency) {
       data-artist="${safeArtist}"
       data-agency="${safeAgency}"
       data-img="${encodeURIComponent(album.img||'')}"
-      data-status="${album.status}">
+      data-status="${album.status || 'none'}">
       <div class="album-media-wrapper">
         ${media}
         ${spotifyOverlay}
+        <button class="album-fav-btn ${isFav ? 'active' : ''}" data-toggle="fav" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}">★</button>
       </div>
       <div class="album-meta-header">
         <h4 class="album-title-text">${album.title}</h4>
-        <span class="status-badge ${album.status}" data-toggle="status">${statusLabel}</span>
       </div>
       <span class="agency-tag">${agency}</span>
     </div>`;
@@ -312,7 +328,7 @@ function renderAlbumGrid(agency, artist, albums) {
     <div class="artist-view-header animate-fade">
       <div class="breadcrumbs">${agency} › ${artist}</div>
       <h2 class="artist-main-title">${artist}.</h2>
-      <p class="album-total-count">${albums.length} disque(s) — clic sur le badge pour modifier le statut</p>
+      <p class="album-total-count">${albums.length} disque(s)</p>
     </div>
     <div class="albums-display-grid animate-fade">
       ${cardsHtml || '<p class="no-result">Aucun album trouvé.</p>'}
@@ -357,13 +373,10 @@ document.getElementById("main-content").addEventListener("click", function(e) {
   const card = e.target.closest(".album-card");
   if (!card) return;
 
-  // Clic sur le badge statut
-  if (e.target.closest("[data-toggle='status']")) {
+  // Clic sur le bouton favori
+  if (e.target.closest("[data-toggle='fav']")) {
     e.stopPropagation();
-    const agency = decodeURIComponent(card.dataset.agency);
-    const artist = decodeURIComponent(card.dataset.artist);
-    const title  = decodeURIComponent(card.dataset.title);
-    toggleAlbumStatus(card.dataset.agency, card.dataset.artist, card.dataset.title);
+    toggleAlbumFav(card.dataset.agency, card.dataset.artist, card.dataset.title);
     return;
   }
 
@@ -385,7 +398,7 @@ document.getElementById("main-content").addEventListener("click", function(e) {
   openAlbumModal(title, artist, agency, img, status);
 });
 
-window.toggleAlbumStatus = function(encodedAgency, encodedArtist, encodedTitle) {
+window.toggleAlbumFav = function(encodedAgency, encodedArtist, encodedTitle) {
   const agency = decodeURIComponent(encodedAgency);
   const artist = decodeURIComponent(encodedArtist);
   const title  = decodeURIComponent(encodedTitle);
@@ -393,10 +406,12 @@ window.toggleAlbumStatus = function(encodedAgency, encodedArtist, encodedTitle) 
   if (!albums) return;
   const album = albums.find(a => a.title === title);
   if (!album) return;
-  album.status = album.status === "owned" ? "wishlist" : "owned";
+  album.status = album.status === "favorite" ? "none" : "favorite";
   saveCollection();
   const q = document.getElementById("album-search").value.toLowerCase().trim();
-  if (q) handleSearch(); else renderAlbumGrid(agency, artist, albums);
+  if (q) handleSearch();
+  else if (sidebarTab === "favorites") showFavorites();
+  else renderAlbumGrid(agency, artist, albums);
 };
 
 // ==========================================
@@ -1601,3 +1616,275 @@ Object.defineProperty(window, 'concertsData', {
   set: (v) => { concertsData = v; },
   configurable: true
 });
+
+// ==========================================
+// VUE FAVORIS
+// ==========================================
+function showFavorites(filter = "all") {
+  document.querySelectorAll(".artist-item").forEach(el => el.classList.remove("active"));
+  document.documentElement.style.setProperty("--dynamic-agency-color", "rgba(255,215,0,0.4)");
+
+  // Collecter tous les favoris
+  const favAlbums = [];
+  for (const ag in collectionData)
+    for (const ar in collectionData[ag])
+      collectionData[ag][ar].forEach(a => {
+        if (a.status === "favorite") favAlbums.push({ ...a, artist: ar, agency: ag });
+      });
+  const favPcs    = photocardsData.filter(pc => pc.status === "favorite");
+  const favConcs  = concertsData.filter(c => c.favorite);
+
+  let html = "";
+
+  // Albums favoris
+  if (filter === "all" || filter === "albums") {
+    if (favAlbums.length) {
+      const cards = favAlbums.map(a => albumCardHtml(a, a.artist, a.agency)).join("");
+      html += `<div class="favorites-section">
+        <h3 class="favorites-section-label">⭐ Albums</h3>
+        <div class="albums-display-grid">${cards}</div>
+      </div>`;
+    }
+  }
+
+  // Photocards favorites
+  if (filter === "all" || filter === "photocards") {
+    if (favPcs.length) {
+      const cards = favPcs.map(pc => {
+        const isFav = true;
+        const agencyOfCard = Object.keys(collectionData).find(ag => collectionData[ag][pc.artist] !== undefined) || "Autres / Indés";
+        const auraColor = agencyThemes[agencyOfCard] || "#ffffff";
+        const imgContent = pc.img
+          ? `<img src="${pc.img}" alt="${pc.member||''}" class="binder-card-img">`
+          : `<div class="binder-card-empty-img"><span>${pc.member?pc.member[0]:"?"}</span></div>`;
+        return `
+          <div class="binder-slot-wrapper is-favorite">
+            <div class="group-aura" style="--aura-color:${auraColor}"></div>
+            <div class="binder-slot filled is-favorite">
+              <div class="binder-card-tilt">
+                ${imgContent}
+                <div class="holo-layer"></div>
+                <div class="binder-card-info">
+                  <span class="binder-card-member">${pc.member||"—"}</span>
+                  <span class="binder-card-artist">${pc.artist}</span>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }).join("");
+      html += `<div class="favorites-section">
+        <h3 class="favorites-section-label">★ Photocards</h3>
+        <div class="binder-grid" style="max-width:600px">${cards}</div>
+      </div>`;
+    }
+  }
+
+  // Concerts favoris
+  if (filter === "all" || filter === "concerts") {
+    if (favConcs.length) {
+      const cards = favConcs.map(c => {
+        const cover = c.photos && c.photos[0] ? c.photos[0] : null;
+        return `
+          <div class="concert-card" onclick="openConcertDetail('${c.id}')">
+            <div class="concert-card-media">
+              ${cover ? `<img src="${cover}" alt="${c.artist}" class="concert-card-img">` : `<div class="concert-card-placeholder">🎤</div>`}
+              <div class="concert-card-overlay">${starsHtml(c.rating)}</div>
+            </div>
+            <div class="concert-card-info">
+              <h4 class="concert-card-artist">${c.artist}</h4>
+              <p class="concert-card-meta">${concertDateLabel(c.date)}</p>
+            </div>
+          </div>`;
+      }).join("");
+      html += `<div class="favorites-section">
+        <h3 class="favorites-section-label">🎤 Concerts</h3>
+        <div class="concerts-grid">${cards}</div>
+      </div>`;
+    }
+  }
+
+  if (!html) {
+    html = `<div class="concerts-empty-state">
+      <div class="concerts-empty-icon">⭐</div>
+      <p class="concerts-empty-title">Aucun favori pour l'instant</p>
+      <p class="concerts-empty-desc">Clique sur ★ sur un album, une photocard ou un concert !</p>
+    </div>`;
+  }
+
+  document.getElementById("main-content").innerHTML = `
+    <div class="artist-view-header animate-fade">
+      <div class="breadcrumbs">collection</div>
+      <h2 class="artist-main-title">favoris.</h2>
+      <p class="album-total-count">${favAlbums.length + favPcs.length + favConcs.length} élément(s)</p>
+    </div>
+    <div class="favorites-content animate-fade">${html}</div>`;
+
+  // Réactiver le tilt sur les photocards favoris
+  setTimeout(initTilt, 60);
+}
+window.showFavorites = showFavorites;
+
+// ==========================================
+// PROFIL ENRICHI — BIASES & RÉSEAUX
+// ==========================================
+let profileExtra = JSON.parse(localStorage.getItem("kshelf_profile_extra") || "{}");
+Object.defineProperty(window, 'profileExtra', {
+  get: () => profileExtra,
+  set: (v) => { profileExtra = v; },
+  configurable: true
+});
+// { favGroup, favAlbum, youtube, tiktok, pinterest, kpopping, biases: [{name, group, img}] }
+
+function saveProfileExtra() {
+  localStorage.setItem("kshelf_profile_extra", JSON.stringify(profileExtra));
+  if (window.syncToFirestore) window.syncToFirestore();
+}
+
+// Charger les données dans le modal
+function loadProfileExtraIntoForm() {
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ""; };
+  setVal("profile-fav-group",  profileExtra.favGroup);
+  setVal("profile-fav-album",  profileExtra.favAlbum);
+  setVal("profile-youtube",    profileExtra.youtube);
+  setVal("profile-tiktok",     profileExtra.tiktok);
+  setVal("profile-pinterest",  profileExtra.pinterest);
+  setVal("profile-kpopping",   profileExtra.kpopping);
+  renderBiasesGrid();
+}
+window.loadProfileExtraIntoForm = loadProfileExtraIntoForm;
+
+// Chercher une photo de l'artiste via MusicBrainz cover art / last.fm
+async function fetchArtistPhoto(name, group) {
+  const query = group ? `${name} ${group} kpop` : `${name} kpop`;
+  // On utilise l'API de recherche d'images publique de Wikipedia (librement accessible)
+  try {
+    const wikiRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name + (group ? " (" + group + ")" : ""))}&prop=pageimages&format=json&pithumbsize=200&origin=*`);
+    const wikiData = await wikiRes.json();
+    const pages = wikiData.query?.pages;
+    if (pages) {
+      const page = Object.values(pages)[0];
+      if (page?.thumbnail?.source) return page.thumbnail.source;
+    }
+  } catch(e) {}
+  // Fallback : avatar généré avec initiales
+  return null;
+}
+
+// Rendu de la grille des biases
+function renderBiasesGrid() {
+  const grid = document.getElementById("biases-grid");
+  if (!grid) return;
+  const biases = profileExtra.biases || [];
+  grid.innerHTML = biases.map((b, i) => `
+    <div class="bias-card">
+      <div class="bias-avatar">
+        ${b.img ? `<img src="${b.img}" alt="${b.name}">` : `<span>${b.name[0]}</span>`}
+      </div>
+      <p class="bias-name">${b.name}</p>
+      <p class="bias-group">${b.group || ""}</p>
+      <button class="bias-remove" onclick="removeBias(${i})">✕</button>
+    </div>`).join("") +
+    (biases.length < 6 ? "" : "");
+}
+
+async function addBias() {
+  const nameEl  = document.getElementById("bias-name-input");
+  const groupEl = document.getElementById("bias-group-input");
+  const name  = nameEl?.value.trim();
+  const group = groupEl?.value.trim();
+  if (!name) return;
+  if ((profileExtra.biases || []).length >= 6) { alert("Maximum 6 biases !"); return; }
+
+  // Chercher une photo automatiquement
+  const img = await fetchArtistPhoto(name, group);
+  if (!profileExtra.biases) profileExtra.biases = [];
+  profileExtra.biases.push({ name, group, img: img || "" });
+  renderBiasesGrid();
+  if (nameEl) nameEl.value = "";
+  if (groupEl) groupEl.value = "";
+}
+window.addBias = addBias;
+
+function removeBias(index) {
+  profileExtra.biases = (profileExtra.biases || []).filter((_, i) => i !== index);
+  renderBiasesGrid();
+}
+window.removeBias = removeBias;
+
+// ==========================================
+// PROFIL PUBLIC
+// ==========================================
+function openPublicProfile() {
+  const user = window._currentUser;
+  if (!user) return;
+  const pseudo   = localStorage.getItem(`kshelf_pseudo_${user.uid}`) || user.displayName || "Utilisateur";
+  const photoURL = localStorage.getItem(`kshelf_photo_${user.uid}`) || user.photoURL || "";
+  const extra    = profileExtra;
+
+  // Stats
+  let totalAlbums = 0, favAlbums = 0;
+  for (const ag in collectionData)
+    for (const ar in collectionData[ag]) {
+      totalAlbums += collectionData[ag][ar].length;
+      favAlbums   += collectionData[ag][ar].filter(a => a.status === "favorite").length;
+    }
+
+  const biasesHtml = (extra.biases || []).map(b => `
+    <div class="public-bias-card">
+      <div class="public-bias-avatar">
+        ${b.img ? `<img src="${b.img}" alt="${b.name}">` : `<span>${b.name[0]}</span>`}
+      </div>
+      <p class="public-bias-name">${b.name}</p>
+      <p class="public-bias-group">${b.group || ""}</p>
+    </div>`).join("");
+
+  const socialsHtml = [
+    extra.youtube    ? `<a class="public-social-link" href="https://youtube.com/${extra.youtube}" target="_blank"><span class="public-social-icon">▶</span>${extra.youtube}</a>` : "",
+    extra.tiktok     ? `<a class="public-social-link" href="https://tiktok.com/${extra.tiktok}" target="_blank"><span class="public-social-icon">♪</span>${extra.tiktok}</a>` : "",
+    extra.pinterest  ? `<a class="public-social-link" href="https://pinterest.com/${extra.pinterest}" target="_blank"><span class="public-social-icon">P</span>${extra.pinterest}</a>` : "",
+    extra.kpopping   ? `<a class="public-social-link" href="https://kpopping.com/${extra.kpopping}" target="_blank"><span class="public-social-icon">K</span>${extra.kpopping}</a>` : "",
+  ].filter(Boolean).join("");
+
+  const overlay = document.createElement("div");
+  overlay.id = "public-profile-overlay";
+  overlay.className = "add-modal-overlay visible";
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+  overlay.innerHTML = `
+    <div class="album-modal public-profile-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('public-profile-overlay').remove()">✕</button>
+      <div class="public-profile-scroll">
+
+        <div class="public-profile-header">
+          <div class="public-profile-avatar">
+            ${photoURL ? `<img src="${photoURL}" alt="${pseudo}">` : `<span>${pseudo[0]}</span>`}
+          </div>
+          <h2 class="public-profile-name">${pseudo}</h2>
+          ${socialsHtml ? `<div class="public-socials">${socialsHtml}</div>` : ""}
+        </div>
+
+        <div class="public-stats-row">
+          <div class="public-stat"><span class="public-stat-num">${totalAlbums}</span><span class="public-stat-label">albums</span></div>
+          <div class="public-stat"><span class="public-stat-num">${favAlbums}</span><span class="public-stat-label">favoris</span></div>
+          <div class="public-stat"><span class="public-stat-num">${concertsData.length}</span><span class="public-stat-label">concerts</span></div>
+          <div class="public-stat"><span class="public-stat-num">${photocardsData.length}</span><span class="public-stat-label">photocards</span></div>
+        </div>
+
+        ${extra.favGroup || extra.favAlbum ? `
+        <div class="public-fav-section">
+          ${extra.favGroup ? `<div class="public-fav-item"><span class="public-fav-label">Groupe favori</span><span class="public-fav-value">${extra.favGroup}</span></div>` : ""}
+          ${extra.favAlbum ? `<div class="public-fav-item"><span class="public-fav-label">Album favori</span><span class="public-fav-value">${extra.favAlbum}</span></div>` : ""}
+        </div>` : ""}
+
+        ${biasesHtml ? `
+        <div class="public-biases-section">
+          <h3 class="modal-section-title">Mes biases</h3>
+          <div class="public-biases-grid">${biasesHtml}</div>
+        </div>` : ""}
+
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+}
+window.openPublicProfile = openPublicProfile;
