@@ -109,6 +109,8 @@ onAuthStateChanged(auth, async (user) => {
     await initUserData(user);
     updateProfileUI(user);
     startRealtimeSync(user);
+    // Déclencher les syncs en attente (données ajoutées avant connexion)
+    if (window._onSyncReady) window._onSyncReady();
   } else {
     window._currentUser = null;
     if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
@@ -232,6 +234,9 @@ window.syncToFirestore = async function() {
     concerts:    window.concertsData || [],
   });
 };
+
+// Notifier script.js que syncToFirestore est maintenant disponible
+if (window._onSyncReady) window._onSyncReady();
 
 // ==========================================
 // UI PROFIL
