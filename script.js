@@ -782,6 +782,18 @@ document.addEventListener("change", function(e) {
   }
 });
 
+function resetToDefaultCollection() {
+  if (!confirm("Restaurer la collection originale (28 albums) ? Cette action écrasera tes modifications actuelles.")) return;
+  collectionData = JSON.parse(JSON.stringify(defaultCollectionData)); // deep clone
+  saveCollection();
+  initSidebar();
+  showDashboard();
+  if (window.syncToFirestore) window.syncToFirestore();
+  if (typeof showDebugToast === "function") showDebugToast("✅ Collection restaurée !");
+  else alert("Collection restaurée !");
+}
+window.resetToDefaultCollection = resetToDefaultCollection;
+
 window.openAddModal   = openAddModal;
 window.closeAddModal  = closeAddModal;
 window.setAddStatus   = setAddStatus;
