@@ -107,6 +107,41 @@ const THEMES = {
       "--card-shadow":     "0 4px 16px rgba(0,0,0,0.06)",
       "--card-border":     "1px solid rgba(0,0,0,0.06)",
     }
+  },
+  lemontang: {
+    name: "LemonTang",
+    label: "Y2K Frutiger Aero",
+    preview: "linear-gradient(135deg, #4fc3f7, #fff176)",
+    vars: {
+      "--bg":              "#5fc9e8",
+      "--surface":         "rgba(255,255,255,0.22)",
+      "--surface-hover":   "rgba(255,255,255,0.32)",
+      "--border":          "rgba(255,255,255,0.45)",
+      "--border-hover":    "rgba(255,255,255,0.7)",
+      "--text-primary":    "#0d3b52",
+      "--text-secondary":  "#1c5c78",
+      "--text-tertiary":   "#3d7c95",
+      "--accent":          "#ffe14d",
+
+      /* Typo — rondes Y2K, gros titres ludiques */
+      "--font-display":    "'Syne', sans-serif",
+      "--font-body":       "'Plus Jakarta Sans', sans-serif",
+      "--font-weight-display": "800",
+      "--letter-spacing-display": "-1px",
+      "--text-transform-display": "none",
+
+      /* Formes — très arrondies, bulles */
+      "--radius-card":     "26px",
+      "--radius-panel":    "32px",
+      "--radius-btn":      "100px",
+      "--radius-pill":     "100px",
+      "--btn-border":      "1px solid rgba(255,255,255,0.6)",
+
+      "--blur":            "blur(18px) saturate(160%)",
+      "--grid-line":       "none",
+      "--card-shadow":     "0 10px 30px rgba(13,59,82,0.25), inset 0 1px 0 rgba(255,255,255,0.5)",
+      "--card-border":     "1.5px solid rgba(255,255,255,0.55)",
+    }
   }
 };
 
@@ -179,9 +214,58 @@ function applyTheme(themeId) {
   saveSettings();
   updateSettingsUI();
 
+  // Afficher/cacher la section upload bg LemonTang
+  const lemontangSection = document.getElementById("lemontang-bg-section");
+  if (lemontangSection) lemontangSection.style.display = themeId === "lemontang" ? "block" : "none";
+
+  // Réappliquer l'image de fond sauvegardée si on revient sur LemonTang
+  if (themeId === "lemontang") {
+    const savedBg = localStorage.getItem("kshelf_lemontang_bg");
+    if (savedBg) {
+      document.documentElement.style.setProperty("--lemontang-bg-image", `url(${savedBg})`);
+    }
+  }
+
   // Forcer re-render du contenu actif
   if (window.showDashboard) window.showDashboard();
 }
+
+// ==========================================
+// IMAGE DE FOND LEMONTANG
+// ==========================================
+function compressBgImage(file, maxSize = 1400, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxSize) { height *= maxSize / width; width = maxSize; }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadLemonTangBg(input) {
+  if (!input.files[0]) return;
+  try {
+    const compressed = await compressBgImage(input.files[0]);
+    localStorage.setItem("kshelf_lemontang_bg", compressed);
+    document.documentElement.style.setProperty("--lemontang-bg-image", `url(${compressed})`);
+  } catch(e) {
+    console.error("Erreur upload image LemonTang:", e);
+  }
+}
+window.uploadLemonTangBg = uploadLemonTangBg;
 
 // ==========================================
 // ANIMATIONS
@@ -289,6 +373,12 @@ function loadSettings() {
   applyTheme(currentSettings.theme || "dark");
   applyAnimations(currentSettings.animations !== false);
   if (currentSettings.accent) applyAccent(currentSettings.accent);
+
+  // Restaurer l'image de fond LemonTang si elle existe
+  const savedBg = localStorage.getItem("kshelf_lemontang_bg");
+  if (savedBg) {
+    document.documentElement.style.setProperty("--lemontang-bg-image", `url(${savedBg})`);
+  }
 }
 
 // ==========================================
