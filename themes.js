@@ -361,6 +361,33 @@ window.applyAccent    = applyAccent;
 window.applyAnimations = applyAnimations;
 window.t              = t;
 
+// ==========================================
+// FORCE FORCE - NETTOYAGE DES CONFLITS
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+  // On attend un tout petit peu (200ms) que script.js ait fini de s'installer
+  setTimeout(() => {
+    document.querySelectorAll(".theme-card").forEach(card => {
+      const themeId = card.dataset.theme;
+      
+      // Technique du clone : supprime proprement tous les écouteurs bloquants de script.js
+      const cleanCard = card.cloneNode(true);
+      card.parentNode.replaceChild(cleanCard, card);
+      
+      // On applique notre fonction de themes.js qui fonctionne parfaitement
+      cleanCard.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        applyTheme(themeId);
+      });
+    });
+    
+    // Force la coche visuelle à se mettre sur le bon thème au démarrage
+    updateSettingsUI();
+  }, 200);
+});
+
+
 // Init au chargement
 document.addEventListener("DOMContentLoaded", () => {
   loadSettings();
