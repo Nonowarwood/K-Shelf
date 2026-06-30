@@ -1185,20 +1185,379 @@ window.selectArtist  = selectArtist;
 window.handleSearch  = handleSearch;
 
 // ==========================================
-// CONCERTS — placeholder (fonctionnalité complète à venir)
+// CONCERTS — système complet
+// ==========================================
+let concertsData = JSON.parse(localStorage.getItem("kshelf_concerts")) || [];
+
+function saveConcerts() {
+  localStorage.setItem("kshelf_concerts", JSON.stringify(concertsData));
+  if (window.syncToFirestore) window.syncToFirestore();
+}
+
+function concertDateLabel(dateStr) {
+  if (!dateStr) return "Date inconnue";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function starsHtml(rating, interactive = false) {
+  let html = `<div class="stars-row ${interactive ? 'interactive' : ''}" data-rating="${rating || 0}">`;
+  for (let i = 1; i <= 5; i++) {
+    const filled = i <= (rating || 0);
+    html += interactive
+      ? `<span class="star-icon ${filled ? 'filled' : ''}" onclick="setConcertRating(${i})">★</span>`
+      : `<span class="star-icon ${filled ? 'filled' : ''}">★</span>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+// ==========================================
+// VUE LISTE DES CONCERTS
 // ==========================================
 function showConcerts() {
   document.querySelectorAll(".artist-item").forEach(el => el.classList.remove("active"));
+  // sidebarTab est déjà "concerts" donc initSidebar() régénère le bon état actif
   document.documentElement.style.setProperty("--dynamic-agency-color", "rgba(255,255,255,0.3)");
+
+  const sorted = [...concertsData].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+  const cardsHtml = sorted.map(c => {
+    const cover = c.photos && c.photos[0] ? c.photos[0] : null;
+    const mediaContent = cover
+      ? `<img src="${cover}" alt="${c.artist}" class="concert-card-img">`
+      : `<div class="concert-card-placeholder">🎤</div>`;
+    return `
+      <div class="concert-card" onclick="openConcertDetail('${c.id}')">
+        <div class="concert-card-media">
+          ${mediaContent}
+          <div class="concert-card-overlay">
+            ${starsHtml(c.rating)}
+          </div>
+        </div>
+        <div class="concert-card-info">
+          <h4 class="concert-card-artist">${c.artist}</h4>
+          <p class="concert-card-meta">${concertDateLabel(c.date)} · ${c.venue || "Lieu non renseigné"}</p>
+          ${c.tour ? `<p class="concert-card-tour">${c.tour}</p>` : ""}
+        </div>
+      </div>`;
+  }).join("");
+
   document.getElementById("main-content").innerHTML = `
     <div class="artist-view-header animate-fade">
       <div class="breadcrumbs">collection</div>
       <h2 class="artist-main-title">concerts.</h2>
-      <p class="album-total-count">Section en cours de construction 🎤</p>
+      <p class="album-total-count">${concertsData.length} concert(s) vécu(s)</p>
+    </div>
+    <div class="concerts-grid animate-fade">
+      ${cardsHtml || `
+        <div class="concerts-empty-state">
+          <div class="concerts-empty-icon">🎫</div>
+          <p class="concerts-empty-title">Aucun concert pour l'instant</p>
+          <p class="concerts-empty-desc">Ajoute ton premier souvenir de concert !</p>
+          <button class="add-submit-btn" style="max-width:280px" onclick="openAddConcert()">+ Ajouter un concert</button>
+        </div>`}
     </div>`;
 }
-function openAddConcert() {
-  alert("La fonctionnalité concerts arrive bientôt !");
+window.showConcerts = showConcerts;
+
+// ==========================================
+// MODAL AJOUT / EDITION CONCERT
+// ==========================================
+let concertFormState = {
+  id: null,
+  rating: 0,
+  photos: [],
+  videos: [],
+  setlist: [],
+};
+
+function openAddConcert(concertId = null) {
+  const existing = concertId ? concertsData.find(c => c.id === concertId) : null;
+
+  concertFormState = existing
+    ? {
+        id: existing.id,
+        rating: existing.rating || 0,
+        photos: [...(existing.photos || [])],
+        videos: [...(existing.videos || [])],
+        setlist: [...(existing.setlist || [])],
+      }
+    : { id: null, rating: 0, photos: [], videos: [], setlist: [] };
+
+  const overlay = document.createElement("div");
+  overlay.id = "concert-modal-overlay";
+  overlay.className = "add-modal-overlay visible";
+  overlay.onclick = (e) => { if (e.target === overlay) closeConcertModal(); };
+
+  overlay.innerHTML = `
+    <div class="add-modal glass-panel concert-form-modal">
+      <button class="modal-close" onclick="closeConcertModal()">✕</button>
+      <h2 class="add-modal-title">${existing ? "Modifier le concert" : "Ajouter un concert"}</h2>
+
+      <div class="add-form concert-form">
+        <div class="add-form-row">
+          <div class="add-form-group">
+            <label>Artiste *</label>
+            <input type="text" id="concert-artist" placeholder="NewJeans" value="${existing?.artist || ""}">
+          </div>
+          <div class="add-form-group">
+            <label>Date *</label>
+            <input type="date" id="concert-date" value="${existing?.date || ""}">
+          </div>
+        </div>
+
+        <div class="add-form-row">
+          <div class="add-form-group">
+            <label>Lieu</label>
+            <input type="text" id="concert-venue" placeholder="AccorHotels Arena, Paris" value="${existing?.venue || ""}">
+          </div>
+          <div class="add-form-group">
+            <label>Tournée</label>
+            <input type="text" id="concert-tour" placeholder="World Tour 2026" value="${existing?.tour || ""}">
+          </div>
+        </div>
+
+        <div class="add-form-group">
+          <label>Ma note</label>
+          <div id="concert-rating-picker">${starsHtml(concertFormState.rating, true)}</div>
+        </div>
+
+        <div class="add-form-group">
+          <label>Mon avis</label>
+          <textarea id="concert-review" placeholder="Une expérience inoubliable..." rows="4">${existing?.review || ""}</textarea>
+        </div>
+
+        <div class="add-form-group">
+          <label>Setlist (un titre par ligne)</label>
+          <textarea id="concert-setlist" placeholder="Hype Boy&#10;Attention&#10;Super Shy" rows="4">${(existing?.setlist || []).join("\n")}</textarea>
+        </div>
+
+        <div class="add-form-group">
+          <label>Photos</label>
+          <input type="file" id="concert-photos-input" accept="image/*" multiple class="pc-file-input" onchange="handleConcertMediaUpload(this, 'photos')">
+          <div id="concert-photos-preview" class="concert-media-preview-grid">${renderMediaPreview(concertFormState.photos, 'photos')}</div>
+        </div>
+
+        <div class="add-form-group">
+          <label>Vidéos</label>
+          <input type="file" id="concert-videos-input" accept="video/*" multiple class="pc-file-input" onchange="handleConcertMediaUpload(this, 'videos')">
+          <div id="concert-videos-preview" class="concert-media-preview-grid">${renderMediaPreview(concertFormState.videos, 'videos')}</div>
+        </div>
+
+        <div id="concert-error" class="add-error" style="display:none"></div>
+        <button class="add-submit-btn" onclick="submitConcert()">${existing ? "Enregistrer les modifications" : "Ajouter ce concert"}</button>
+        ${existing ? `<button class="signout-btn" onclick="deleteConcert('${existing.id}')">Supprimer ce concert</button>` : ""}
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
 }
-window.showConcerts   = showConcerts;
 window.openAddConcert = openAddConcert;
+
+function closeConcertModal() {
+  document.getElementById("concert-modal-overlay")?.remove();
+}
+window.closeConcertModal = closeConcertModal;
+
+function setConcertRating(n) {
+  concertFormState.rating = n;
+  document.getElementById("concert-rating-picker").innerHTML = starsHtml(n, true);
+}
+window.setConcertRating = setConcertRating;
+
+// ==========================================
+// UPLOAD MEDIA (compression photos, vidéos en l'état)
+// ==========================================
+function compressConcertImage(file, maxSize = 1000, quality = 0.78) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxSize) { height *= maxSize / width; width = maxSize; }
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleConcertMediaUpload(input, type) {
+  const files = Array.from(input.files || []);
+  for (const file of files) {
+    try {
+      if (type === "photos") {
+        const compressed = await compressConcertImage(file);
+        concertFormState.photos.push(compressed);
+      } else {
+        // Vidéos : pas de compression possible côté client simplement —
+        // on prévient si trop lourd pour éviter de saturer le localStorage
+        if (file.size > 8 * 1024 * 1024) {
+          alert(`"${file.name}" dépasse 8MB et risque de ne pas pouvoir être sauvegardée localement. Privilégie des vidéos courtes.`);
+        }
+        const dataUrl = await readFileAsDataURL(file);
+        concertFormState.videos.push(dataUrl);
+      }
+    } catch(e) {
+      console.error("Erreur upload média concert:", e);
+    }
+  }
+  document.getElementById(`concert-${type}-preview`).innerHTML = renderMediaPreview(concertFormState[type], type);
+  input.value = "";
+}
+window.handleConcertMediaUpload = handleConcertMediaUpload;
+
+function renderMediaPreview(items, type) {
+  return items.map((src, i) => {
+    const thumb = type === "photos"
+      ? `<img src="${src}" class="concert-media-thumb">`
+      : `<video src="${src}" class="concert-media-thumb"></video>`;
+    return `<div class="concert-media-item">
+      ${thumb}
+      <button class="concert-media-remove" onclick="removeConcertMedia('${type}', ${i})">✕</button>
+    </div>`;
+  }).join("");
+}
+
+function removeConcertMedia(type, index) {
+  concertFormState[type].splice(index, 1);
+  document.getElementById(`concert-${type}-preview`).innerHTML = renderMediaPreview(concertFormState[type], type);
+}
+window.removeConcertMedia = removeConcertMedia;
+
+// ==========================================
+// SUBMIT / DELETE
+// ==========================================
+function submitConcert() {
+  const artist = document.getElementById("concert-artist").value.trim();
+  const date   = document.getElementById("concert-date").value;
+  const venue  = document.getElementById("concert-venue").value.trim();
+  const tour   = document.getElementById("concert-tour").value.trim();
+  const review = document.getElementById("concert-review").value.trim();
+  const setlistRaw = document.getElementById("concert-setlist").value.trim();
+  const setlist = setlistRaw ? setlistRaw.split("\n").map(s => s.trim()).filter(Boolean) : [];
+  const errEl = document.getElementById("concert-error");
+
+  if (!artist || !date) {
+    errEl.textContent = "L'artiste et la date sont obligatoires.";
+    errEl.style.display = "block";
+    return;
+  }
+
+  const concertObj = {
+    id: concertFormState.id || ("concert_" + Date.now()),
+    artist, date, venue, tour, review, setlist,
+    rating: concertFormState.rating,
+    photos: concertFormState.photos,
+    videos: concertFormState.videos,
+  };
+
+  if (concertFormState.id) {
+    const idx = concertsData.findIndex(c => c.id === concertFormState.id);
+    if (idx !== -1) concertsData[idx] = concertObj;
+  } else {
+    concertsData.push(concertObj);
+  }
+
+  saveConcerts();
+  closeConcertModal();
+  showConcerts();
+}
+window.submitConcert = submitConcert;
+
+function deleteConcert(id) {
+  if (!confirm("Supprimer ce concert et tous ses souvenirs ?")) return;
+  concertsData = concertsData.filter(c => c.id !== id);
+  saveConcerts();
+  closeConcertModal();
+  showConcerts();
+}
+window.deleteConcert = deleteConcert;
+
+// ==========================================
+// FICHE DÉTAIL CONCERT
+// ==========================================
+function openConcertDetail(id) {
+  const c = concertsData.find(x => x.id === id);
+  if (!c) return;
+
+  const overlay = document.createElement("div");
+  overlay.id = "concert-detail-overlay";
+  overlay.className = "add-modal-overlay visible";
+  overlay.onclick = (e) => { if (e.target === overlay) closeConcertDetail(); };
+
+  const photosHtml = (c.photos || []).map(src => `<img src="${src}" class="concert-gallery-photo" onclick="event.stopPropagation()">`).join("");
+  const videosHtml = (c.videos || []).map(src => `<video src="${src}" class="concert-gallery-video" controls onclick="event.stopPropagation()"></video>`).join("");
+  const setlistHtml = (c.setlist || []).map((t, i) => `<div class="modal-track"><span class="modal-track-num">${i+1}</span><span class="modal-track-name">${t}</span></div>`).join("");
+
+  overlay.innerHTML = `
+    <div class="album-modal concert-detail-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeConcertDetail()">✕</button>
+      <div class="concert-detail-scroll">
+
+        <div class="concert-detail-header">
+          <p class="modal-agency">${concertDateLabel(c.date)}${c.tour ? " · " + c.tour : ""}</p>
+          <h2 class="modal-title">${c.artist}</h2>
+          <p class="modal-artist">📍 ${c.venue || "Lieu non renseigné"}</p>
+          ${starsHtml(c.rating)}
+        </div>
+
+        ${c.review ? `<div class="concert-detail-section">
+          <h3 class="modal-section-title">Mon avis</h3>
+          <p class="concert-review-text">${c.review}</p>
+        </div>` : ""}
+
+        ${setlistHtml ? `<div class="concert-detail-section">
+          <h3 class="modal-section-title">Setlist</h3>
+          <div class="modal-tracks-container">${setlistHtml}</div>
+        </div>` : ""}
+
+        ${photosHtml ? `<div class="concert-detail-section">
+          <h3 class="modal-section-title">Photos</h3>
+          <div class="concert-gallery-grid">${photosHtml}</div>
+        </div>` : ""}
+
+        ${videosHtml ? `<div class="concert-detail-section">
+          <h3 class="modal-section-title">Vidéos</h3>
+          <div class="concert-gallery-grid">${videosHtml}</div>
+        </div>` : ""}
+
+        <div class="concert-detail-actions">
+          <button class="add-submit-btn" onclick="closeConcertDetail(); openAddConcert('${c.id}')">✎ Modifier</button>
+        </div>
+
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+}
+window.openConcertDetail = openConcertDetail;
+
+function closeConcertDetail() {
+  document.getElementById("concert-detail-overlay")?.remove();
+}
+window.closeConcertDetail = closeConcertDetail;
+
+// Exposer pour Firebase sync
+Object.defineProperty(window, 'concertsData', {
+  get: () => concertsData,
+  set: (v) => { concertsData = v; },
+  configurable: true
+});
