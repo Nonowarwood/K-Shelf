@@ -107,16 +107,66 @@
           <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
         </div>
         <div class="add-form">
-          <div class="add-form-group">
-            <label>Pseudo</label>
-            <input type="text" id="profile-pseudo-input" placeholder="ton pseudo...">
+
+          <!-- Infos de base -->
+          <div class="add-form-row">
+            <div class="add-form-group">
+              <label>Pseudo</label>
+              <input type="text" id="profile-pseudo-input" placeholder="ton pseudo...">
+            </div>
+            <div class="add-form-group">
+              <label>Email Google</label>
+              <input type="text" id="profile-email-display" disabled style="opacity:0.4; cursor:default;">
+            </div>
           </div>
-          <div class="add-form-group">
-            <label>Email Google</label>
-            <input type="text" id="profile-email-display" disabled style="opacity:0.4; cursor:default;">
+
+          <!-- Favoris -->
+          <div class="add-form-row">
+            <div class="add-form-group">
+              <label>Groupe favori</label>
+              <input type="text" id="profile-fav-group" placeholder="NewJeans">
+            </div>
+            <div class="add-form-group">
+              <label>Album favori</label>
+              <input type="text" id="profile-fav-album" placeholder="How Sweet">
+            </div>
           </div>
+
+          <!-- Réseaux sociaux -->
+          <div class="profile-section-label">Réseaux sociaux</div>
+          <div class="add-form-row">
+            <div class="add-form-group">
+              <label>YouTube</label>
+              <input type="text" id="profile-youtube" placeholder="@nonowarwood">
+            </div>
+            <div class="add-form-group">
+              <label>TikTok</label>
+              <input type="text" id="profile-tiktok" placeholder="@nonowarwood">
+            </div>
+          </div>
+          <div class="add-form-row">
+            <div class="add-form-group">
+              <label>Pinterest</label>
+              <input type="text" id="profile-pinterest" placeholder="nonowarwood">
+            </div>
+            <div class="add-form-group">
+              <label>Kpopping</label>
+              <input type="text" id="profile-kpopping" placeholder="nonowarwood">
+            </div>
+          </div>
+
+          <!-- Biases -->
+          <div class="profile-section-label">Mes biases <span style="opacity:0.5;font-weight:400">(6 max)</span></div>
+          <div id="biases-grid" class="biases-grid"></div>
+          <div class="bias-add-row">
+            <input type="text" id="bias-name-input" placeholder="Nom du membre (ex: Minji)">
+            <input type="text" id="bias-group-input" placeholder="Groupe (ex: NewJeans)">
+            <button class="concert-add-url-btn" onclick="addBias()">+ Ajouter</button>
+          </div>
+
           <button class="add-submit-btn" onclick="saveProfile()">Sauvegarder</button>
           <button class="signout-btn" onclick="signOutUser()">Se déconnecter</button>
+          <button class="signout-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--text-secondary)" onclick="openPublicProfile()">👁 Voir mon profil public</button>
         </div>
       </div>
 
