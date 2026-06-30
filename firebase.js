@@ -147,13 +147,14 @@ async function initUserData(user) {
       localStorage.setItem("kshelf_binder_pages", data.binderPages);
     }
     if (data.concerts !== null) {
-      // Fusionner avec les vidéos locales (non stockées dans Firestore)
+      // Fusionner avec les médias locaux (photos/vidéos non stockés dans Firestore)
       const localConcerts = JSON.parse(localStorage.getItem("kshelf_concerts") || "[]");
       const merged = data.concerts.map(remoteConcert => {
         const local = localConcerts.find(l => l.id === remoteConcert.id);
         return {
           ...remoteConcert,
-          videos: local?.videos || [], // restaurer les vidéos depuis le localStorage local
+          photos: local?.photos || [], // restaurer les photos depuis le localStorage
+          videos: [],
         };
       });
       window.concertsData = merged;
@@ -253,11 +254,20 @@ function sanitizeForFirestore(data) {
 }
 
 function prepareConcertsForSync(concerts) {
-  // Concerts sans vidéos (gardées uniquement en localStorage)
-  return (concerts || []).map(c => {
-    const { videos, ...rest } = c;
-    return sanitizeForFirestore(rest);
-  });
+  // Concerts sans médias base64 (photos/vidéos trop lourdes pour Firestore)
+  // On ne stocke que les métadonnées texte + setlist + note
+  return (concerts || []).map(c => sanitizeForFirestore({
+    id:     c.id,
+    artist: c.artist,
+    date:   c.date,
+    venue:  c.venue,
+    tour:   c.tour,
+    review: c.review,
+    setlist: c.setlist || [],
+    rating:  c.rating || 0,
+    // photos : on stocke juste le nombre pour info, pas le contenu base64
+    photoCount: (c.photos || []).length,
+  }));
 }
 
 window.syncToFirestore = async function() {
