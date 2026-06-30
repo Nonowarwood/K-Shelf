@@ -107,6 +107,42 @@ const THEMES = {
       "--card-shadow":     "0 4px 16px rgba(0,0,0,0.06)",
       "--card-border":     "1px solid rgba(0,0,0,0.06)",
     }
+  },
+  lemontang: {
+    name: "LemonTang",
+    label: "Y2K Pop / Bubbly",
+    preview: "#fff59d",
+    vars: {
+      // Dégradé jaune citron/menthe translucide sur une image de fond fixe
+      "--bg":              "linear-gradient(135deg, rgba(254, 240, 138, 0.75) 0%, rgba(187, 247, 208, 0.75) 100%), url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1200') no-repeat center/cover fixed",
+      "--surface":         "rgba(255, 255, 255, 0.65)",
+      "--surface-hover":   "rgba(255, 255, 255, 0.85)",
+      "--border":          "rgba(234, 179, 8, 0.25)",
+      "--border-hover":    "rgba(234, 179, 8, 0.6)",
+      "--text-primary":    "#0f172a",
+      "--text-secondary":  "#334155",
+      "--text-tertiary":   "#64748b",
+      "--accent":          "#eab308",
+
+      /* Typo — Style rond Y2K */
+      "--font-display":    "'Fredoka', sans-serif",
+      "--font-body":       "'Plus Jakarta Sans', sans-serif",
+      "--font-weight-display": "700",
+      "--letter-spacing-display": "0px",
+      "--text-transform-display": "none",
+
+      /* Formes — Ultra-bulles & arrondies */
+      "--radius-card":     "24px",
+      "--radius-panel":    "32px",
+      "--radius-btn":      "18px",
+      "--radius-pill":     "50px",
+      "--btn-border":      "2.5px solid rgba(234, 179, 8, 0.4)",
+
+      "--blur":            "blur(16px) saturate(145%)",
+      "--grid-line":       "none",
+      "--card-shadow":     "0 10px 30px rgba(234, 179, 8, 0.12)",
+      "--card-border":     "2px solid rgba(255, 255, 255, 0.7)",
+    }
   }
 };
 
@@ -158,8 +194,6 @@ function applyTheme(themeId) {
     el.style.border = "";
     el.style.borderRadius = "";
   });
-  // Tout le reste est piloté par les classes body.theme-* dans style.css
-  // (album-media-wrapper, boutons, titres, etc. utilisent var(--radius-card) etc directement)
 
   // Topbar
   const topbar = document.querySelector(".profile-btn");
