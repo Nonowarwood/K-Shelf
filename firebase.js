@@ -68,9 +68,10 @@ async function writeToFirestore(uid, payload) {
     if (payload.binderPages !== undefined) toWrite.binderPages = payload.binderPages;
     if (payload.pseudo      !== undefined) toWrite.pseudo      = payload.pseudo;
     await setDoc(userDocRef(uid), toWrite, { merge: true });
-    console.log("✅ Firestore sync OK");
+    return true;
   } catch(e) {
-    console.error("❌ Firestore write error:", e);
+    showDebugToast("❌ Firestore: " + e.code, "#f87171");
+    return false;
   }
 }
 
@@ -115,18 +116,22 @@ onAuthStateChanged(auth, async (user) => {
 // ==========================================
 // INIT DONNÉES — lecture Firestore
 // ==========================================
+function showDebugToast(msg, color="#1db954") {
+  const t = document.createElement("div");
+  t.style.cssText = `position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:${color};color:#000;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;max-width:90vw;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.4)`;
+  t.innerText = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 5000);
+}
+
 async function initUserData(user) {
-  console.log("🔄 Chargement Firestore pour", user.uid);
+  showDebugToast("🔄 Connexion Firebase... UID: " + user.uid.slice(0,8));
   const data = await readFromFirestore(user.uid);
 
-  if (data && (data.collection || data.photocards !== null)) {
-    // ✅ Données trouvées → charger depuis Firestore
-    console.log("✅ Données Firestore trouvées, chargement...");
-
-    if (data.collection) {
-      window.collectionData = data.collection;
-      localStorage.setItem("kshelf_save", JSON.stringify(data.collection));
-    }
+  if (data && data.collection && Object.keys(data.collection).length > 0) {
+    showDebugToast("✅ Données Firestore trouvées !");
+    window.collectionData = data.collection;
+    localStorage.setItem("kshelf_save", JSON.stringify(data.collection));
     if (data.photocards !== null) {
       window.photocardsData = data.photocards;
       localStorage.setItem("kshelf_photocards", JSON.stringify(data.photocards));
@@ -139,20 +144,19 @@ async function initUserData(user) {
       localStorage.setItem(`kshelf_pseudo_${user.uid}`, data.pseudo);
     }
   } else {
-    // 🆕 Première connexion → pousser les données par défaut
-    console.log("🆕 Première connexion, push des données par défaut...");
-    // S'assurer que les données par défaut sont chargées
+    showDebugToast("🆕 Première connexion, sauvegarde en cours...", "#f59e0b");
+    // Forcer le chargement des données par défaut
     if (!window.collectionData || Object.keys(window.collectionData).length === 0) {
-      if (window.defaultCollectionData) window.collectionData = window.defaultCollectionData;
+      window.collectionData = window.defaultCollectionData || {};
     }
-    await writeToFirestore(user.uid, {
-      collection:  window.collectionData  || {},
+    const result = await writeToFirestore(user.uid, {
+      collection:  window.collectionData,
       photocards:  window.photocardsData  || [],
       binderPages: window.binderTotalPages || 1,
     });
+    showDebugToast(result ? "✅ Sauvegarde OK !" : "❌ Erreur sauvegarde", result ? "#1db954" : "#f87171");
   }
 
-  // Rafraîchir l'UI
   if (window.initSidebar)   window.initSidebar();
   if (window.showDashboard) window.showDashboard();
 }
