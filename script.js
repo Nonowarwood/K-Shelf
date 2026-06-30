@@ -1742,6 +1742,8 @@ function saveProfileExtra() {
 
 // Charger les données dans le modal
 function loadProfileExtraIntoForm() {
+  // Recharger depuis localStorage pour avoir les données les plus récentes
+  profileExtra = JSON.parse(localStorage.getItem("kshelf_profile_extra") || "{}");
   const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ""; };
   setVal("profile-fav-group",  profileExtra.favGroup);
   setVal("profile-fav-album",  profileExtra.favAlbum);
@@ -1819,7 +1821,10 @@ function openPublicProfile() {
   if (!user) return;
   const pseudo   = localStorage.getItem(`kshelf_pseudo_${user.uid}`) || user.displayName || "Utilisateur";
   const photoURL = localStorage.getItem(`kshelf_photo_${user.uid}`) || user.photoURL || "";
-  const extra    = profileExtra;
+
+  // Toujours recharger depuis localStorage pour avoir les données les plus récentes
+  const extra = JSON.parse(localStorage.getItem("kshelf_profile_extra") || "{}");
+  profileExtra = extra; // synchroniser aussi la variable locale
 
   // Stats
   let totalAlbums = 0, favAlbums = 0;
