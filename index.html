@@ -38,14 +38,14 @@
       <!-- DROPDOWN MENU -->
       <div class="profile-dropdown-menu" id="profile-dropdown-menu">
         <button class="dropdown-item" onclick="closeProfileDropdown(); openProfilePage();">
-          <span class="dropdown-item-icon">👤</span> Mon profil
+          <span class="dropdown-item-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Mon profil
         </button>
         <button class="dropdown-item" onclick="closeProfileDropdown(); openSettings();">
-          <span class="dropdown-item-icon">⚙️</span> Paramètres
+          <span class="dropdown-item-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres
         </button>
         <div class="dropdown-divider"></div>
         <button class="dropdown-item dropdown-item-danger" onclick="closeProfileDropdown(); signOutUser();">
-          <span class="dropdown-item-icon">↩</span> Se déconnecter
+          <span class="dropdown-item-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Se déconnecter
         </button>
       </div>
     </div>
@@ -164,7 +164,7 @@
           <!-- Biases -->
           <div class="kprofile-card">
             <div class="kprofile-card-header">
-              <span class="kprofile-card-icon">💗</span>
+              <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="#FF5C8A"><path d="M12 21.593c-.525-.445-4.783-4.144-6.622-5.672-1.839-1.529-3.378-3.538-3.378-6.021 0-2.583 2.099-4.5 4.5-4.5 1.485 0 2.886.699 3.5 1.706.614-1.007 2.015-1.706 3.5-1.706 2.401 0 4.5 1.917 4.5 4.5 0 2.483-1.539 4.492-3.378 6.021-1.839 1.528-6.097 5.227-6.622 5.672z"/></svg>
               <span class="kprofile-card-title">Mes biases</span>
               <span class="kprofile-card-count" id="biases-count">0/6</span>
             </div>
@@ -184,24 +184,32 @@
           <!-- Réseaux sociaux -->
           <div class="kprofile-card">
             <div class="kprofile-card-header">
-              <span class="kprofile-card-icon">🔗</span>
+              <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
               <span class="kprofile-card-title">Réseaux sociaux</span>
             </div>
             <div class="kprofile-socials-grid">
               <div class="kprofile-social-item">
-                <span class="kprofile-social-icon">▶</span>
+                <span class="kprofile-social-icon kprofile-icon-yt">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </span>
                 <input type="text" id="profile-youtube" placeholder="@nonowarwood">
               </div>
               <div class="kprofile-social-item">
-                <span class="kprofile-social-icon">♪</span>
+                <span class="kprofile-social-icon kprofile-icon-tt">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.83a8.16 8.16 0 0 0 4.77 1.52V6.9a4.85 4.85 0 0 1-1-.21z"/></svg>
+                </span>
                 <input type="text" id="profile-tiktok" placeholder="@nonowarwood">
               </div>
               <div class="kprofile-social-item">
-                <span class="kprofile-social-icon">P</span>
+                <span class="kprofile-social-icon kprofile-icon-pin">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="#E60023"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+                </span>
                 <input type="text" id="profile-pinterest" placeholder="nonowarwood">
               </div>
               <div class="kprofile-social-item">
-                <span class="kprofile-social-icon">K</span>
+                <span class="kprofile-social-icon kprofile-icon-kp">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><circle cx="12" cy="12" r="12" fill="#FF5C8A"/><path d="M7 12.5c0-2.76 2.24-5 5-5s5 2.24 5 5-2.24 5-5 5-5-2.24-5-5z" fill="#fff" opacity=".9"/><circle cx="12" cy="12.5" r="2.2" fill="#FF5C8A"/></svg>
+                </span>
                 <input type="text" id="profile-kpopping" placeholder="nonowarwood">
               </div>
             </div>
@@ -210,7 +218,7 @@
           <!-- Stats -->
           <div class="kprofile-card">
             <div class="kprofile-card-header">
-              <span class="kprofile-card-icon">📊</span>
+              <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
               <span class="kprofile-card-title">Ma collection</span>
             </div>
             <div class="kprofile-stats-grid" id="kprofile-stats-grid"></div>
