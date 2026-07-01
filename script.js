@@ -80,11 +80,11 @@ function savePhotocards() {
 }
 
 // Lightsticks data
-const lightsticksData = [
-  { name: "NewJeans Powerpuff Lightstick", img: "https://media.asiaworldmusic.fr/84302-large_default/newjeans-powerpuff-girls-x-nj-official-light-stick.jpg", artist: "NewJeans" },
-  { name: "LE SSERAFIM Lightstick", img: "https://media.asiaworldmusic.fr/75594-large_default/le-sserafim-official-light-stick.jpg", artist: "LE Sserafim" },
-  { name: "TWICE Candy Bong Z2", img: "https://media.asiaworldmusic.fr/79072-large_default/twice-official-light-stick-candy-bong-z2.jpg", artist: "TWICE" },
-];
+let lightsticksData = JSON.parse(localStorage.getItem("kshelf_lightsticks") || "[]");
+
+function saveLightsticks() {
+  localStorage.setItem("kshelf_lightsticks", JSON.stringify(lightsticksData));
+}
 
 // Exposé pour Firebase (première connexion)
 window.defaultCollectionData = defaultCollectionData;
@@ -189,7 +189,7 @@ function initSidebar() {
     }
     html += `<div class="agency-section">
       <div class="artist-list">
-        <div class="artist-item lightstick-nav" onclick="showLightsticks()">✦ lightsticks</div>
+        <div class="artist-item lightstick-nav" onclick="showLightsticks()">${t ? t("sidebar.lightsticks") : "✦ lightsticks"}</div>
       </div>
     </div>`;
   } else if (sidebarTab === "photocards") {
@@ -431,14 +431,23 @@ function showLightsticks() {
   document.querySelector(".lightstick-nav")?.classList.add("active");
   document.documentElement.style.setProperty("--dynamic-agency-color", "rgba(255,255,255,0.3)");
 
-  const cardsHtml = lightsticksData.map(ls => `
+  const cardsHtml = lightsticksData.map((ls, i) => `
     <div class="lightstick-card">
       <div class="lightstick-img-wrapper">
         ${ls.img ? `<img src="${ls.img}" alt="${ls.name}" class="lightstick-img" loading="lazy">` : `<div class="lightstick-placeholder">🪄</div>`}
+        <button class="lightstick-delete-btn" onclick="deleteLightstick(${i})" title="Supprimer">✕</button>
       </div>
       <p class="lightstick-name">${ls.name}</p>
       <span class="lightstick-artist">${ls.artist}</span>
     </div>`).join("");
+
+  const emptyHtml = `
+    <div class="concerts-empty-state">
+      <div class="concerts-empty-icon">🪄</div>
+      <p class="concerts-empty-title">Aucun lightstick pour l'instant</p>
+      <p class="concerts-empty-desc">Ajoute tes lightsticks officiels !</p>
+      <button class="add-submit-btn" style="max-width:280px" onclick="openAddLightstick()">+ Ajouter un lightstick</button>
+    </div>`;
 
   document.getElementById("main-content").innerHTML = `
     <div class="artist-view-header animate-fade">
@@ -447,9 +456,63 @@ function showLightsticks() {
       <p class="album-total-count">${lightsticksData.length} lightstick(s)</p>
     </div>
     <div class="lightsticks-grid animate-fade">
-      ${cardsHtml || '<p class="no-result">Aucun lightstick.</p>'}
+      ${cardsHtml || emptyHtml}
     </div>`;
 }
+
+function openAddLightstick() {
+  const overlay = document.createElement("div");
+  overlay.id = "lightstick-modal-overlay";
+  overlay.className = "add-modal-overlay visible";
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+  overlay.innerHTML = `
+    <div class="add-modal glass-panel" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('lightstick-modal-overlay').remove()">✕</button>
+      <h2 class="add-modal-title">Ajouter un lightstick</h2>
+      <div class="add-form">
+        <div class="add-form-group">
+          <label>Nom *</label>
+          <input type="text" id="ls-name" placeholder="TWICE Candy Bong Z2">
+        </div>
+        <div class="add-form-group">
+          <label>Artiste *</label>
+          <input type="text" id="ls-artist" placeholder="TWICE">
+        </div>
+        <div class="add-form-group">
+          <label>URL de l'image</label>
+          <input type="text" id="ls-img" placeholder="https://...">
+        </div>
+        <div id="ls-error" class="add-error" style="display:none">Nom et artiste obligatoires.</div>
+        <button class="add-submit-btn" onclick="submitAddLightstick()">Ajouter ce lightstick</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+window.openAddLightstick = openAddLightstick;
+
+function submitAddLightstick() {
+  const name   = document.getElementById("ls-name").value.trim();
+  const artist = document.getElementById("ls-artist").value.trim();
+  const img    = document.getElementById("ls-img").value.trim();
+  if (!name || !artist) {
+    document.getElementById("ls-error").style.display = "block";
+    return;
+  }
+  lightsticksData.push({ name, artist, img });
+  saveLightsticks();
+  document.getElementById("lightstick-modal-overlay").remove();
+  showLightsticks();
+}
+window.submitAddLightstick = submitAddLightstick;
+
+function deleteLightstick(index) {
+  if (!confirm("Supprimer ce lightstick ?")) return;
+  lightsticksData.splice(index, 1);
+  saveLightsticks();
+  showLightsticks();
+}
+window.deleteLightstick = deleteLightstick;
 
 // ==========================================
 // SYSTEME AUDIO LOCAL
