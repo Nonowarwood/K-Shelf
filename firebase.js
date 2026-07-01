@@ -68,12 +68,13 @@ async function readFromFirestore(uid) {
 async function writeToFirestore(uid, payload) {
   try {
     const toWrite = { updatedAt: Date.now() };
-    if (payload.collection  !== undefined) toWrite.collection  = JSON.stringify(payload.collection);
-    if (payload.photocards  !== undefined) toWrite.photocards  = JSON.stringify(payload.photocards);
-    if (payload.binderPages !== undefined) toWrite.binderPages = payload.binderPages;
-    if (payload.concerts    !== undefined) toWrite.concerts    = JSON.stringify(payload.concerts);
-    if (payload.pseudo      !== undefined) toWrite.pseudo      = payload.pseudo;
-    if (payload.photoURL    !== undefined) toWrite.photoURL    = payload.photoURL;
+    if (payload.collection    !== undefined) toWrite.collection    = JSON.stringify(payload.collection);
+    if (payload.photocards    !== undefined) toWrite.photocards    = JSON.stringify(payload.photocards);
+    if (payload.binderPages   !== undefined) toWrite.binderPages   = payload.binderPages;
+    if (payload.concerts      !== undefined) toWrite.concerts      = JSON.stringify(payload.concerts);
+    if (payload.pseudo        !== undefined) toWrite.pseudo        = payload.pseudo;
+    if (payload.photoURL      !== undefined) toWrite.photoURL      = payload.photoURL;
+    if (payload.profileExtra  !== undefined) toWrite.profileExtra  = payload.profileExtra;
     await setDoc(userDocRef(uid), toWrite, { merge: true });
     return true;
   } catch(e) {
