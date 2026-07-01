@@ -1954,10 +1954,7 @@ window.toggleMobileSearch = toggleMobileSearch;
 // ==========================================
 function toggleProfileDropdown() {
   const user = window._currentUser;
-  if (!user) {
-    openProfilePage();
-    return;
-  }
+  if (!user) { openProfilePage(); return; }
   document.getElementById("profile-dropdown-menu")?.classList.toggle("visible");
 }
 window.toggleProfileDropdown = toggleProfileDropdown;
@@ -1967,15 +1964,11 @@ function closeProfileDropdown() {
 }
 window.closeProfileDropdown = closeProfileDropdown;
 
-// Gestion centralisée des actions du dropdown
-// (évite les conflits d'ordre d'exécution entre onclick et document.click)
 function handleDropdownAction(action) {
-  closeProfileDropdown();
-  requestAnimationFrame(() => {
-    if (action === "profile")  openProfilePage();
-    if (action === "settings") window.openSettings?.();
-    if (action === "signout")  window.signOutUser?.();
-  });
+  document.getElementById("profile-dropdown-menu")?.classList.remove("visible");
+  if (action === "profile")  openProfilePage();
+  if (action === "settings") window.openSettings?.();
+  if (action === "signout")  window.signOutUser?.();
 }
 window.handleDropdownAction = handleDropdownAction;
 
