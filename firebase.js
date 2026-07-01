@@ -6,6 +6,8 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -87,10 +89,32 @@ window.signInWithGoogle = async function() {
   try {
     await signInWithPopup(auth, provider);
   } catch(e) {
-    console.error("Connexion Google:", e);
-    alert("Connexion impossible : " + e.message);
+    console.error("Connexion Google (popup):", e);
+    // Fallback : si le popup est bloqué ou échoue, utiliser le redirect
+    if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request") {
+      showDebugToast("↪️ Redirection vers Google...", "#4fc3f7");
+      try {
+        await signInWithRedirect(auth, provider);
+      } catch(e2) {
+        console.error("Connexion Google (redirect):", e2);
+        alert("Connexion impossible : " + e2.message);
+      }
+    } else {
+      alert("Connexion impossible : " + e.message);
+    }
   }
 };
+
+// Gérer le retour d'une connexion par redirect (mobile/navigateurs stricts)
+getRedirectResult(auth).then((result) => {
+  if (result?.user) {
+    showDebugToast("✅ Connecté via redirect", "#1db954");
+  }
+}).catch((e) => {
+  if (e.code && e.code !== "auth/no-auth-event") {
+    console.error("Erreur redirect result:", e);
+  }
+});
 
 window.signOutUser = async function() {
   if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
