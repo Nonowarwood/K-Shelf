@@ -348,6 +348,7 @@ function updateProfileUI(user) {
   setEl("profile-email-display-text", el => el.innerText = user.email || "");
   setEl("profile-large-letter",  el => { el.innerText = pseudo[0].toUpperCase(); el.style.display = photoURL ? "none" : "block"; });
   setEl("profile-large-img",     el => { el.src = photoURL; el.style.display = photoURL ? "block" : "none"; });
+  setEl("topbar-logged-out", el => el.classList.remove("visible"));
 }
 
 function clearProfileUI() {
@@ -357,6 +358,7 @@ function clearProfileUI() {
   setEl("profile-logged-out",    el => el.style.display = "block");
   const loggedIn3 = document.getElementById("profile-logged-in");
   if (loggedIn3) loggedIn3.classList.add("profile-hidden");
+  setEl("topbar-logged-out", el => el.classList.remove("visible"));
 }
 
 function setEl(id, fn) {
