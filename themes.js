@@ -108,6 +108,72 @@ const THEMES = {
       "--card-border":     "1px solid rgba(0,0,0,0.06)",
     }
   },
+  chatgpt: {
+    name: "ChatGPT",
+    label: "Dark Minimal",
+    preview: "#212121",
+    vars: {
+      "--bg":              "#212121",
+      "--surface":         "#2f2f2f",
+      "--surface-hover":   "#3a3a3a",
+      "--border":          "rgba(255,255,255,0.1)",
+      "--border-hover":    "rgba(255,255,255,0.2)",
+      "--text-primary":    "#ececec",
+      "--text-secondary":  "#8e8ea0",
+      "--text-tertiary":   "#565869",
+      "--accent":          "#10a37f",
+
+      "--font-display":    "'Syne', sans-serif",
+      "--font-body":       "'Plus Jakarta Sans', sans-serif",
+      "--font-weight-display": "700",
+      "--letter-spacing-display": "-1px",
+      "--text-transform-display": "none",
+
+      "--radius-card":     "12px",
+      "--radius-panel":    "16px",
+      "--radius-btn":      "8px",
+      "--radius-pill":     "8px",
+      "--btn-border":      "none",
+
+      "--blur":            "none",
+      "--grid-line":       "none",
+      "--card-shadow":     "0 2px 8px rgba(0,0,0,0.4)",
+      "--card-border":     "1px solid rgba(255,255,255,0.08)",
+    }
+  },
+  kpopping: {
+    name: "Kpopping",
+    label: "K-pop Coloré",
+    preview: "#f7f7f8",
+    vars: {
+      "--bg":              "#f7f7f8",
+      "--surface":         "#ffffff",
+      "--surface-hover":   "#f0f0f2",
+      "--border":          "rgba(0,0,0,0.08)",
+      "--border-hover":    "rgba(0,0,0,0.16)",
+      "--text-primary":    "#0d0d0d",
+      "--text-secondary":  "#6b7280",
+      "--text-tertiary":   "#9ca3af",
+      "--accent":          "#e040a0",
+
+      "--font-display":    "'Syne', sans-serif",
+      "--font-body":       "'Plus Jakarta Sans', sans-serif",
+      "--font-weight-display": "800",
+      "--letter-spacing-display": "-1.5px",
+      "--text-transform-display": "none",
+
+      "--radius-card":     "20px",
+      "--radius-panel":    "24px",
+      "--radius-btn":      "100px",
+      "--radius-pill":     "100px",
+      "--btn-border":      "none",
+
+      "--blur":            "none",
+      "--grid-line":       "none",
+      "--card-shadow":     "0 4px 16px rgba(0,0,0,0.08)",
+      "--card-border":     "1px solid rgba(0,0,0,0.06)",
+    }
+  },
   lemontang: {
     name: "LemonTang",
     label: "Y2K Frutiger Aero",
