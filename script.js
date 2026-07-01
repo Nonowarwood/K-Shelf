@@ -1928,3 +1928,16 @@ window.openPublicProfile = openPublicProfile;
 // ==========================================
 initSidebar();
 showDashboard();
+
+// ==========================================
+// RECHERCHE MOBILE
+// ==========================================
+function toggleMobileSearch() {
+  const overlay = document.getElementById("mobile-search-overlay");
+  if (!overlay) return;
+  overlay.classList.toggle("visible");
+  if (overlay.classList.contains("visible")) {
+    setTimeout(() => document.getElementById("mobile-search-input")?.focus(), 100);
+  }
+}
+window.toggleMobileSearch = toggleMobileSearch;
