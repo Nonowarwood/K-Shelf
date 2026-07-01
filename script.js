@@ -1811,8 +1811,9 @@ function renderBiasesGrid() {
       <p class="bias-name">${b.name}</p>
       <p class="bias-group">${b.group || ""}</p>
       <button class="bias-remove" onclick="removeBias(${i})">✕</button>
-    </div>`).join("") +
-    (biases.length < 6 ? "" : "");
+    </div>`).join("");
+  const countEl = document.getElementById("biases-count");
+  if (countEl) countEl.innerText = `${biases.length}/6`;
 }
 
 async function addBias() {
@@ -1947,3 +1948,60 @@ function toggleMobileSearch() {
   }
 }
 window.toggleMobileSearch = toggleMobileSearch;
+
+// ==========================================
+// DROPDOWN MENU PROFIL
+// ==========================================
+function toggleProfileDropdown() {
+  const user = window._currentUser;
+  if (!user) {
+    // Pas connecté → ouvrir directement la page profil (état login)
+    openProfilePage();
+    return;
+  }
+  document.getElementById("profile-dropdown-menu")?.classList.toggle("visible");
+}
+window.toggleProfileDropdown = toggleProfileDropdown;
+
+function closeProfileDropdown() {
+  document.getElementById("profile-dropdown-menu")?.classList.remove("visible");
+}
+window.closeProfileDropdown = closeProfileDropdown;
+
+// Fermer le dropdown si on clique ailleurs
+document.addEventListener("click", (e) => {
+  const wrap = document.querySelector(".profile-dropdown-wrap");
+  if (wrap && !wrap.contains(e.target)) closeProfileDropdown();
+});
+
+// ==========================================
+// PAGE PROFIL — ouverture avec stats
+// ==========================================
+function openProfilePage() {
+  document.getElementById("profile-modal-overlay")?.classList.add("visible");
+  setTimeout(() => {
+    if (window.loadProfileExtraIntoForm) window.loadProfileExtraIntoForm();
+    renderKprofileStats();
+  }, 50);
+}
+window.openProfilePage = openProfilePage;
+
+function renderKprofileStats() {
+  const grid = document.getElementById("kprofile-stats-grid");
+  if (!grid) return;
+
+  let totalAlbums = 0, favAlbums = 0;
+  for (const ag in collectionData)
+    for (const ar in collectionData[ag]) {
+      totalAlbums += collectionData[ag][ar].length;
+      favAlbums   += collectionData[ag][ar].filter(a => a.status === "favorite").length;
+    }
+
+  grid.innerHTML = `
+    <div class="kprofile-stat"><span class="kprofile-stat-num">${totalAlbums}</span><span class="kprofile-stat-label">Albums</span></div>
+    <div class="kprofile-stat"><span class="kprofile-stat-num">${favAlbums}</span><span class="kprofile-stat-label">Favoris</span></div>
+    <div class="kprofile-stat"><span class="kprofile-stat-num">${concertsData.length}</span><span class="kprofile-stat-label">Concerts</span></div>
+    <div class="kprofile-stat"><span class="kprofile-stat-num">${photocardsData.length}</span><span class="kprofile-stat-label">Photocards</span></div>
+  `;
+}
+window.renderKprofileStats = renderKprofileStats;
