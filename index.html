@@ -19,7 +19,7 @@
   <!-- BOUTON RECHERCHE MOBILE -->
   <button class="mobile-search-btn" id="mobile-search-btn" onclick="toggleMobileSearch()">🔍</button>
   <div class="mobile-search-overlay" id="mobile-search-overlay">
-    <input type="text" id="mobile-search-input" placeholder="rechercher un album, un artiste..." oninput="handleSearch(); document.getElementById('album-search').value=this.value;">
+    <input type="text" id="mobile-search-input" data-i18n-placeholder="sidebar.search" placeholder="rechercher un album, un artiste..." oninput="handleSearch(); document.getElementById('album-search').value=this.value;">
     <button onclick="toggleMobileSearch()">✕</button>
   </div>
 
@@ -38,14 +38,14 @@
       <!-- DROPDOWN MENU -->
       <div class="profile-dropdown-menu" id="profile-dropdown-menu">
         <button class="dropdown-item" onclick="closeProfileDropdown(); openProfilePage();">
-          <span class="dropdown-item-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Mon profil
+          <span class="dropdown-item-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span data-i18n="dropdown.profile"> Mon profil
         </button>
         <button class="dropdown-item" onclick="closeProfileDropdown(); openSettings();">
-          <span class="dropdown-item-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres
+          <span class="dropdown-item-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span data-i18n="dropdown.settings"> Paramètres
         </button>
         <div class="dropdown-divider"></div>
         <button class="dropdown-item dropdown-item-danger" onclick="closeProfileDropdown(); signOutUser();">
-          <span class="dropdown-item-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Se déconnecter
+          <span class="dropdown-item-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span data-i18n="dropdown.signout"> Se déconnecter
         </button>
       </div>
     </div>
@@ -68,7 +68,7 @@
     <aside class="sidebar glass-panel">
       <div class="sidebar-header" onclick="showDashboard()">
         <h1>k-shelf.</h1>
-        <p>ma collection virtuelle</p>
+        <p data-i18n="sidebar.subtitle">ma collection virtuelle</p>
       </div>
       <div class="search-box">
         <input type="text" id="album-search" placeholder="rechercher un album, un artiste..." oninput="handleSearch()"/>
@@ -109,8 +109,8 @@
     <div id="profile-logged-out" class="profile-page-center">
       <button class="profile-page-close" onclick="closeProfileModal()">✕</button>
       <div class="profile-modal-icon">👤</div>
-      <h2 class="add-modal-title" style="margin-bottom:8px;text-align:center">Bienvenue sur K-Shelf</h2>
-      <p class="profile-modal-sub">Connecte-toi pour personnaliser ton profil</p>
+      <h2 class="add-modal-title" style="margin-bottom:8px;text-align:center" data-i18n="auth.title">Bienvenue sur K-Shelf</h2>
+      <p class="profile-modal-sub" data-i18n="auth.subtitle">Connecte-toi pour personnaliser ton profil</p>
       <button class="google-signin-btn" onclick="signInWithGoogle()">
         <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
           <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
@@ -118,14 +118,14 @@
           <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
           <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
         </svg>
-        Continuer avec Google
+        <span data-i18n="auth.google">Continuer avec Google</span>
       </button>
     </div>
 
     <!-- État connecté — style Kpopping -->
     <div id="profile-logged-in" class="kprofile-page profile-hidden">
 
-      <button class="profile-page-close kprofile-close" onclick="closeProfileModal()">✕ Fermer</button>
+      <button class="profile-page-close kprofile-close" onclick="closeProfileModal()"><span data-i18n="profile.close">✕ Fermer</span></button>
 
       <!-- Bannière gradient (adaptative au thème) -->
       <div class="kprofile-banner"></div>
@@ -229,7 +229,7 @@
 
       <!-- Bouton sauvegarder flottant -->
       <div class="kprofile-save-bar">
-        <button class="add-submit-btn" onclick="saveProfile()">Sauvegarder les modifications</button>
+        <button class="add-submit-btn" onclick="saveProfile()"><span data-i18n="profile.save">Sauvegarder les modifications</span></button>
       </div>
 
     </div>
@@ -442,30 +442,11 @@
       <div class="settings-section">
         <h3 class="settings-section-title">Langue</h3>
         <div class="lang-toggle">
-          <button class="lang-btn active" data-lang="fr" onclick="applyLang('fr')">🇫🇷 Français</button>
-          <button class="lang-btn" data-lang="en" onclick="applyLang('en')">🇬🇧 English</button>
+          <button class="lang-btn active" data-lang="fr" onclick="setLang('fr')">🇫🇷 Français</button>
+          <button class="lang-btn" data-lang="en" onclick="setLang('en')">🇬🇧 English</button>
         </div>
       </div>
 
-      <!-- COULEUR D'ACCENT -->
-      <div class="settings-section">
-        <h3 class="settings-section-title">Couleur d'accent</h3>
-        <div class="accent-row">
-          <div class="accent-presets">
-            <button class="accent-preset" style="background:#ffffff" onclick="applyAccent('#ffffff')" title="Blanc"></button>
-            <button class="accent-preset" style="background:#ff5500" onclick="applyAccent('#ff5500')" title="Orange"></button>
-            <button class="accent-preset" style="background:#0091ea" onclick="applyAccent('#0091ea')" title="Bleu"></button>
-            <button class="accent-preset" style="background:#34d399" onclick="applyAccent('#34d399')" title="Vert"></button>
-            <button class="accent-preset" style="background:#f59e0b" onclick="applyAccent('#f59e0b')" title="Jaune"></button>
-            <button class="accent-preset" style="background:#b040ff" onclick="applyAccent('#b040ff')" title="Violet"></button>
-            <button class="accent-preset" style="background:#ff006680" onclick="applyAccent('#ff0066')" title="Rose"></button>
-          </div>
-          <label class="accent-custom-label">
-            <input type="color" id="accent-picker" value="#ffffff" oninput="applyAccent(this.value)">
-            <span>Personnaliser</span>
-          </label>
-        </div>
-      </div>
 
       <!-- ANIMATIONS -->
       <div class="settings-section">
