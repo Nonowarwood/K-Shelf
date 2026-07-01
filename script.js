@@ -1212,15 +1212,12 @@ window._loadLocalData = function() {
 };
 
 // ==========================================
-// INIT
+// INIT — déplacé en fin de fichier (voir tout en bas)
 // ==========================================
 const urlParams = new URLSearchParams(window.location.search);
 const authCode  = urlParams.get("code");
 if (authCode) exchangeSpotifyCode(authCode);
 else { restoreSpotifySession(); updateSpotifyButton(!!spotifyAccessToken); }
-
-initSidebar();
-showDashboard();
 
 window.showDashboard = showDashboard;
 window.selectArtist  = selectArtist;
@@ -1923,3 +1920,11 @@ function openPublicProfile() {
   document.body.appendChild(overlay);
 }
 window.openPublicProfile = openPublicProfile;
+
+// ==========================================
+// INIT FINAL — appelé une fois TOUT le script chargé
+// (garantit que collectionData, photocardsData, concertsData,
+//  profileExtra etc. sont tous déclarés avant le premier rendu)
+// ==========================================
+initSidebar();
+showDashboard();
