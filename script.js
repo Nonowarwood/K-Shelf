@@ -1757,10 +1757,20 @@ window.loadProfileExtraIntoForm = loadProfileExtraIntoForm;
 
 // Chercher une photo de l'artiste via MusicBrainz cover art / last.fm
 async function fetchArtistPhoto(name, group) {
-  const query = group ? `${name} ${group} kpop` : `${name} kpop`;
-  // On utilise l'API de recherche d'images publique de Wikipedia (librement accessible)
+  // 1. Essayer Kpopping via leur URL d'image directe
+  // Format : kpopping.com/idols/{slug} — on construit le slug
+  const slug = (group ? group + "-" + name : name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  const kpoppingUrl = `https://kpopping.com/uploads/idols/profile/${slug}.jpg`;
+
+  // 2. Essayer Wikipedia comme fallback
   try {
-    const wikiRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name + (group ? " (" + group + ")" : ""))}&prop=pageimages&format=json&pithumbsize=200&origin=*`);
+    const wikiTitle = name + (group ? " (" + group + " member)" : "");
+    const wikiRes = await fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(wikiTitle)}&prop=pageimages&format=json&pithumbsize=250&origin=*`
+    );
     const wikiData = await wikiRes.json();
     const pages = wikiData.query?.pages;
     if (pages) {
@@ -1768,8 +1778,21 @@ async function fetchArtistPhoto(name, group) {
       if (page?.thumbnail?.source) return page.thumbnail.source;
     }
   } catch(e) {}
-  // Fallback : avatar généré avec initiales
-  return null;
+
+  // 3. Essayer Wikipedia avec juste le nom
+  try {
+    const wikiRes2 = await fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name)}&prop=pageimages&format=json&pithumbsize=250&origin=*`
+    );
+    const wikiData2 = await wikiRes2.json();
+    const pages2 = wikiData2.query?.pages;
+    if (pages2) {
+      const page2 = Object.values(pages2)[0];
+      if (page2?.thumbnail?.source) return page2.thumbnail.source;
+    }
+  } catch(e) {}
+
+  return null; // fallback initiale géré dans le rendu
 }
 
 // Rendu de la grille des biases
