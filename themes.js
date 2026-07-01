@@ -422,11 +422,7 @@ function applyLang(lang) {
 // ==========================================
 // ACCENT COULEUR
 // ==========================================
-function applyAccent(color) {
-  currentSettings.accent = color;
-  document.documentElement.style.setProperty("--accent", color);
-  saveSettings();
-}
+// applyAccent retirée
 
 // ==========================================
 // SAVE / LOAD
@@ -438,7 +434,7 @@ function saveSettings() {
 function loadSettings() {
   applyTheme(currentSettings.theme || "dark");
   applyAnimations(currentSettings.animations !== false);
-  if (currentSettings.accent) applyAccent(currentSettings.accent);
+  // accent retiré
 
   // Restaurer l'image de fond LemonTang si elle existe
   const savedBg = localStorage.getItem("kshelf_lemontang_bg");
@@ -465,21 +461,22 @@ function updateSettingsUI() {
   });
   // Lang
   document.querySelectorAll(".lang-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.lang === currentSettings.lang);
+    const lang = window.currentLang || currentSettings.lang || "fr";
+    btn.classList.toggle("active", btn.dataset.lang === lang);
   });
   // Animations
   const animToggle = document.getElementById("anim-toggle");
   if (animToggle) animToggle.checked = currentSettings.animations !== false;
   // Accent
   const accentPicker = document.getElementById("accent-picker");
-  if (accentPicker && currentSettings.accent) accentPicker.value = currentSettings.accent;
+  // accent retiré
 }
 
 window.openSettings   = openSettings;
 window.closeSettings  = closeSettings;
 window.applyTheme     = applyTheme;
 window.applyLang      = applyLang;
-window.applyAccent    = applyAccent;
+// applyAccent retirée
 window.applyAnimations = applyAnimations;
 window.t              = t;
 
