@@ -301,10 +301,11 @@ function updateProfileUI(user) {
   setEl("profile-name-label",    el => el.innerText = pseudo);
   setEl("profile-avatar-letter", el => { el.innerText = pseudo[0].toUpperCase(); el.style.display = photoURL ? "none" : "block"; });
   setEl("profile-avatar-img",    el => { el.src = photoURL; el.style.display = photoURL ? "block" : "none"; });
-  setEl("profile-logged-out",    el => el.style.display = "none");
-  setEl("profile-logged-in",     el => el.style.display = "block");
-  setEl("profile-pseudo-input",  el => el.value = pseudo);
-  setEl("profile-email-display", el => el.value = user.email || "");
+  setEl("profile-logged-out",      el => el.style.display = "none");
+  setEl("profile-logged-in",       el => el.style.display = "flex");
+  setEl("profile-pseudo-input",    el => el.value = pseudo);
+  setEl("profile-email-display",   el => el.value = user.email || "");
+  setEl("profile-email-display-text", el => el.innerText = user.email || "");
   setEl("profile-large-letter",  el => { el.innerText = pseudo[0].toUpperCase(); el.style.display = photoURL ? "none" : "block"; });
   setEl("profile-large-img",     el => { el.src = photoURL; el.style.display = photoURL ? "block" : "none"; });
 }
