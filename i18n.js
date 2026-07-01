@@ -353,7 +353,7 @@ function setLang(lang) {
   // Re-rendre le contenu actif
   if (window.initSidebar) window.initSidebar();
   if (window.showDashboard) window.showDashboard();
-  updateSettingsUI();
+  if (window.updateSettingsUI) window.updateSettingsUI();
 }
 window.setLang = setLang;
 
@@ -388,7 +388,9 @@ function localeDateLabel(dateStr) {
 }
 window.localeDateLabel = localeDateLabel;
 
-// Init au chargement
-document.addEventListener("DOMContentLoaded", () => {
+// Init immédiat (script classique chargé avant le DOM complet — sécurisé)
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", applyTranslations);
+} else {
   applyTranslations();
-});
+}
