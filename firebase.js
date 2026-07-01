@@ -121,9 +121,29 @@ window.signOutUser = async function() {
   if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
   await signOut(auth);
   window._currentUser = null;
+
+  // Vider toutes les données locales
+  localStorage.removeItem("kshelf_save");
+  localStorage.removeItem("kshelf_photocards");
+  localStorage.removeItem("kshelf_concerts");
+  localStorage.removeItem("kshelf_lightsticks");
+  localStorage.removeItem("kshelf_binder_pages");
+  localStorage.removeItem("kshelf_profile_extra");
+  localStorage.removeItem("kshelf_concerts");
+
+  // Remettre les variables en mémoire à zéro
+  window.collectionData   = {};
+  window.photocardsData   = [];
+  window.concertsData     = [];
+  window.lightsticksData  = [];
+  window.profileExtra     = {};
+
   clearProfileUI();
   closeProfileModal();
-  if (window._loadLocalData) window._loadLocalData();
+
+  // Retour à la landing page
+  if (window.initSidebar)   window.initSidebar();
+  if (window.showDashboard) window.showDashboard();
 };
 
 // ==========================================
