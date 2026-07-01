@@ -1955,7 +1955,6 @@ window.toggleMobileSearch = toggleMobileSearch;
 function toggleProfileDropdown() {
   const user = window._currentUser;
   if (!user) {
-    // Pas connecté → ouvrir directement la page profil (état login)
     openProfilePage();
     return;
   }
@@ -1968,11 +1967,17 @@ function closeProfileDropdown() {
 }
 window.closeProfileDropdown = closeProfileDropdown;
 
-// Fermer le dropdown si on clique ailleurs
-document.addEventListener("click", (e) => {
-  const wrap = document.querySelector(".profile-dropdown-wrap");
-  if (wrap && !wrap.contains(e.target)) closeProfileDropdown();
-});
+// Gestion centralisée des actions du dropdown
+// (évite les conflits d'ordre d'exécution entre onclick et document.click)
+function handleDropdownAction(action) {
+  closeProfileDropdown();
+  requestAnimationFrame(() => {
+    if (action === "profile")  openProfilePage();
+    if (action === "settings") window.openSettings?.();
+    if (action === "signout")  window.signOutUser?.();
+  });
+}
+window.handleDropdownAction = handleDropdownAction;
 
 // ==========================================
 // PAGE PROFIL — ouverture avec stats
