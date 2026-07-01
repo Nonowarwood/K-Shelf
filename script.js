@@ -1820,10 +1820,17 @@ async function addBias() {
   if (!name) return;
   if ((profileExtra.biases || []).length >= 6) { alert("Maximum 6 biases !"); return; }
 
-  // Chercher une photo automatiquement
+  // Feedback pendant la recherche
+  const addBtn = document.querySelector(".bias-add-row .concert-add-url-btn");
+  if (addBtn) { addBtn.innerText = "⏳"; addBtn.disabled = true; }
+
   const img = await fetchArtistPhoto(name, group);
+
+  if (addBtn) { addBtn.innerText = "+ Ajouter"; addBtn.disabled = false; }
+
   if (!profileExtra.biases) profileExtra.biases = [];
   profileExtra.biases.push({ name, group, img: img || "" });
+  localStorage.setItem("kshelf_profile_extra", JSON.stringify(profileExtra));
   renderBiasesGrid();
   if (nameEl) nameEl.value = "";
   if (groupEl) groupEl.value = "";
