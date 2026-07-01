@@ -172,10 +172,11 @@ async function initUserData(user) {
       window.collectionData = window.defaultCollectionData || {};
     }
     const result = await writeToFirestore(user.uid, {
-      collection:  sanitizeForFirestore(window.collectionData),
-      photocards:  sanitizeForFirestore(window.photocardsData  || []),
-      binderPages: window.binderTotalPages || 1,
-      concerts:    prepareConcertsForSync(window.concertsData),
+      collection:   sanitizeForFirestore(window.collectionData),
+      photocards:   sanitizeForFirestore(window.photocardsData  || []),
+      binderPages:  window.binderTotalPages || 1,
+      concerts:     prepareConcertsForSync(window.concertsData),
+      profileExtra: JSON.stringify(window.profileExtra || {}),
     });
     showDebugToast(result ? "✅ Sauvegarde OK !" : "❌ Erreur sauvegarde", result ? "#1db954" : "#f87171");
   }
@@ -216,6 +217,18 @@ function startRealtimeSync(user) {
         window.binderTotalPages = remoteBinderPages;
         localStorage.setItem("kshelf_binder_pages", remoteBinderPages);
       }
+      // Sync profileExtra depuis autre appareil
+      if (raw.profileExtra) {
+        try {
+          const remoteExtra = JSON.parse(raw.profileExtra);
+          const localExtra = JSON.stringify(window.profileExtra || {});
+          if (JSON.stringify(remoteExtra) !== localExtra) {
+            window.profileExtra = remoteExtra;
+            localStorage.setItem("kshelf_profile_extra", JSON.stringify(remoteExtra));
+          }
+        } catch(e) {}
+      }
+
       if (remoteConcerts && JSON.stringify(remoteConcerts) !== JSON.stringify(window.concertsData)) {
         console.log("🔄 Sync concerts depuis un autre appareil");
         window.concertsData = remoteConcerts;
@@ -275,10 +288,11 @@ window.syncToFirestore = async function() {
   }
   try {
     const ok = await writeToFirestore(user.uid, {
-      collection:  sanitizeForFirestore(window.collectionData),
-      photocards:  sanitizeForFirestore(window.photocardsData),
-      binderPages: window.binderTotalPages || 1,
-      concerts:    prepareConcertsForSync(window.concertsData),
+      collection:   sanitizeForFirestore(window.collectionData),
+      photocards:   sanitizeForFirestore(window.photocardsData),
+      binderPages:  window.binderTotalPages || 1,
+      concerts:     prepareConcertsForSync(window.concertsData),
+      profileExtra: JSON.stringify(window.profileExtra || {}),
     });
     if (ok) showDebugToast("☁️ Sauvegardé dans le cloud ✓", "#1db954");
   } catch(e) {
@@ -353,11 +367,16 @@ window.saveProfile = async function() {
   window.profileExtra = updatedExtra;
   localStorage.setItem("kshelf_profile_extra", JSON.stringify(updatedExtra));
 
+  // Écriture complète incluant toutes les données pour garantir la cohérence
   const ok = await writeToFirestore(user.uid, {
     pseudo,
-    profileExtra: JSON.stringify(updatedExtra),
+    profileExtra:  JSON.stringify(updatedExtra),
+    collection:    sanitizeForFirestore(window.collectionData),
+    photocards:    sanitizeForFirestore(window.photocardsData),
+    binderPages:   window.binderTotalPages || 1,
+    concerts:      prepareConcertsForSync(window.concertsData),
   });
-  showDebugToast(ok ? "✅ Profil sauvegardé" : "❌ Erreur sauvegarde profil", ok ? "#1db954" : "#f87171");
+  showDebugToast(ok ? "✅ Profil sauvegardé et synchronisé" : "❌ Erreur sauvegarde profil", ok ? "#1db954" : "#f87171");
   updateProfileUI(user);
   closeProfileModal();
 };
