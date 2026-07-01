@@ -96,39 +96,37 @@
     <!-- État connecté — layout plein écran -->
     <div id="profile-logged-in" class="profile-page-layout" style="display:none">
 
-      <!-- Colonne gauche : avatar + actions -->
-      <div class="profile-page-left">
+      <!-- Topbar fixe -->
+      <div class="profile-page-topbar">
         <button class="profile-page-close" onclick="closeProfileModal()">✕ Fermer</button>
-        <div class="profile-avatar-large" id="profile-avatar-large">
-          <span id="profile-large-letter"></span>
-          <img id="profile-large-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
-        </div>
-        <label class="profile-avatar-upload-label" for="profile-photo-input">Changer la photo</label>
-        <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
-        <div class="profile-page-actions">
-          <button class="add-submit-btn" onclick="saveProfile()">Sauvegarder</button>
-          <button class="signout-btn" onclick="signOutUser()">Se déconnecter</button>
-          <button class="profile-public-btn" onclick="openPublicProfile()">👁 Profil public</button>
-        </div>
+        <h2 class="profile-page-title">Mon profil</h2>
+        <button class="add-submit-btn profile-save-top" onclick="saveProfile()">Sauvegarder</button>
       </div>
 
-      <!-- Colonne droite : formulaire scrollable -->
-      <div class="profile-page-right">
-        <h2 class="profile-page-title">Mon profil</h2>
+      <!-- Contenu scrollable -->
+      <div class="profile-page-scroll">
 
+        <!-- Avatar -->
+        <div class="profile-page-avatar-row">
+          <div class="profile-avatar-large" id="profile-avatar-large">
+            <span id="profile-large-letter"></span>
+            <img id="profile-large-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
+          </div>
+          <div>
+            <label class="profile-avatar-upload-label" for="profile-photo-input">Changer la photo</label>
+            <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+            <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:4px" id="profile-email-display-text"></p>
+          </div>
+        </div>
+
+        <!-- Infos de base -->
         <div class="profile-page-section">
           <p class="profile-section-label">Infos de base</p>
-          <div class="add-form-row">
+          <div class="profile-fields-grid">
             <div class="add-form-group">
               <label>Pseudo</label>
               <input type="text" id="profile-pseudo-input" placeholder="ton pseudo...">
             </div>
-            <div class="add-form-group">
-              <label>Email Google</label>
-              <input type="text" id="profile-email-display" disabled style="opacity:0.4;cursor:default;">
-            </div>
-          </div>
-          <div class="add-form-row">
             <div class="add-form-group">
               <label>Groupe favori</label>
               <input type="text" id="profile-fav-group" placeholder="NewJeans">
@@ -137,12 +135,14 @@
               <label>Album favori</label>
               <input type="text" id="profile-fav-album" placeholder="How Sweet">
             </div>
+            <input type="text" id="profile-email-display" style="display:none">
           </div>
         </div>
 
+        <!-- Réseaux sociaux -->
         <div class="profile-page-section">
           <p class="profile-section-label">Réseaux sociaux</p>
-          <div class="add-form-row">
+          <div class="profile-fields-grid">
             <div class="add-form-group">
               <label>YouTube</label>
               <input type="text" id="profile-youtube" placeholder="@nonowarwood">
@@ -151,8 +151,6 @@
               <label>TikTok</label>
               <input type="text" id="profile-tiktok" placeholder="@nonowarwood">
             </div>
-          </div>
-          <div class="add-form-row">
             <div class="add-form-group">
               <label>Pinterest</label>
               <input type="text" id="profile-pinterest" placeholder="nonowarwood">
@@ -164,6 +162,7 @@
           </div>
         </div>
 
+        <!-- Biases -->
         <div class="profile-page-section">
           <p class="profile-section-label">Mes biases <span style="opacity:0.5;font-weight:400">(6 max)</span></p>
           <div id="biases-grid" class="biases-grid"></div>
@@ -172,6 +171,12 @@
             <input type="text" id="bias-group-input" placeholder="Groupe (ex: NewJeans)">
             <button class="concert-add-url-btn" onclick="addBias()">+ Ajouter</button>
           </div>
+        </div>
+
+        <!-- Actions bas de page -->
+        <div class="profile-page-bottom-actions">
+          <button class="profile-public-btn" onclick="openPublicProfile()">👁 Voir mon profil public</button>
+          <button class="signout-btn" onclick="signOutUser()">Se déconnecter</button>
         </div>
 
       </div>
