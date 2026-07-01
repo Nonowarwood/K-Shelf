@@ -25,18 +25,40 @@
 
   <!-- TOPBAR PROFIL -->
   <div class="topbar" id="topbar">
+    <div class="profile-dropdown-wrap">
+      <button class="profile-btn" id="profile-btn" onclick="toggleProfileDropdown()">
+        <div class="profile-avatar" id="profile-avatar-btn">
+          <span id="profile-avatar-letter">?</span>
+          <img id="profile-avatar-img" src="" alt="" style="display:none">
+        </div>
+        <span class="profile-name-label" id="profile-name-label">Se connecter</span>
+        <svg class="profile-dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+
+      <!-- DROPDOWN MENU -->
+      <div class="profile-dropdown-menu" id="profile-dropdown-menu">
+        <button class="dropdown-item" onclick="closeProfileDropdown(); openProfilePage();">
+          <span class="dropdown-item-icon">👤</span> Mon profil
+        </button>
+        <button class="dropdown-item" onclick="closeProfileDropdown(); openSettings();">
+          <span class="dropdown-item-icon">⚙️</span> Paramètres
+        </button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item dropdown-item-danger" onclick="closeProfileDropdown(); signOutUser();">
+          <span class="dropdown-item-icon">↩</span> Se déconnecter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bouton connexion (visible seulement si non connecté) -->
+  <div class="topbar-logged-out" id="topbar-logged-out">
     <button class="topbar-settings-btn" onclick="openSettings()" title="Paramètres">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </svg>
     </button>
-    <button class="profile-btn" id="profile-btn" onclick="openProfileModal()">
-      <div class="profile-avatar" id="profile-avatar-btn">
-        <span id="profile-avatar-letter">?</span>
-        <img id="profile-avatar-img" src="" alt="" style="display:none">
-      </div>
-      <span class="profile-name-label" id="profile-name-label">Se connecter</span>
-    </button>
+    <button class="google-signin-topbar-btn" onclick="signInWithGoogle()">Se connecter</button>
   </div>
 
   <!-- APP SHELL -->
@@ -80,7 +102,7 @@
 
   </div>
 
-  <!-- PAGE PROFIL (plein écran) -->
+  <!-- PAGE PROFIL (style Kpopping) -->
   <div id="profile-modal-overlay" class="profile-page-overlay">
 
     <!-- État non connecté -->
@@ -100,97 +122,112 @@
       </button>
     </div>
 
-    <!-- État connecté — layout plein écran -->
-    <div id="profile-logged-in" class="profile-page-layout profile-hidden">
+    <!-- État connecté — style Kpopping -->
+    <div id="profile-logged-in" class="kprofile-page profile-hidden">
 
-      <!-- Topbar fixe -->
-      <div class="profile-page-topbar">
-        <button class="profile-page-close" onclick="closeProfileModal()">✕ Fermer</button>
-        <h2 class="profile-page-title">Mon profil</h2>
-        <button class="add-submit-btn profile-save-top" onclick="saveProfile()">Sauvegarder</button>
-      </div>
+      <button class="profile-page-close kprofile-close" onclick="closeProfileModal()">✕ Fermer</button>
 
-      <!-- Contenu scrollable -->
-      <div class="profile-page-scroll">
+      <!-- Bannière gradient (adaptative au thème) -->
+      <div class="kprofile-banner"></div>
 
-        <!-- Avatar -->
-        <div class="profile-page-avatar-row">
-          <div class="profile-avatar-large" id="profile-avatar-large">
-            <span id="profile-large-letter"></span>
-            <img id="profile-large-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
-          </div>
-          <div>
-            <label class="profile-avatar-upload-label" for="profile-photo-input">Changer la photo</label>
-            <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
-            <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:4px" id="profile-email-display-text"></p>
-          </div>
-        </div>
+      <div class="kprofile-body">
 
-        <!-- Infos de base -->
-        <div class="profile-page-section">
-          <p class="profile-section-label">Infos de base</p>
-          <div class="profile-fields-grid">
-            <div class="add-form-group">
-              <label>Pseudo</label>
-              <input type="text" id="profile-pseudo-input" placeholder="ton pseudo...">
+        <!-- COLONNE GAUCHE -->
+        <div class="kprofile-left">
+
+          <div class="kprofile-identity-card">
+            <div class="kprofile-avatar-wrap">
+              <div class="profile-avatar-large" id="profile-avatar-large">
+                <span id="profile-large-letter"></span>
+                <img id="profile-large-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:16px;">
+              </div>
+              <label class="kprofile-avatar-edit" for="profile-photo-input">✎</label>
+              <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
             </div>
-            <div class="add-form-group">
-              <label>Groupe favori</label>
-              <input type="text" id="profile-fav-group" placeholder="NewJeans">
-            </div>
-            <div class="add-form-group">
-              <label>Album favori</label>
-              <input type="text" id="profile-fav-album" placeholder="How Sweet">
-            </div>
+
+            <input type="text" id="profile-pseudo-input" class="kprofile-name-input" placeholder="Ton pseudo">
+            <p class="kprofile-email" id="profile-email-display-text"></p>
             <input type="text" id="profile-email-display" style="display:none">
-          </div>
-        </div>
 
-        <!-- Réseaux sociaux -->
-        <div class="profile-page-section">
-          <p class="profile-section-label">Réseaux sociaux</p>
-          <div class="profile-fields-grid">
-            <div class="add-form-group">
-              <label>YouTube</label>
-              <input type="text" id="profile-youtube" placeholder="@nonowarwood">
-            </div>
-            <div class="add-form-group">
-              <label>TikTok</label>
-              <input type="text" id="profile-tiktok" placeholder="@nonowarwood">
-            </div>
-            <div class="add-form-group">
-              <label>Pinterest</label>
-              <input type="text" id="profile-pinterest" placeholder="nonowarwood">
-            </div>
-            <div class="add-form-group">
-              <label>Kpopping</label>
-              <input type="text" id="profile-kpopping" placeholder="nonowarwood">
+            <div class="kprofile-fav-row">
+              <div class="kprofile-fav-item">
+                <span class="kprofile-fav-label">Groupe favori</span>
+                <input type="text" id="profile-fav-group" placeholder="NewJeans">
+              </div>
+              <div class="kprofile-fav-item">
+                <span class="kprofile-fav-label">Album favori</span>
+                <input type="text" id="profile-fav-album" placeholder="How Sweet">
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Biases -->
-        <div class="profile-page-section">
-          <p class="profile-section-label">Mes biases <span style="opacity:0.5;font-weight:400">(6 max)</span></p>
-          <div id="biases-grid" class="biases-grid"></div>
-          <div class="bias-add-row">
-            <input type="text" id="bias-name-input" placeholder="Nom (ex: Minji)">
-            <input type="text" id="bias-group-input" placeholder="Groupe (ex: NewJeans)">
-            <button class="concert-add-url-btn" onclick="addBias()">+ Ajouter</button>
+          <!-- Biases -->
+          <div class="kprofile-card">
+            <div class="kprofile-card-header">
+              <span class="kprofile-card-icon">💗</span>
+              <span class="kprofile-card-title">Mes biases</span>
+              <span class="kprofile-card-count" id="biases-count">0/6</span>
+            </div>
+            <div id="biases-grid" class="biases-grid"></div>
+            <div class="bias-add-row">
+              <input type="text" id="bias-name-input" placeholder="Nom (ex: Minji)">
+              <input type="text" id="bias-group-input" placeholder="Groupe (ex: NewJeans)">
+              <button class="concert-add-url-btn" onclick="addBias()">+ Ajouter</button>
+            </div>
           </div>
+
         </div>
 
-        <!-- Actions bas de page -->
-        <div class="profile-page-bottom-actions">
-          <button class="profile-public-btn" onclick="openPublicProfile()">👁 Voir mon profil public</button>
-          <button class="signout-btn" onclick="signOutUser()">Se déconnecter</button>
-        </div>
+        <!-- COLONNE DROITE -->
+        <div class="kprofile-right">
 
+          <!-- Réseaux sociaux -->
+          <div class="kprofile-card">
+            <div class="kprofile-card-header">
+              <span class="kprofile-card-icon">🔗</span>
+              <span class="kprofile-card-title">Réseaux sociaux</span>
+            </div>
+            <div class="kprofile-socials-grid">
+              <div class="kprofile-social-item">
+                <span class="kprofile-social-icon">▶</span>
+                <input type="text" id="profile-youtube" placeholder="@nonowarwood">
+              </div>
+              <div class="kprofile-social-item">
+                <span class="kprofile-social-icon">♪</span>
+                <input type="text" id="profile-tiktok" placeholder="@nonowarwood">
+              </div>
+              <div class="kprofile-social-item">
+                <span class="kprofile-social-icon">P</span>
+                <input type="text" id="profile-pinterest" placeholder="nonowarwood">
+              </div>
+              <div class="kprofile-social-item">
+                <span class="kprofile-social-icon">K</span>
+                <input type="text" id="profile-kpopping" placeholder="nonowarwood">
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="kprofile-card">
+            <div class="kprofile-card-header">
+              <span class="kprofile-card-icon">📊</span>
+              <span class="kprofile-card-title">Ma collection</span>
+            </div>
+            <div class="kprofile-stats-grid" id="kprofile-stats-grid"></div>
+          </div>
+
+        </div>
       </div>
+
+      <!-- Bouton sauvegarder flottant -->
+      <div class="kprofile-save-bar">
+        <button class="add-submit-btn" onclick="saveProfile()">Sauvegarder les modifications</button>
+      </div>
+
     </div>
   </div>
 
-  <!-- MODAL AJOUT ALBUM -->
+    <!-- MODAL AJOUT ALBUM -->
   <div id="add-modal-overlay" class="add-modal-overlay" onclick="closeAddModal(event)">
     <div class="add-modal glass-panel">
       <button class="modal-close" onclick="closeAddModal()">✕</button>
