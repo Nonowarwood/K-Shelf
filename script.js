@@ -93,6 +93,15 @@ let collectionData = JSON.parse(localStorage.getItem("kshelf_save")) || defaultC
 let currentPlaylist = [];
 let currentTrackIndex = 0;
 
+// profileExtra déclaré tôt pour être disponible avant que firebase.js
+// (chargé en module async) ne tente d'y accéder
+let profileExtra = JSON.parse(localStorage.getItem("kshelf_profile_extra") || "{}");
+Object.defineProperty(window, 'profileExtra', {
+  get: () => profileExtra,
+  set: (v) => { profileExtra = v; },
+  configurable: true
+});
+
 // DOM refs
 const audioPlayer = document.getElementById("local-audio-player");
 const playBtn     = document.getElementById("btn-play");
@@ -1723,13 +1732,10 @@ window.showFavorites = showFavorites;
 
 // ==========================================
 // PROFIL ENRICHI — BIASES & RÉSEAUX
+// (profileExtra est déclaré tout en haut du fichier pour être
+//  disponible dès le premier instant, avant même que firebase.js
+//  ne tente d'y accéder de manière asynchrone)
 // ==========================================
-let profileExtra = JSON.parse(localStorage.getItem("kshelf_profile_extra") || "{}");
-Object.defineProperty(window, 'profileExtra', {
-  get: () => profileExtra,
-  set: (v) => { profileExtra = v; },
-  configurable: true
-});
 // { favGroup, favAlbum, youtube, tiktok, pinterest, kpopping, biases: [{name, group, img}] }
 
 function saveProfileExtra() {
