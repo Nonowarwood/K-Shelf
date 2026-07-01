@@ -168,10 +168,10 @@ function initSidebar() {
 
   // Switch d'onglets en haut
   html += `<div class="sidebar-tabs">
-    <button class="sidebar-tab-btn ${sidebarTab === 'albums' ? 'active' : ''}" onclick="switchSidebarTab('albums')">Albums</button>
-    <button class="sidebar-tab-btn ${sidebarTab === 'photocards' ? 'active' : ''}" onclick="switchSidebarTab('photocards')">Photos</button>
-    <button class="sidebar-tab-btn ${sidebarTab === 'concerts' ? 'active' : ''}" onclick="switchSidebarTab('concerts')">Concerts</button>
-    <button class="sidebar-tab-btn ${sidebarTab === 'favorites' ? 'active' : ''}" onclick="switchSidebarTab('favorites')">★</button>
+    <button class="sidebar-tab-btn ${sidebarTab === 'albums' ? 'active' : ''}" onclick="switchSidebarTab('albums')">${t("sidebar.tab.albums")}</button>
+    <button class="sidebar-tab-btn ${sidebarTab === 'photocards' ? 'active' : ''}" onclick="switchSidebarTab('photocards')">${t("sidebar.tab.photos")}</button>
+    <button class="sidebar-tab-btn ${sidebarTab === 'concerts' ? 'active' : ''}" onclick="switchSidebarTab('concerts')">${t("sidebar.tab.concerts")}</button>
+    <button class="sidebar-tab-btn ${sidebarTab === 'favorites' ? 'active' : ''}" onclick="switchSidebarTab('favorites')">${t("sidebar.tab.favorites")}</button>
   </div>`;
 
   if (sidebarTab === "albums") {
@@ -189,7 +189,7 @@ function initSidebar() {
     }
     html += `<div class="agency-section">
       <div class="artist-list">
-        <div class="artist-item lightstick-nav" onclick="showLightsticks()">✦ lightsticks</div>
+        <div class="artist-item lightstick-nav" onclick="showLightsticks()">${t("sidebar.lightsticks")}</div>
       </div>
     </div>`;
   } else if (sidebarTab === "photocards") {
@@ -216,19 +216,19 @@ function initSidebar() {
     const favConcs = concertsData.filter(c => c.favorite);
     html += `<div class="agency-section">
       <div class="artist-list">
-        <div class="artist-item" onclick="showFavorites()">Tous les favoris</div>
-        <div class="artist-item" onclick="showFavorites('albums')">Albums (${favAlbums.length})</div>
-        <div class="artist-item" onclick="showFavorites('photocards')">Photocards (${favPcs.length})</div>
-        <div class="artist-item" onclick="showFavorites('concerts')">Concerts (${favConcs.length})</div>
+        <div class="artist-item" onclick="showFavorites()">${t("sidebar.all_favorites")}</div>
+        <div class="artist-item" onclick="showFavorites('albums')">${t("sidebar.fav.albums")} (${favAlbums.length})</div>
+        <div class="artist-item" onclick="showFavorites('photocards')">${t("sidebar.fav.photocards")} (${favPcs.length})</div>
+        <div class="artist-item" onclick="showFavorites('concerts')">${t("sidebar.fav.concerts")} (${favConcs.length})</div>
       </div>
     </div>`;
   }
 
   // Bouton ajout — contextuel selon l'onglet
-  let addBtnLabel = "+ ajouter un album";
+  let addBtnLabel = t("sidebar.add_album");
   let addBtnAction = "openAddModal()";
-  if (sidebarTab === "photocards") { addBtnLabel = "+ ajouter une photocard"; addBtnAction = "openAddPhotocard(binderCurrentPage, findFirstEmptySlot())"; }
-  if (sidebarTab === "concerts")   { addBtnLabel = "+ ajouter un concert";    addBtnAction = "openAddConcert()"; }
+  if (sidebarTab === "photocards") { addBtnLabel = t("sidebar.add_photocard"); addBtnAction = "openAddPhotocard(binderCurrentPage, findFirstEmptySlot())"; }
+  if (sidebarTab === "concerts")   { addBtnLabel = t("sidebar.add_concert");   addBtnAction = "openAddConcert()"; }
   if (sidebarTab === "favorites")  { addBtnLabel = ""; addBtnAction = ""; }
 
   html += `<div class="add-album-btn-wrap">
@@ -1242,7 +1242,7 @@ function saveConcerts() {
   syncSafe();
 }
 
-function concertDateLabel(dateStr) {
+function localeDateLabel(dateStr) {
   if (!dateStr) return "Date inconnue";
   const d = new Date(dateStr);
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
@@ -1285,7 +1285,7 @@ function showConcerts() {
         </div>
         <div class="concert-card-info">
           <h4 class="concert-card-artist">${c.artist}</h4>
-          <p class="concert-card-meta">${concertDateLabel(c.date)} · ${c.venue || "Lieu non renseigné"}</p>
+          <p class="concert-card-meta">${localeDateLabel(c.date)} · ${c.venue || "Lieu non renseigné"}</p>
           ${c.tour ? `<p class="concert-card-tour">${c.tour}</p>` : ""}
         </div>
       </div>`;
@@ -1295,15 +1295,15 @@ function showConcerts() {
     <div class="artist-view-header animate-fade">
       <div class="breadcrumbs">collection</div>
       <h2 class="artist-main-title">concerts.</h2>
-      <p class="album-total-count">${concertsData.length} concert(s) vécu(s)</p>
+      <p class="album-total-count">${concertsData.length} ${t("concerts.count")}</p>
     </div>
     <div class="concerts-grid animate-fade">
       ${cardsHtml || `
         <div class="concerts-empty-state">
           <div class="concerts-empty-icon">🎫</div>
-          <p class="concerts-empty-title">Aucun concert pour l'instant</p>
-          <p class="concerts-empty-desc">Ajoute ton premier souvenir de concert !</p>
-          <button class="add-submit-btn" style="max-width:280px" onclick="openAddConcert()">+ Ajouter un concert</button>
+          <p class="concerts-empty-title">${t("concerts.empty_title")}</p>
+          <p class="concerts-empty-desc">${t("concerts.empty_desc")}</p>
+          <button class="add-submit-btn" style="max-width:280px" onclick="openAddConcert()">${t("concerts.add")}</button>
         </div>`}
     </div>`;
 }
@@ -1579,7 +1579,7 @@ function openConcertDetail(id) {
       <div class="concert-detail-scroll">
 
         <div class="concert-detail-header">
-          <p class="modal-agency">${concertDateLabel(c.date)}${c.tour ? " · " + c.tour : ""}</p>
+          <p class="modal-agency">${localeDateLabel(c.date)}${c.tour ? " · " + c.tour : ""}</p>
           <h2 class="modal-title">${c.artist}</h2>
           <p class="modal-artist">📍 ${c.venue || "Lieu non renseigné"}</p>
           ${starsHtml(c.rating)}
@@ -1698,7 +1698,7 @@ function showFavorites(filter = "all") {
             </div>
             <div class="concert-card-info">
               <h4 class="concert-card-artist">${c.artist}</h4>
-              <p class="concert-card-meta">${concertDateLabel(c.date)}</p>
+              <p class="concert-card-meta">${localeDateLabel(c.date)}</p>
             </div>
           </div>`;
       }).join("");
@@ -1712,16 +1712,16 @@ function showFavorites(filter = "all") {
   if (!html) {
     html = `<div class="concerts-empty-state">
       <div class="concerts-empty-icon">⭐</div>
-      <p class="concerts-empty-title">Aucun favori pour l'instant</p>
-      <p class="concerts-empty-desc">Clique sur ★ sur un album, une photocard ou un concert !</p>
+      <p class="concerts-empty-title">${t("favorites.empty_title")}</p>
+      <p class="concerts-empty-desc">${t("favorites.empty_desc")}</p>
     </div>`;
   }
 
   document.getElementById("main-content").innerHTML = `
     <div class="artist-view-header animate-fade">
       <div class="breadcrumbs">collection</div>
-      <h2 class="artist-main-title">favoris.</h2>
-      <p class="album-total-count">${favAlbums.length + favPcs.length + favConcs.length} élément(s)</p>
+      <h2 class="artist-main-title">${t("favorites.title")}</h2>
+      <p class="album-total-count">${favAlbums.length + favPcs.length + favConcs.length} ${t("favorites.count")}</p>
     </div>
     <div class="favorites-content animate-fade">${html}</div>`;
 
