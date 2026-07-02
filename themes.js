@@ -457,7 +457,7 @@ function closeSettings() {
 function updateSettingsUI() {
   // Thèmes
   document.querySelectorAll(".theme-card").forEach(card => {
-    card.classList.toggle("active", card.dataset.theme === currentSettings.theme); 
+    card.classList.toggle("active", card.dataset.theme === currentSettings.theme);
   });
   // Lang
   document.querySelectorAll(".lang-btn").forEach(btn => {
