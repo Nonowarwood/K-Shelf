@@ -104,7 +104,6 @@ window.signInWithGoogle = async function() {
     }
   }
 };
-window._firebaseReady = true; // signale que firebase est initialisé
 
 // Gérer le retour d'une connexion par redirect (mobile/navigateurs stricts)
 getRedirectResult(auth).then((result) => {
