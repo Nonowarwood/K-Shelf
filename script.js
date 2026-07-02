@@ -2075,4 +2075,4 @@ function renderKprofileStats() {
     <div class="kprofile-stat"><span class="kprofile-stat-num">${photocardsData.length}</span><span class="kprofile-stat-label">Photocards</span></div>
   `;
 }
-window.renderKprofileStats = renderKprofileStats;
+window.renderKprofileStats = renderKprofileStats; 
