@@ -253,16 +253,7 @@ function showDashboard() {
     for (const artist in collectionData[agency]) totalAlbums += collectionData[agency][artist].length;
   }
 
-  // Landing page plein écran si collection vide et non connecté
-  if (totalAlbums === 0 && !window._currentUser) {
-    document.getElementById("app-landing").style.display = "flex";
-    document.getElementById("app-fullscreen").style.display = "none";
-    return;
-  }
 
-  // Sinon affichage normal
-  document.getElementById("app-landing").style.display = "none";
-  document.getElementById("app-fullscreen").style.display = "flex";
   document.getElementById("main-content").innerHTML = `
     <div class="dashboard-view animate-fade">
       <h2 class="welcome-title">ma collection virtuelle.</h2>
@@ -278,8 +269,6 @@ function showDashboard() {
 // Mode démo — charge la collection par défaut temporairement
 function loadDemoCollection() {
   collectionData = JSON.parse(JSON.stringify(defaultCollectionData));
-  document.getElementById("app-landing").style.display = "none";
-  document.getElementById("app-fullscreen").style.display = "flex";
   initSidebar();
   showDashboard();
   showDebugToast("✨ Mode démo — connecte-toi pour ta vraie collection", "#a855f7");
