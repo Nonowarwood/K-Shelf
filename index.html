@@ -475,16 +475,6 @@
 
   <audio id="local-audio-player"></audio>
 
-  <!-- STUB — fonctions disponibles avant le chargement de firebase.js -->
-  <script>
-    window._firebaseReady = false;
-    window.signInWithGoogle = function() {
-      const t = setInterval(() => {
-        if (window._firebaseReady) { clearInterval(t); window.signInWithGoogle(); }
-      }, 100);
-    };
-  </script>
-
   <!-- FIREBASE -->
   <script src="themes.js"></script>
   <script type="module" src="firebase.js"></script>
