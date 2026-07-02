@@ -477,4 +477,4 @@ window.openProfileModal  = () => {
   // Charger les données extra dans le formulaire
   setTimeout(() => { if (window.loadProfileExtraIntoForm) window.loadProfileExtraIntoForm(); }, 50);
 };
-window.closeProfileModal = () => document.getElementById("profile-modal-overlay")?.classList.remove("visible");
+window.closeProfileModal = () => document.getElementById("profile-modal-overlay")?.classList.remove("visible"); 
