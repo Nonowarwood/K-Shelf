@@ -91,7 +91,6 @@ window.signInWithGoogle = async function() {
     await signInWithPopup(auth, provider);
   } catch(e) {
     console.error("Connexion Google (popup):", e);
-    // Fallback : si le popup est bloqué ou échoue, utiliser le redirect
     if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request") {
       showDebugToast("↪️ Redirection vers Google...", "#4fc3f7");
       try {
@@ -105,6 +104,7 @@ window.signInWithGoogle = async function() {
     }
   }
 };
+window._firebaseReady = true; // signale que firebase est initialisé
 
 // Gérer le retour d'une connexion par redirect (mobile/navigateurs stricts)
 getRedirectResult(auth).then((result) => {
