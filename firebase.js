@@ -91,6 +91,7 @@ window.signInWithGoogle = async function() {
     await signInWithPopup(auth, provider);
   } catch(e) {
     console.error("Connexion Google (popup):", e);
+    // Fallback : si le popup est bloqué ou échoue, utiliser le redirect
     if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request") {
       showDebugToast("↪️ Redirection vers Google...", "#4fc3f7");
       try {
@@ -477,4 +478,4 @@ window.openProfileModal  = () => {
   // Charger les données extra dans le formulaire
   setTimeout(() => { if (window.loadProfileExtraIntoForm) window.loadProfileExtraIntoForm(); }, 50);
 };
-window.closeProfileModal = () => document.getElementById("profile-modal-overlay")?.classList.remove("visible"); 
+window.closeProfileModal = () => document.getElementById("profile-modal-overlay")?.classList.remove("visible");
