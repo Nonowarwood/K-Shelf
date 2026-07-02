@@ -61,7 +61,7 @@
         <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </svg>
     </button>
-    <button class="google-signin-topbar-btn" onclick="signInWithGoogle()">Se connecter</button>
+    <button class="google-signin-topbar-btn" onclick="(window.signInWithGoogle||function(){setTimeout(()=>window.signInWithGoogle&&window.signInWithGoogle(),800)})()">Se connecter</button>
   </div>
 
   <!-- APP SHELL -->
@@ -114,7 +114,7 @@
       <div class="profile-modal-icon">👤</div>
       <h2 class="add-modal-title" style="margin-bottom:8px;text-align:center" data-i18n="auth.title">Bienvenue sur K-Shelf</h2>
       <p class="profile-modal-sub" data-i18n="auth.subtitle">Connecte-toi pour personnaliser ton profil</p>
-      <button class="google-signin-btn" onclick="signInWithGoogle()">
+      <button class="google-signin-btn" onclick="(window.signInWithGoogle||function(){setTimeout(()=>window.signInWithGoogle&&window.signInWithGoogle(),800)})()">
         <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
           <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
           <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
@@ -475,10 +475,19 @@
 
   <audio id="local-audio-player"></audio>
 
+  <!-- STUB — fonctions disponibles avant le chargement de firebase.js -->
+  <script>
+    window._firebaseReady = false;
+    window.signInWithGoogle = function() {
+      const t = setInterval(() => {
+        if (window._firebaseReady) { clearInterval(t); window.signInWithGoogle(); }
+      }, 100);
+    };
+  </script>
+
   <!-- FIREBASE -->
   <script src="themes.js"></script>
   <script type="module" src="firebase.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
-
