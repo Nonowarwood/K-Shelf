@@ -246,62 +246,68 @@ function showDashboard() {
   document.getElementById("album-search").value = "";
   document.documentElement.style.setProperty("--dynamic-agency-color", "rgba(255,255,255,0.2)");
 
-  let totalAlbums = 0, totalArtists = 0;
+  let totalAlbums = 0, totalArtists = 0, favCount = 0;
+  const allAlbums = [];
   const totalAgencies = Object.keys(collectionData).length;
   for (const agency in collectionData) {
     totalArtists += Object.keys(collectionData[agency]).length;
-    for (const artist in collectionData[agency]) totalAlbums += collectionData[agency][artist].length;
+    for (const artist in collectionData[agency]) {
+      for (const alb of collectionData[agency][artist]) {
+        totalAlbums++;
+        if (alb.status === "favorite") favCount++;
+        allAlbums.push({ ...alb, artist, agency });
+      }
+    }
   }
+  const pcCount = (typeof photocardsData !== "undefined" ? photocardsData : []).length;
+  const concertCount = (typeof concertsData !== "undefined" ? concertsData : []).length;
 
-  // Landing page si collection vide
-  if (totalAlbums === 0 && !window._currentUser) {
+  // Accueil engageant si collection vide
+  if (totalAlbums === 0) {
     document.getElementById("main-content").innerHTML = `
-      <div class="landing-view animate-fade">
-        <div class="landing-hero">
-          <p class="landing-tag">✦ votre collection K-pop</p>
-          <h1 class="welcome-title">k-shelf.</h1>
-          <p class="welcome-desc">Organisez vos albums physiques, photocards, concerts et lightsticks en un seul endroit.</p>
-          <div class="landing-actions">
-            <button class="landing-btn-primary" onclick="signInWithGoogle()">
-              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
-                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
-                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-              </svg>
-              Commencer avec Google
-            </button>
-            <button class="landing-btn-secondary" onclick="loadDemoCollection()">
-              Essayer la démo
-            </button>
+      <div class="dashboard-view animate-fade">
+        <div class="dash-hero-empty">
+          <p class="landing-tag">✦ votre collection k-pop virtuelle</p>
+          <h2 class="welcome-title">bienvenue sur k-shelf.</h2>
+          <p class="welcome-desc">Albums, photocards, concerts et lightsticks — tout au même endroit, synchronisé sur tous vos appareils.</p>
+          <div class="dash-empty-actions">
+            <button class="add-submit-btn" style="max-width:260px" onclick="openAddModal()">+ Ajouter mon premier album</button>
+            <button class="dash-demo-btn" onclick="loadDemoCollection()">Explorer la démo →</button>
           </div>
         </div>
-
-        <div class="landing-features">
-          <div class="landing-feature-card">
-            <span class="landing-feature-icon">💿</span>
-            <h3>Albums</h3>
-            <p>Catalogue tes albums physiques par artiste et agence</p>
+        <div class="dash-quick-grid">
+          <div class="dash-quick-card" onclick="switchSidebarTab('photocards')">
+            <div class="dash-quick-icon" style="background:rgba(236,72,153,0.12)">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="9" r="3"/><path d="M7 19c1.5-2.5 8.5-2.5 10 0"/></svg>
+            </div>
+            <h3>Binder photocards</h3>
+            <p>Organise tes photocards avec effets holo</p>
           </div>
-          <div class="landing-feature-card">
-            <span class="landing-feature-icon">🎴</span>
-            <h3>Photocards</h3>
-            <p>Gère ton binder de photocards avec effets holographiques</p>
-          </div>
-          <div class="landing-feature-card">
-            <span class="landing-feature-icon">🎤</span>
+          <div class="dash-quick-card" onclick="switchSidebarTab('concerts')">
+            <div class="dash-quick-icon" style="background:rgba(249,115,22,0.12)">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
             <h3>Concerts</h3>
-            <p>Archive tes souvenirs de concerts avec setlists et photos</p>
+            <p>Archive tes souvenirs avec setlists et photos</p>
           </div>
-          <div class="landing-feature-card">
-            <span class="landing-feature-icon">🎵</span>
-            <h3>Spotify</h3>
-            <p>Connecte Spotify pour écouter tes albums directement</p>
+          <div class="dash-quick-card" onclick="showLightsticks()">
+            <div class="dash-quick-icon" style="background:rgba(234,179,8,0.12)">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.5V11h-4V9.5A4 4 0 0 1 12 2z"/><path d="M10 11h4l-1 11h-2l-1-11z"/></svg>
+            </div>
+            <h3>Lightsticks</h3>
+            <p>Collectionne tes lightsticks officiels</p>
           </div>
         </div>
       </div>`;
     return;
   }
+
+  // Mosaïque des 6 dernières pochettes ajoutées
+  const recent = allAlbums.filter(a => a.img).slice(-6).reverse();
+  const mosaicHtml = recent.map(a => `
+    <div class="dash-mosaic-item" onclick="selectArtist('${encodeURIComponent(a.agency)}','${encodeURIComponent(a.artist)}')" title="${a.title} — ${a.artist}">
+      <img src="${a.img}" alt="${a.title}" loading="lazy">
+    </div>`).join("");
 
   document.getElementById("main-content").innerHTML = `
     <div class="dashboard-view animate-fade">
@@ -311,7 +317,15 @@ function showDashboard() {
         <div class="stat-card"><span class="stat-number">${totalAlbums}</span><br><span class="stat-label">albums</span></div>
         <div class="stat-card"><span class="stat-number">${totalArtists}</span><br><span class="stat-label">artistes</span></div>
         <div class="stat-card"><span class="stat-number">${totalAgencies}</span><br><span class="stat-label">agences</span></div>
+        <div class="stat-card stat-card-clickable" onclick="switchSidebarTab('favorites')"><span class="stat-number">${favCount}</span><br><span class="stat-label">★ favoris</span></div>
+        <div class="stat-card stat-card-clickable" onclick="switchSidebarTab('photocards')"><span class="stat-number">${pcCount}</span><br><span class="stat-label">photocards</span></div>
+        <div class="stat-card stat-card-clickable" onclick="switchSidebarTab('concerts')"><span class="stat-number">${concertCount}</span><br><span class="stat-label">concerts</span></div>
       </div>
+      ${recent.length ? `
+      <div class="dash-section">
+        <p class="dash-section-label">ajoutés récemment</p>
+        <div class="dash-mosaic">${mosaicHtml}</div>
+      </div>` : ""}
     </div>`;
 }
 
@@ -320,7 +334,7 @@ function loadDemoCollection() {
   collectionData = JSON.parse(JSON.stringify(defaultCollectionData));
   initSidebar();
   showDashboard();
-  showDebugToast("✨ Mode démo activé — connecte-toi pour sauvegarder ta vraie collection", "#a855f7");
+  showDebugToast("✨ Mode démo — connecte-toi pour ta vraie collection", "#a855f7");
 }
 window.loadDemoCollection = loadDemoCollection;
 
