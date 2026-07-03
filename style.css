@@ -5441,3 +5441,53 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
   margin-top: 8px;
   line-height: 1.4;
 }
+
+/* ==========================================
+   ENCADRÉ CRÉDITS — page d'accueil
+   ========================================== */
+
+.home-credits {
+  margin-top: 32px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid var(--border, rgba(255,255,255,0.06));
+}
+
+.home-credits-label {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  color: var(--text-secondary, #808799);
+}
+
+.home-credits-logos {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.home-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.home-credit:hover { opacity: 1; }
+.home-credit svg { flex-shrink: 0; }
+
+.home-credits-author {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #808799);
+  font-style: italic;
+  margin-top: 2px;
+}
