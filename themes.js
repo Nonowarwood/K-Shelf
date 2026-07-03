@@ -208,6 +208,192 @@ const THEMES = {
       "--card-shadow":     "0 10px 30px rgba(13,59,82,0.25), inset 0 1px 0 rgba(255,255,255,0.5)",
       "--card-border":     "1.5px solid rgba(255,255,255,0.55)",
     }
+  },
+
+  newjeans: {
+    name: "NewJeans",
+    label: "Bunnies 🐰",
+    preview: "linear-gradient(135deg, #a8d8ff, #d9c2ff)",
+    vars: {
+      "--bg":              "#eef4fb",
+      "--surface":         "#ffffff",
+      "--surface-hover":   "#e6eef8",
+      "--border":          "rgba(90,130,180,0.16)",
+      "--border-hover":    "rgba(90,130,180,0.3)",
+      "--text-primary":    "#1b2a45",
+      "--text-secondary":  "#5a6b85",
+      "--text-tertiary":   "#8a97ad",
+      "--accent":          "#6ba6ff",
+      "--font-display":    "'Plus Jakarta Sans', sans-serif",
+      "--font-body":       "'Plus Jakarta Sans', sans-serif",
+      "--font-weight-display": "800",
+      "--letter-spacing-display": "-1px",
+      "--text-transform-display": "none",
+      "--radius-card":     "22px",
+      "--radius-panel":    "26px",
+      "--radius-btn":      "100px",
+      "--radius-pill":     "100px",
+      "--btn-border":      "none",
+      "--blur":            "none",
+      "--grid-line":       "none",
+      "--card-shadow":     "0 6px 20px rgba(107,166,255,0.14)",
+      "--card-border":     "1px solid rgba(90,130,180,0.12)",
+    }
+  },
+
+  aespa: {
+    name: "aespa",
+    label: "MY — Synk Dive",
+    preview: "linear-gradient(135deg, #000000, #00ffa3)",
+    vars: {
+      "--bg":              "#08090d",
+      "--surface":         "rgba(0,255,163,0.05)",
+      "--surface-hover":   "rgba(0,255,163,0.1)",
+      "--border":          "rgba(0,255,163,0.2)",
+      "--border-hover":    "rgba(0,255,163,0.4)",
+      "--text-primary":    "#eafff6",
+      "--text-secondary":  "#7fbfa8",
+      "--text-tertiary":   "#4d7d6d",
+      "--accent":          "#00ffa3",
+      "--font-display":    "'Syne', sans-serif",
+      "--font-body":       "'Space Mono', monospace",
+      "--font-weight-display": "800",
+      "--letter-spacing-display": "-1px",
+      "--text-transform-display": "uppercase",
+      "--radius-card":     "6px",
+      "--radius-panel":    "8px",
+      "--radius-btn":      "4px",
+      "--radius-pill":     "4px",
+      "--btn-border":      "1px solid rgba(0,255,163,0.4)",
+      "--blur":            "blur(12px)",
+      "--grid-line":       "rgba(0,255,163,0.06)",
+      "--card-shadow":     "0 0 24px rgba(0,255,163,0.12)",
+      "--card-border":     "1px solid rgba(0,255,163,0.18)",
+    }
+  },
+
+  bts: {
+    name: "BTS",
+    label: "ARMY 💜",
+    preview: "linear-gradient(135deg, #7c4dff, #b39ddb)",
+    vars: {
+      "--bg":              "#0e0a1a",
+      "--surface":         "rgba(140,100,220,0.08)",
+      "--surface-hover":   "rgba(140,100,220,0.15)",
+      "--border":          "rgba(150,110,230,0.22)",
+      "--border-hover":    "rgba(150,110,230,0.42)",
+      "--text-primary":    "#f3edff",
+      "--text-secondary":  "#a99cc9",
+      "--text-tertiary":   "#7a6ea0",
+      "--accent":          "#9b6dff",
+      "--font-display":    "'Syne', sans-serif",
+      "--font-body":       "'Plus Jakarta Sans', sans-serif",
+      "--font-weight-display": "800",
+      "--letter-spacing-display": "-1px",
+      "--text-transform-display": "none",
+      "--radius-card":     "18px",
+      "--radius-panel":    "22px",
+      "--radius-btn":      "100px",
+      "--radius-pill":     "100px",
+      "--btn-border":      "none",
+      "--blur":            "blur(16px) saturate(150%)",
+      "--grid-line":       "none",
+      "--card-shadow":     "0 10px 30px rgba(120,80,200,0.2)",
+      "--card-border":     "1px solid rgba(150,110,230,0.16)",
+    }
+  },
+
+  twice: {
+    name: "TWICE",
+    label: "ONCE 🍑",
+    preview: "linear-gradient(135deg, #ff6ea9, #ffd8a8)",
+    vars: {
+      "--bg":              "#fff5f8",
+      "--surface":         "#ffffff",
+      "--surface-hover":   "#ffe8f0",
+      "--border":          "rgba(255,110,169,0.18)",
+      "--border-hover":    "rgba(255,110,169,0.35)",
+      "--text-primary":    "#3d1f2e",
+      "--text-secondary":  "#8a5c6e",
+      "--text-tertiary":   "#b58a99",
+      "--accent":          "#ff6ea9",
+      "--font-display":    "'Syne', sans-serif",
+      "--font-body":       "'Plus Jakarta Sans', sans-serif",
+      "--font-weight-display": "800",
+      "--letter-spacing-display": "-1px",
+      "--text-transform-display": "none",
+      "--radius-card":     "24px",
+      "--radius-panel":    "28px",
+      "--radius-btn":      "100px",
+      "--radius-pill":     "100px",
+      "--btn-border":      "none",
+      "--blur":            "none",
+      "--grid-line":       "none",
+      "--card-shadow":     "0 6px 22px rgba(255,110,169,0.16)",
+      "--card-border":     "1px solid rgba(255,110,169,0.14)",
+    }
+  },
+
+  straykids: {
+    name: "Stray Kids",
+    label: "STAY 🔴",
+    preview: "linear-gradient(135deg, #e11d2f, #1a1a1a)",
+    vars: {
+      "--bg":              "#0d0a0b",
+      "--surface":         "rgba(225,29,47,0.06)",
+      "--surface-hover":   "rgba(225,29,47,0.12)",
+      "--border":          "rgba(225,29,47,0.24)",
+      "--border-hover":    "rgba(225,29,47,0.45)",
+      "--text-primary":    "#fdeaec",
+      "--text-secondary":  "#c98f96",
+      "--text-tertiary":   "#8f5c62",
+      "--accent":          "#e11d2f",
+      "--font-display":    "'Syne', sans-serif",
+      "--font-body":       "'Space Mono', monospace",
+      "--font-weight-display": "800",
+      "--letter-spacing-display": "-0.5px",
+      "--text-transform-display": "uppercase",
+      "--radius-card":     "8px",
+      "--radius-panel":    "10px",
+      "--radius-btn":      "6px",
+      "--radius-pill":     "6px",
+      "--btn-border":      "1px solid rgba(225,29,47,0.4)",
+      "--blur":            "blur(12px)",
+      "--grid-line":       "none",
+      "--card-shadow":     "0 8px 26px rgba(225,29,47,0.14)",
+      "--card-border":     "1px solid rgba(225,29,47,0.2)",
+    }
+  },
+
+  cortis: {
+    name: "CORTIS",
+    label: "Streetwear",
+    preview: "linear-gradient(135deg, #c8ff00, #1a1a1a)",
+    vars: {
+      "--bg":              "#0c0d0a",
+      "--surface":         "rgba(200,255,0,0.05)",
+      "--surface-hover":   "rgba(200,255,0,0.1)",
+      "--border":          "rgba(200,255,0,0.2)",
+      "--border-hover":    "rgba(200,255,0,0.4)",
+      "--text-primary":    "#f4ffe0",
+      "--text-secondary":  "#a3b87a",
+      "--text-tertiary":   "#6d7d4d",
+      "--accent":          "#c8ff00",
+      "--font-display":    "'Space Mono', monospace",
+      "--font-body":       "'Space Mono', monospace",
+      "--font-weight-display": "700",
+      "--letter-spacing-display": "-0.5px",
+      "--text-transform-display": "uppercase",
+      "--radius-card":     "2px",
+      "--radius-panel":    "4px",
+      "--radius-btn":      "2px",
+      "--radius-pill":     "2px",
+      "--btn-border":      "1px solid rgba(200,255,0,0.4)",
+      "--blur":            "blur(10px)",
+      "--grid-line":       "rgba(200,255,0,0.05)",
+      "--card-shadow":     "0 0 20px rgba(200,255,0,0.1)",
+      "--card-border":     "1px solid rgba(200,255,0,0.18)",
+    }
   }
 };
 
@@ -245,8 +431,12 @@ function applyTheme(themeId) {
     // Body background + classe thème
     document.body.style.background = theme.vars["--bg"];
     document.body.className = document.body.className
-      .replace(/theme-\S+/g, "").trim();
+      .replace(/theme-\S+/g, "").replace(/is-(light|dark)/g, "").trim();
     if (themeId !== "dark") document.body.classList.add(`theme-${themeId}`);
+
+    // Classe de luminosité — permet de cibler tous les thèmes clairs d'un coup
+    const LIGHT_THEMES = ["grid", "editorial", "kpopping", "lemontang", "newjeans", "twice"];
+    document.body.classList.add(LIGHT_THEMES.includes(themeId) ? "is-light" : "is-dark");
 
     // Thème clair : cacher l'aurora
     const aurora = document.querySelector(".apple-aurora");
