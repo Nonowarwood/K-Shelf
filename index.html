@@ -325,13 +325,6 @@
           <button type="button" class="spotify-autofill-btn" id="spotify-autofill-btn" onclick="autofillFromSpotify()">✦ Récupérer via Spotify</button>
           <p class="spotify-autofill-status" id="spotify-autofill-status" style="display:none"></p>
         </div>
-        <div class="add-form-group">
-          <label>Statut</label>
-          <div class="add-status-toggle">
-            <button class="status-toggle-btn active" id="toggle-owned" onclick="setAddStatus('owned')">● Possédé</button>
-            <button class="status-toggle-btn" id="toggle-wishlist" onclick="setAddStatus('wishlist')">○ Wishlist</button>
-          </div>
-        </div>
         <div id="add-preview" class="add-preview" style="display:none">
           <img id="add-preview-img" src="" alt="preview">
         </div>
@@ -520,7 +513,11 @@
       <!-- DONNÉES -->
       <div class="settings-section">
         <h3 class="settings-section-title">Données</h3>
-        <button class="reset-collection-btn" onclick="loadDemoCollection(); closeSettings();">
+        <button class="reset-collection-btn" onclick="fillAllYearsFromSpotify(); closeSettings();">
+          ✦ Compléter les années via Spotify
+        </button>
+        <p class="settings-hint">Récupère automatiquement l'année de sortie des albums qui n'en ont pas encore. Nécessite d'être connecté à Spotify.</p>
+        <button class="reset-collection-btn" style="margin-top:14px" onclick="loadDemoCollection(); closeSettings();">
           ✦ Charger la collection démo
         </button>
         <p class="settings-hint">Charge 28 albums de démonstration pour explorer l'interface. Connecte-toi pour ta vraie collection.</p>
