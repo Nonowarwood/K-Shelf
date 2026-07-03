@@ -2198,7 +2198,7 @@ body.theme-editorial .binder-spine { background: rgba(0,0,0,0.04); }
    ========================================== */
 
 .reset-collection-btn {
-  width: 100%;
+  width: 100%; 
   padding: 12px;
   background: rgba(248,113,113,0.08);
   border: 1px solid rgba(248,113,113,0.18);
