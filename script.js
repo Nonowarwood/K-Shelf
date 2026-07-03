@@ -307,9 +307,14 @@ function renderHomeStats() {
         agencyAlbumCount++;
         if (alb.status === "favorite") favCount++;
         allAlbums.push({ ...alb, artist, agency });
-        // Extraire une année si présente dans le titre (ex "(2023)")
-        const ym = (alb.title || "").match(/\b(19|20)\d{2}\b/);
-        if (ym) yearCounts[ym[0]] = (yearCounts[ym[0]] || 0) + 1;
+        // Année : champ dédié en priorité, sinon extraction depuis le titre
+        let year = null;
+        if (alb.year && !isNaN(alb.year)) year = String(alb.year);
+        else {
+          const ym = (alb.title || "").match(/\b(19|20)\d{2}\b/);
+          if (ym) year = ym[0];
+        }
+        if (year) yearCounts[year] = (yearCounts[year] || 0) + 1;
       }
     }
     if (agencyAlbumCount) agencyCounts[agency] = agencyAlbumCount;
@@ -435,6 +440,9 @@ function showDashboard() {
 
   // Accueil engageant si collection vide
   if (totalAlbums === 0) {
+    // Effet plein écran (sidebar masquée) pour les visiteurs sans collection
+    const app = document.querySelector(".app-fullscreen");
+    if (app && !window._currentUser) app.classList.add("home-mode");
     document.getElementById("main-content").innerHTML = `
       <div class="dashboard-view animate-fade">
         <div class="dash-hero-empty">
@@ -486,6 +494,10 @@ function showDashboard() {
     <div class="dash-mosaic-item" onclick="selectArtist('${encodeURIComponent(a.agency)}','${encodeURIComponent(a.artist)}')" title="${a.title} — ${a.artist}">
       <img src="${a.img}" alt="${a.title}" loading="lazy">
     </div>`).join("");
+
+  // Collection présente → sidebar visible (désactive le mode plein écran landing)
+  const appEl = document.querySelector(".app-fullscreen");
+  if (appEl) appEl.classList.remove("home-mode");
 
   document.getElementById("main-content").innerHTML = `
     <div class="dashboard-view animate-fade">
@@ -830,6 +842,8 @@ function openAddModal() {
   document.getElementById("add-title").value = "";
   document.getElementById("add-artist").value = "";
   document.getElementById("add-img").value = "";
+  const yEl = document.getElementById("add-year");
+  if (yEl) yEl.value = "";
   document.getElementById("add-error").style.display = "none";
   document.getElementById("add-preview").style.display = "none";
   addStatus = "owned";
@@ -864,6 +878,8 @@ function submitAddAlbum() {
   const artist = document.getElementById("add-artist").value.trim();
   const agency = document.getElementById("add-agency").value;
   const img    = document.getElementById("add-img").value.trim();
+  const yearEl = document.getElementById("add-year");
+  const year   = yearEl && yearEl.value ? parseInt(yearEl.value) : null;
   const errEl  = document.getElementById("add-error");
 
   if (!title || !artist) {
@@ -876,7 +892,7 @@ function submitAddAlbum() {
   // Créer l'artiste si il n'existe pas
   if (!collectionData[agency][artist]) collectionData[agency][artist] = [];
 
-  collectionData[agency][artist].push({ title, img, status: addStatus, mp3: "" });
+  collectionData[agency][artist].push({ title, img, status: addStatus, mp3: "", year });
   saveCollection();
   initSidebar();
 
@@ -1371,6 +1387,63 @@ async function searchSpotifyAlbum(q) {
   const r = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&type=album&limit=1`, { headers:{ Authorization:`Bearer ${spotifyAccessToken}` } });
   return (await r.json()).albums?.items?.[0] || null;
 }
+
+// Auto-remplir année + cover depuis Spotify dans le formulaire d'ajout
+async function autofillFromSpotify() {
+  const btn = document.getElementById("spotify-autofill-btn");
+  const title  = document.getElementById("add-title").value.trim();
+  const artist = document.getElementById("add-artist").value.trim();
+  const statusEl = document.getElementById("spotify-autofill-status");
+
+  if (!spotifyAccessToken) {
+    if (statusEl) { statusEl.textContent = "Connecte-toi à Spotify d'abord (bouton dans la sidebar)."; statusEl.style.color = "#f87171"; statusEl.style.display = "block"; }
+    return;
+  }
+  if (!title && !artist) {
+    if (statusEl) { statusEl.textContent = "Renseigne au moins le titre ou l'artiste."; statusEl.style.color = "#f87171"; statusEl.style.display = "block"; }
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.dataset.label = btn.textContent; btn.textContent = "Recherche…"; }
+  if (statusEl) { statusEl.style.display = "none"; }
+
+  try {
+    // Requête combinée artiste + titre pour un meilleur match
+    const query = [artist, title].filter(Boolean).join(" ");
+    const album = await searchSpotifyAlbum(query);
+
+    if (!album) {
+      if (statusEl) { statusEl.textContent = "Aucun album trouvé sur Spotify."; statusEl.style.color = "#f87171"; statusEl.style.display = "block"; }
+      return;
+    }
+
+    // Année
+    const year = (album.release_date || "").split("-")[0];
+    const yearEl = document.getElementById("add-year");
+    if (year && yearEl) yearEl.value = year;
+
+    // Cover (si le champ est vide)
+    const imgEl = document.getElementById("add-img");
+    const coverUrl = album.images?.[0]?.url;
+    if (coverUrl && imgEl && !imgEl.value.trim()) {
+      imgEl.value = coverUrl;
+      const preview = document.getElementById("add-preview");
+      const previewImg = document.getElementById("add-preview-img");
+      if (preview && previewImg) { previewImg.src = coverUrl; preview.style.display = "block"; }
+    }
+
+    if (statusEl) {
+      statusEl.textContent = `✓ Trouvé : ${album.name} (${year || "année inconnue"})`;
+      statusEl.style.color = "#34d399";
+      statusEl.style.display = "block";
+    }
+  } catch(e) {
+    if (statusEl) { statusEl.textContent = "Erreur lors de la recherche Spotify."; statusEl.style.color = "#f87171"; statusEl.style.display = "block"; }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label || "✦ Récupérer via Spotify"; }
+  }
+}
+window.autofillFromSpotify = autofillFromSpotify;
 
 async function getActiveDevice() {
   try {
