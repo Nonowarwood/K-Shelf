@@ -280,6 +280,13 @@ function showDashboard() {
           </div>
         </div>
         <div class="dash-quick-grid">
+          <div class="dash-quick-card" onclick="openAddModal()">
+            <div class="dash-quick-icon" style="background:rgba(99,102,241,0.12)">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <h3>Albums</h3>
+            <p>Catalogue tes albums physiques par artiste et agence</p>
+          </div>
           <div class="dash-quick-card" onclick="switchSidebarTab('photocards')">
             <div class="dash-quick-icon" style="background:rgba(236,72,153,0.12)">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="9" r="3"/><path d="M7 19c1.5-2.5 8.5-2.5 10 0"/></svg>
@@ -1355,7 +1362,7 @@ Object.defineProperty(window, 'binderTotalPages', {
 });
 
 window._loadLocalData = function() {
-  collectionData   = JSON.parse(localStorage.getItem("kshelf_save"))        || defaultCollectionData;
+  collectionData   = JSON.parse(localStorage.getItem("kshelf_save"))        || {};
   photocardsData   = JSON.parse(localStorage.getItem("kshelf_photocards"))  || [];
   binderTotalPages = parseInt(localStorage.getItem("kshelf_binder_pages")   || "1");
   if (window.initSidebar)   window.initSidebar();
