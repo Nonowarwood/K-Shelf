@@ -289,7 +289,6 @@ function renderHomeStats() {
   const allAlbums = [];
   const agencyCounts = {};
   const artistCounts = {};
-  const yearCounts = {};
   const totalAgencies = Object.keys(collectionData).length;
   let totalArtists = 0;
 
@@ -307,14 +306,6 @@ function renderHomeStats() {
         agencyAlbumCount++;
         if (alb.status === "favorite") favCount++;
         allAlbums.push({ ...alb, artist, agency });
-        // Année : champ dédié en priorité, sinon extraction depuis le titre
-        let year = null;
-        if (alb.year && !isNaN(alb.year)) year = String(alb.year);
-        else {
-          const ym = (alb.title || "").match(/\b(19|20)\d{2}\b/);
-          if (ym) year = ym[0];
-        }
-        if (year) yearCounts[year] = (yearCounts[year] || 0) + 1;
       }
     }
     if (agencyAlbumCount) agencyCounts[agency] = agencyAlbumCount;
@@ -327,9 +318,10 @@ function renderHomeStats() {
   let topArtist = "—", topArtistCount = 0;
   for (const a in artistCounts) if (artistCounts[a] > topArtistCount) { topArtist = a; topArtistCount = artistCounts[a]; }
 
-  // Année la plus représentée
-  let topYear = "—", topYearCount = 0;
-  for (const y in yearCounts) if (yearCounts[y] > topYearCount) { topYear = y; topYearCount = yearCounts[y]; }
+  // Agence dominante (nom + pourcentage de la collection)
+  let topAgency = "—", topAgencyCount = 0;
+  for (const ag in agencyCounts) if (agencyCounts[ag] > topAgencyCount) { topAgency = ag; topAgencyCount = agencyCounts[ag]; }
+  const topAgencyPct = totalAlbums ? Math.round((topAgencyCount / totalAlbums) * 100) : 0;
 
   // Répartition par agence (barres)
   const maxAgency = Math.max(1, ...Object.values(agencyCounts));
@@ -389,9 +381,9 @@ function renderHomeStats() {
           <span class="home-highlight-sub">${topArtistCount} album(s)</span>
         </div>
         <div class="home-highlight-card">
-          <span class="home-highlight-label">année la plus représentée</span>
-          <span class="home-highlight-value">${topYear}</span>
-          <span class="home-highlight-sub">${topYearCount ? topYearCount + " album(s)" : "—"}</span>
+          <span class="home-highlight-label">agence dominante</span>
+          <span class="home-highlight-value">${topAgency}</span>
+          <span class="home-highlight-sub">${topAgencyCount ? topAgencyPct + "% de la collection" : "—"}</span>
         </div>
       </div>
 
@@ -406,6 +398,25 @@ function renderHomeStats() {
         <p class="dash-section-label">ajoutés récemment</p>
         <div class="dash-mosaic home-mosaic">${mosaicHtml}</div>
       </div>` : ""}
+
+      <div class="home-credits">
+        <span class="home-credits-label">Propulsé par</span>
+        <div class="home-credits-logos">
+          <span class="home-credit">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="#1DB954"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.52 17.34c-.24.36-.66.48-1.02.24-2.82-1.74-6.36-2.1-10.56-1.14-.42.12-.78-.18-.9-.54-.12-.42.18-.78.54-.9 4.56-1.02 8.52-.6 11.64 1.32.42.18.48.66.3 1.02zm1.44-3.3c-.3.42-.84.6-1.26.3-3.24-1.98-8.16-2.58-11.94-1.38-.48.12-1.02-.12-1.14-.6-.12-.48.12-1.02.6-1.14 4.38-1.32 9.78-.66 13.5 1.62.36.18.54.78.24 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.1 9.3c-.6.18-1.2-.18-1.38-.72-.18-.6.18-1.2.72-1.38 4.32-1.32 11.4-1.02 15.9 1.62.54.3.72 1.02.42 1.56-.3.42-1.02.6-1.56.36z"/></svg>
+            Spotify
+          </span>
+          <span class="home-credit">
+            <svg viewBox="0 0 24 24" width="15" height="15"><path fill="#FFA000" d="M3.89 15.67 6.26 2.6a.42.42 0 0 1 .78-.13l2.54 4.74z"/><path fill="#F57F17" d="m3.89 15.67 4.34-8.46 1.35 2.53z"/><path fill="#FFCA28" d="m3.89 15.67 8.32-9.9a.42.42 0 0 1 .72.14l1.4 4.06 1.85 3.44a.85.85 0 0 1-.32 1.12l-6.6 3.7a.85.85 0 0 1-.83 0z"/><path fill="#FFA000" d="M14.05 9.87 12.93 6.6a.42.42 0 0 0-.72-.14l-8.32 9.21z"/></svg>
+            Firebase
+          </span>
+          <span class="home-credit">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="#D97757"><path d="M4.5 15.5 8.8 4.4a.6.6 0 0 1 1.12 0l4.3 11.1h-2.2l-.9-2.5H7.6l-.9 2.5zm3.8-4.4h2.9L9.75 7z"/><path d="M14.2 15.5 18.5 4.4a.6.6 0 0 1 1.12 0L24 15.5h-2.2z" opacity=".55"/></svg>
+            Claude
+          </span>
+        </div>
+        <span class="home-credits-author">by Nonowarwood</span>
+      </div>
     </div>`;
 }
 window.renderHomeStats = renderHomeStats;
@@ -1441,53 +1452,6 @@ async function autofillFromSpotify() {
 }
 window.autofillFromSpotify = autofillFromSpotify;
 
-// Complète en masse les années manquantes de toute la collection via Spotify
-async function fillAllYearsFromSpotify() {
-  if (!spotifyAccessToken) {
-    showDebugToast("⚠️ Connecte-toi à Spotify d'abord", "#f87171");
-    return;
-  }
-
-  // Rassembler les albums sans année
-  const toFill = [];
-  for (const agency in collectionData) {
-    if (!collectionData[agency] || typeof collectionData[agency] !== "object") continue;
-    for (const artist in collectionData[agency]) {
-      const list = collectionData[agency][artist];
-      if (!Array.isArray(list)) continue;
-      list.forEach((alb, idx) => {
-        if (alb && (!alb.year || isNaN(alb.year))) toFill.push({ agency, artist, idx, alb });
-      });
-    }
-  }
-
-  if (!toFill.length) {
-    showDebugToast("✓ Tous tes albums ont déjà une année", "#34d399");
-    return;
-  }
-
-  showDebugToast(`🔍 Recherche de ${toFill.length} année(s)…`, "#4fc3f7");
-  let found = 0;
-
-  for (const item of toFill) {
-    try {
-      const query = [item.artist, item.alb.title].filter(Boolean).join(" ");
-      const album = await searchSpotifyAlbum(query);
-      const year = album && album.release_date ? parseInt(album.release_date.split("-")[0]) : null;
-      if (year && !isNaN(year)) {
-        collectionData[item.agency][item.artist][item.idx].year = year;
-        found++;
-      }
-      // Petite pause pour ne pas saturer l'API Spotify
-      await new Promise(r => setTimeout(r, 120));
-    } catch(e) { /* on continue même si un album échoue */ }
-  }
-
-  saveCollection();
-  if (window.syncToFirestore) window.syncToFirestore();
-  showDebugToast(`✓ ${found}/${toFill.length} année(s) récupérée(s) !`, "#34d399");
-}
-window.fillAllYearsFromSpotify = fillAllYearsFromSpotify;
 
 async function getActiveDevice() {
   try {
