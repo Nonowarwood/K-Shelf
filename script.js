@@ -173,6 +173,7 @@ function saveCollection() {
 let sidebarTab = localStorage.getItem("kshelf_sidebar_tab") || "albums";
 
 function switchSidebarTab(tab) {
+  exitHome();
   sidebarTab = tab;
   localStorage.setItem("kshelf_sidebar_tab", tab);
   initSidebar();
@@ -263,6 +264,146 @@ function initSidebar() {
   </div>`;
   nav.innerHTML = html;
 }
+
+// ==========================================
+// PAGE D'ACCUEIL PLEIN ÉCRAN (mode home)
+// ==========================================
+function showHome() {
+  const app = document.querySelector(".app-fullscreen");
+  if (app) app.classList.add("home-mode");
+  document.querySelectorAll(".header-tab").forEach(b => b.classList.remove("active"));
+  renderHomeStats();
+}
+window.showHome = showHome;
+
+// Quitter le mode accueil (au clic sur un onglet)
+function exitHome() {
+  const app = document.querySelector(".app-fullscreen");
+  if (app) app.classList.remove("home-mode");
+}
+window.exitHome = exitHome;
+
+function renderHomeStats() {
+  // Collecte sécurisée
+  let totalAlbums = 0, favCount = 0;
+  const allAlbums = [];
+  const agencyCounts = {};
+  const artistCounts = {};
+  const yearCounts = {};
+  const totalAgencies = Object.keys(collectionData).length;
+  let totalArtists = 0;
+
+  for (const agency in collectionData) {
+    if (!collectionData[agency] || typeof collectionData[agency] !== "object") continue;
+    let agencyAlbumCount = 0;
+    for (const artist in collectionData[agency]) {
+      const list = collectionData[agency][artist];
+      if (!Array.isArray(list)) continue;
+      totalArtists++;
+      artistCounts[artist] = (artistCounts[artist] || 0) + list.length;
+      for (const alb of list) {
+        if (!alb) continue;
+        totalAlbums++;
+        agencyAlbumCount++;
+        if (alb.status === "favorite") favCount++;
+        allAlbums.push({ ...alb, artist, agency });
+        // Extraire une année si présente dans le titre (ex "(2023)")
+        const ym = (alb.title || "").match(/\b(19|20)\d{2}\b/);
+        if (ym) yearCounts[ym[0]] = (yearCounts[ym[0]] || 0) + 1;
+      }
+    }
+    if (agencyAlbumCount) agencyCounts[agency] = agencyAlbumCount;
+  }
+
+  const pcCount = (typeof photocardsData !== "undefined" && Array.isArray(photocardsData) ? photocardsData : []).length;
+  const concertCount = (typeof concertsData !== "undefined" && Array.isArray(concertsData) ? concertsData : []).length;
+
+  // Artiste le plus collectionné
+  let topArtist = "—", topArtistCount = 0;
+  for (const a in artistCounts) if (artistCounts[a] > topArtistCount) { topArtist = a; topArtistCount = artistCounts[a]; }
+
+  // Année la plus représentée
+  let topYear = "—", topYearCount = 0;
+  for (const y in yearCounts) if (yearCounts[y] > topYearCount) { topYear = y; topYearCount = yearCounts[y]; }
+
+  // Répartition par agence (barres)
+  const maxAgency = Math.max(1, ...Object.values(agencyCounts));
+  const agencyBars = Object.entries(agencyCounts)
+    .sort((a,b) => b[1]-a[1])
+    .map(([ag, n]) => {
+      const color = (typeof agencyTitleColor === "function") ? agencyTitleColor(ag) : "var(--accent)";
+      const pct = Math.round((n / maxAgency) * 100);
+      return `
+        <div class="home-bar-row">
+          <span class="home-bar-label">${ag}</span>
+          <div class="home-bar-track"><div class="home-bar-fill" style="width:${pct}%; background:${color}"></div></div>
+          <span class="home-bar-value">${n}</span>
+        </div>`;
+    }).join("");
+
+  // Mosaïque récente
+  const recent = allAlbums.filter(a => a.img).slice(-8).reverse();
+  const mosaicHtml = recent.map(a => `
+    <div class="dash-mosaic-item" onclick="selectArtist('${encodeURIComponent(a.agency)}','${encodeURIComponent(a.artist)}')" title="${a.title} — ${a.artist}">
+      <img src="${a.img}" alt="${a.title}" loading="lazy">
+    </div>`).join("");
+
+  const isEmpty = totalAlbums === 0;
+
+  document.getElementById("main-content").innerHTML = isEmpty ? `
+    <div class="home-view animate-fade">
+      <div class="home-hero">
+        <p class="landing-tag">✦ votre collection k-pop virtuelle</p>
+        <h1 class="home-title">k-shelf.</h1>
+        <p class="welcome-desc">Ta collection est vide pour l'instant. Ajoute ton premier album ou explore la démo.</p>
+        <div class="dash-empty-actions">
+          <button class="add-submit-btn" style="max-width:260px" onclick="exitHome(); openAddModal()">+ Ajouter un album</button>
+          <button class="dash-demo-btn" onclick="loadDemoCollection()">Explorer la démo →</button>
+        </div>
+      </div>
+    </div>` : `
+    <div class="home-view animate-fade">
+      <div class="home-hero">
+        <p class="landing-tag">✦ tableau de bord</p>
+        <h1 class="home-title">ma collection.</h1>
+      </div>
+
+      <div class="home-stats-grid">
+        <div class="home-stat"><span class="home-stat-num">${totalAlbums}</span><span class="home-stat-label">albums</span></div>
+        <div class="home-stat"><span class="home-stat-num">${totalArtists}</span><span class="home-stat-label">artistes</span></div>
+        <div class="home-stat"><span class="home-stat-num">${totalAgencies}</span><span class="home-stat-label">agences</span></div>
+        <div class="home-stat"><span class="home-stat-num">${favCount}</span><span class="home-stat-label">★ favoris</span></div>
+        <div class="home-stat"><span class="home-stat-num">${pcCount}</span><span class="home-stat-label">photocards</span></div>
+        <div class="home-stat"><span class="home-stat-num">${concertCount}</span><span class="home-stat-label">concerts</span></div>
+      </div>
+
+      <div class="home-highlights">
+        <div class="home-highlight-card">
+          <span class="home-highlight-label">artiste le plus collectionné</span>
+          <span class="home-highlight-value">${topArtist}</span>
+          <span class="home-highlight-sub">${topArtistCount} album(s)</span>
+        </div>
+        <div class="home-highlight-card">
+          <span class="home-highlight-label">année la plus représentée</span>
+          <span class="home-highlight-value">${topYear}</span>
+          <span class="home-highlight-sub">${topYearCount ? topYearCount + " album(s)" : "—"}</span>
+        </div>
+      </div>
+
+      ${agencyBars ? `
+      <div class="home-section">
+        <p class="dash-section-label">répartition par agence</p>
+        <div class="home-bars">${agencyBars}</div>
+      </div>` : ""}
+
+      ${recent.length ? `
+      <div class="home-section">
+        <p class="dash-section-label">ajoutés récemment</p>
+        <div class="dash-mosaic home-mosaic">${mosaicHtml}</div>
+      </div>` : ""}
+    </div>`;
+}
+window.renderHomeStats = renderHomeStats;
 
 // ==========================================
 // DASHBOARD
@@ -380,6 +521,7 @@ window.loadDemoCollection = loadDemoCollection;
 // SELECT ARTIST
 // ==========================================
 function selectArtist(encodedAgency, encodedArtist) {
+  if (window.exitHome) exitHome();
   const agency = decodeURIComponent(encodedAgency);
   const artist = decodeURIComponent(encodedArtist);
 
