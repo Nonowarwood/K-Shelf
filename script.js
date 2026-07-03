@@ -10,6 +10,26 @@ const agencyThemes = {
   "Autres / Indés": "#34d399",
 };
 
+// Renvoie la luminance approximative d'une couleur hex (0 = noir, 255 = blanc)
+function colorLuminance(hex) {
+  const c = hex.replace("#", "");
+  if (c.length !== 6) return 128;
+  const r = parseInt(c.slice(0,2), 16);
+  const g = parseInt(c.slice(2,4), 16);
+  const b = parseInt(c.slice(4,6), 16);
+  return 0.299*r + 0.587*g + 0.114*b;
+}
+
+// Couleur de titre d'agence adaptée : garde la couleur de marque si elle est
+// suffisamment visible, sinon bascule sur la variable de texte du thème
+function agencyTitleColor(agency) {
+  const brand = agencyThemes[agency];
+  if (!brand) return "var(--text-primary)";
+  // Couleur trop claire (blanc/quasi-blanc) → laisser le thème décider
+  if (colorLuminance(brand) > 225) return "var(--text-primary)";
+  return brand;
+}
+
 const defaultCollectionData = {
   HYBE: {
     NewJeans: [
@@ -185,7 +205,7 @@ function initSidebar() {
 
   if (sidebarTab === "albums") {
     for (const agency in collectionData) {
-      const color = agencyThemes[agency] || "#ffffff";
+      const color = agencyTitleColor(agency);
       html += `<div class="agency-section">
         <div class="agency-title" style="color:${color}">${agency}</div>
         <div class="artist-list">`;
