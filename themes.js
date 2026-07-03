@@ -674,3 +674,4 @@ window.t              = t;
 document.addEventListener("DOMContentLoaded", () => {
   loadSettings();
 });
+ 
