@@ -5412,3 +5412,32 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
 @media (max-width: 500px) {
   .home-stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ==========================================
+   BOUTON AUTO-REMPLISSAGE SPOTIFY
+   ========================================== */
+
+.spotify-autofill-btn {
+  width: 100%;
+  padding: 11px 16px;
+  background: rgba(29,185,84,0.12);
+  border: 1px solid rgba(29,185,84,0.35);
+  border-radius: var(--radius-btn, 10px);
+  color: #1DB954;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.spotify-autofill-btn:hover:not(:disabled) {
+  background: rgba(29,185,84,0.2);
+  border-color: rgba(29,185,84,0.55);
+}
+.spotify-autofill-btn:disabled { opacity: 0.6; cursor: wait; }
+
+.spotify-autofill-status {
+  font-size: 0.78rem;
+  margin-top: 8px;
+  line-height: 1.4;
+}
