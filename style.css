@@ -1103,8 +1103,9 @@ body {
 }
 
 .lightstick-nav {
-  color: rgba(255,255,255,0.45) !important;
+  color: var(--text-secondary) !important;
   font-style: italic;
+  opacity: 0.75;
 }
 
 /* ==========================================
@@ -5222,4 +5223,6 @@ body.theme-kpopping .header-logo {
   top: auto;
   right: auto;
 }
- 
+
+/* Titres d'agence : lisibles sur thèmes clairs même sans couleur de marque */
+body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); }
