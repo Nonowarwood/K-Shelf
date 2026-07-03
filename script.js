@@ -242,13 +242,11 @@ function initSidebar() {
       for (const ar in collectionData[ag])
         collectionData[ag][ar].forEach(a => { if (a.status === "favorite") favAlbums.push(a); });
     const favPcs   = photocardsData.filter(pc => pc.status === "favorite");
-    const favConcs = concertsData.filter(c => c.favorite);
     html += `<div class="agency-section">
       <div class="artist-list">
         <div class="artist-item" onclick="showFavorites()">Tous les favoris</div>
         <div class="artist-item" onclick="showFavorites('albums')">Albums (${favAlbums.length})</div>
         <div class="artist-item" onclick="showFavorites('photocards')">Photocards (${favPcs.length})</div>
-        <div class="artist-item" onclick="showFavorites('concerts')">Concerts (${favConcs.length})</div>
       </div>
     </div>`;
   }
@@ -1825,7 +1823,6 @@ function showFavorites(filter = "all") {
         if (a.status === "favorite") favAlbums.push({ ...a, artist: ar, agency: ag });
       });
   const favPcs    = photocardsData.filter(pc => pc.status === "favorite");
-  const favConcs  = concertsData.filter(c => c.favorite);
 
   let html = "";
 
@@ -1872,35 +1869,11 @@ function showFavorites(filter = "all") {
     }
   }
 
-  // Concerts favoris
-  if (filter === "all" || filter === "concerts") {
-    if (favConcs.length) {
-      const cards = favConcs.map(c => {
-        const cover = c.photos && c.photos[0] ? c.photos[0] : null;
-        return `
-          <div class="concert-card" onclick="openConcertDetail('${c.id}')">
-            <div class="concert-card-media">
-              ${cover ? `<img src="${cover}" alt="${c.artist}" class="concert-card-img">` : `<div class="concert-card-placeholder">🎤</div>`}
-              <div class="concert-card-overlay">${starsHtml(c.rating)}</div>
-            </div>
-            <div class="concert-card-info">
-              <h4 class="concert-card-artist">${c.artist}</h4>
-              <p class="concert-card-meta">${concertDateLabel(c.date)}</p>
-            </div>
-          </div>`;
-      }).join("");
-      html += `<div class="favorites-section">
-        <h3 class="favorites-section-label">🎤 Concerts</h3>
-        <div class="concerts-grid">${cards}</div>
-      </div>`;
-    }
-  }
-
   if (!html) {
     html = `<div class="concerts-empty-state">
       <div class="concerts-empty-icon">⭐</div>
       <p class="concerts-empty-title">Aucun favori pour l'instant</p>
-      <p class="concerts-empty-desc">Clique sur ★ sur un album, une photocard ou un concert !</p>
+      <p class="concerts-empty-desc">Clique sur ★ sur un album ou une photocard !</p>
     </div>`;
   }
 
@@ -1908,7 +1881,7 @@ function showFavorites(filter = "all") {
     <div class="artist-view-header animate-fade">
       <div class="breadcrumbs">collection</div>
       <h2 class="artist-main-title">favoris.</h2>
-      <p class="album-total-count">${favAlbums.length + favPcs.length + favConcs.length} élément(s)</p>
+      <p class="album-total-count">${favAlbums.length + favPcs.length} élément(s)</p>
     </div>
     <div class="favorites-content animate-fade">${html}</div>`;
 
