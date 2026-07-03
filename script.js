@@ -847,8 +847,6 @@ function openAddModal() {
   document.getElementById("add-error").style.display = "none";
   document.getElementById("add-preview").style.display = "none";
   addStatus = "owned";
-  document.getElementById("toggle-owned").classList.add("active");
-  document.getElementById("toggle-wishlist").classList.remove("active");
 }
 
 function closeAddModal(e) {
@@ -858,8 +856,6 @@ function closeAddModal(e) {
 
 function setAddStatus(s) {
   addStatus = s;
-  document.getElementById("toggle-owned").classList.toggle("active", s === "owned");
-  document.getElementById("toggle-wishlist").classList.toggle("active", s === "wishlist");
 }
 
 // Preview de la cover (délégué via l'élément statique dans l'HTML)
@@ -1444,6 +1440,54 @@ async function autofillFromSpotify() {
   }
 }
 window.autofillFromSpotify = autofillFromSpotify;
+
+// Complète en masse les années manquantes de toute la collection via Spotify
+async function fillAllYearsFromSpotify() {
+  if (!spotifyAccessToken) {
+    showDebugToast("⚠️ Connecte-toi à Spotify d'abord", "#f87171");
+    return;
+  }
+
+  // Rassembler les albums sans année
+  const toFill = [];
+  for (const agency in collectionData) {
+    if (!collectionData[agency] || typeof collectionData[agency] !== "object") continue;
+    for (const artist in collectionData[agency]) {
+      const list = collectionData[agency][artist];
+      if (!Array.isArray(list)) continue;
+      list.forEach((alb, idx) => {
+        if (alb && (!alb.year || isNaN(alb.year))) toFill.push({ agency, artist, idx, alb });
+      });
+    }
+  }
+
+  if (!toFill.length) {
+    showDebugToast("✓ Tous tes albums ont déjà une année", "#34d399");
+    return;
+  }
+
+  showDebugToast(`🔍 Recherche de ${toFill.length} année(s)…`, "#4fc3f7");
+  let found = 0;
+
+  for (const item of toFill) {
+    try {
+      const query = [item.artist, item.alb.title].filter(Boolean).join(" ");
+      const album = await searchSpotifyAlbum(query);
+      const year = album && album.release_date ? parseInt(album.release_date.split("-")[0]) : null;
+      if (year && !isNaN(year)) {
+        collectionData[item.agency][item.artist][item.idx].year = year;
+        found++;
+      }
+      // Petite pause pour ne pas saturer l'API Spotify
+      await new Promise(r => setTimeout(r, 120));
+    } catch(e) { /* on continue même si un album échoue */ }
+  }
+
+  saveCollection();
+  if (window.syncToFirestore) window.syncToFirestore();
+  showDebugToast(`✓ ${found}/${toFill.length} année(s) récupérée(s) !`, "#34d399");
+}
+window.fillAllYearsFromSpotify = fillAllYearsFromSpotify;
 
 async function getActiveDevice() {
   try {
