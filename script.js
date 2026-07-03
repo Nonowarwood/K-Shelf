@@ -156,6 +156,10 @@ function switchSidebarTab(tab) {
   sidebarTab = tab;
   localStorage.setItem("kshelf_sidebar_tab", tab);
   initSidebar();
+  // Synchroniser l'état actif des onglets du header
+  document.querySelectorAll(".header-tab").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tab === tab);
+  });
   if (tab === "albums")     showDashboard();
   else if (tab === "photocards") showBinder();
   else if (tab === "concerts")   showConcerts();
@@ -164,6 +168,10 @@ function switchSidebarTab(tab) {
 window.switchSidebarTab = switchSidebarTab;
 
 function initSidebar() {
+  // Synchroniser les onglets du header avec l'onglet actif
+  document.querySelectorAll(".header-tab").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tab === sidebarTab);
+  });
   const nav = document.getElementById("sidebar-nav");
   let html = "";
 
@@ -375,7 +383,7 @@ function selectArtist(encodedAgency, encodedArtist) {
     playerTitle.innerText = "Aucun morceau sélectionné";
     trackStatus.innerText = "Lecteur Hors-Ligne";
     progressBar.style.width = "0%";
-    playBtn.innerText = "▶";
+    setPlayIcon(false);
     document.getElementById("player-cover").style.display = "none";
     document.getElementById("player-emoji").style.display = "inline";
   }
@@ -613,29 +621,38 @@ function loadTrack(index) {
   const emoji = document.getElementById("player-emoji");
   if (track.img) { cover.src = track.img; cover.style.display = "block"; emoji.style.display = "none"; }
   else { cover.style.display = "none"; emoji.style.display = "inline"; }
-  trackStatus.innerText = "Prêt à écouter 🎧";
+  trackStatus.innerText = "Prêt à écouter";
   progressBar.style.width = "0%";
-  playBtn.innerText = "▶";
+  setPlayIcon(false);
 }
+
+// Bascule entre l'icône play et pause (SVG)
+function setPlayIcon(isPlaying) {
+  const playIcon  = document.getElementById("play-icon");
+  const pauseIcon = document.getElementById("pause-icon");
+  if (playIcon)  playIcon.style.display  = isPlaying ? "none" : "block";
+  if (pauseIcon) pauseIcon.style.display = isPlaying ? "block" : "none";
+}
+window.setPlayIcon = setPlayIcon;
 
 function togglePlay() {
   if (!audioPlayer.src || !currentPlaylist.length) return;
-  if (audioPlayer.paused) { audioPlayer.play(); playBtn.innerText = "⏸"; trackStatus.innerText = "En cours 🔊"; }
-  else { audioPlayer.pause(); playBtn.innerText = "▶"; trackStatus.innerText = "Pause ⏸"; }
+  if (audioPlayer.paused) { audioPlayer.play(); setPlayIcon(true); trackStatus.innerText = "En cours"; }
+  else { audioPlayer.pause(); setPlayIcon(false); trackStatus.innerText = "Pause"; }
 }
 
 function nextTrack() {
   if (!currentPlaylist.length) return;
   currentTrackIndex = (currentTrackIndex + 1) % currentPlaylist.length;
   loadTrack(currentTrackIndex); audioPlayer.play();
-  playBtn.innerText = "⏸"; trackStatus.innerText = "En cours 🔊";
+  setPlayIcon(true); trackStatus.innerText = "En cours";
 }
 
 function prevTrack() {
   if (!currentPlaylist.length) return;
   currentTrackIndex = (currentTrackIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
   loadTrack(currentTrackIndex); audioPlayer.play();
-  playBtn.innerText = "⏸"; trackStatus.innerText = "En cours 🔊";
+  setPlayIcon(true); trackStatus.innerText = "En cours";
 }
 
 audioPlayer.addEventListener("timeupdate", () => {
@@ -1121,12 +1138,13 @@ function disconnectSpotify() {
 function updateSpotifyButton(connected) {
   const btn = document.getElementById("spotify-connect-btn");
   if (!btn) return;
+  const lbl = document.getElementById("spotify-btn-label");
   if (connected) {
-    btn.innerText = "✓ Spotify connecté";
+    if (lbl) lbl.innerText = "spotify connecté";
     btn.style.background = "#1DB954"; btn.style.color = "#000";
     btn.onclick = disconnectSpotify;
   } else {
-    btn.innerText = "connexion spotify";
+    if (lbl) lbl.innerText = "connexion spotify";
     btn.style.background = ""; btn.style.color = "";
     btn.onclick = loginSpotify;
   }
@@ -1146,7 +1164,7 @@ async function fetchNowPlaying() {
     const isPlaying = data.is_playing;
     _spotifyIsPlaying = isPlaying;
     playerTitle.innerText = track.name;
-    trackStatus.innerText = isPlaying ? `▶ ${track.artists.map(a=>a.name).join(", ")}` : `⏸ ${track.artists.map(a=>a.name).join(", ")}`;
+    trackStatus.innerText = track.artists.map(a=>a.name).join(", ");
     const cover = track.album?.images?.[0]?.url;
     if (cover) {
       document.getElementById("player-cover").src = cover;
@@ -1154,7 +1172,7 @@ async function fetchNowPlaying() {
       document.getElementById("player-emoji").style.display = "none";
     }
     progressBar.style.width = `${(data.progress_ms / track.duration_ms) * 100}%`;
-    playBtn.innerText = isPlaying ? "⏸" : "▶";
+    setPlayIcon(isPlaying);
   } catch(e) { console.error("Now playing error:", e); }
 }
 
