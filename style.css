@@ -5549,3 +5549,89 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
 @media (max-width: 768px) {
   #concert-map { height: 50vh; min-height: 320px; }
 }
+
+/* ==========================================
+   BADGES / ACHIEVEMENTS
+   ========================================== */
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.badge-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 20px 14px;
+  background: var(--surface, rgba(255,255,255,0.03));
+  border: 1px solid var(--border, rgba(255,255,255,0.06));
+  border-radius: var(--radius-card, 16px);
+  transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), border-color 0.2s;
+}
+.badge-card.unlocked:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-hover, rgba(255,255,255,0.15));
+}
+.badge-card.locked {
+  opacity: 0.5;
+  filter: grayscale(0.7);
+}
+
+.badge-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(128,128,128,0.1);
+  color: var(--text-secondary, #808799);
+}
+
+.badge-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+}
+
+.badge-desc {
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--text-secondary, #808799);
+}
+
+.badge-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background: #34d399;
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.badge-lock {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+@media (max-width: 900px) {
+  .badges-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .badges-grid { grid-template-columns: repeat(2, 1fr); }
+}
