@@ -5947,3 +5947,113 @@ a.home-credits-author:hover {
   opacity: 1;
   text-decoration: underline;
 }
+
+/* ==========================================
+   ÉCRAN DE CHARGEMENT (SPLASH)
+   ========================================== */
+
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: #07090e;
+  transition: opacity 0.55s ease, visibility 0.55s ease;
+}
+#splash-screen.splash-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-logo {
+  animation: splashPop 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.splash-logo svg {
+  display: block;
+  filter: drop-shadow(0 12px 40px rgba(168, 85, 247, 0.4));
+}
+
+.splash-wordmark {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #fff;
+  opacity: 0;
+  animation: splashFadeUp 0.5s ease 0.25s forwards;
+}
+
+.splash-loader {
+  width: 120px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  overflow: hidden;
+  opacity: 0;
+  animation: splashFadeUp 0.5s ease 0.4s forwards;
+}
+.splash-loader-bar {
+  width: 40%;
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, #4f8ef7, #a855f7, #e040a0);
+  animation: splashSlide 1s ease-in-out infinite;
+}
+
+@keyframes splashPop {
+  0%   { transform: scale(0.6) rotate(-8deg); opacity: 0; }
+  60%  { transform: scale(1.08) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes splashFadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes splashSlide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* ==========================================
+   ANIMATIONS D'APPARITION DES CARTES
+   ========================================== */
+
+@keyframes cardRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Les cartes d'albums apparaissent en cascade */
+.album-card {
+  animation: cardRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.albums-display-grid .album-card:nth-child(1) { animation-delay: 0.02s; }
+.albums-display-grid .album-card:nth-child(2) { animation-delay: 0.06s; }
+.albums-display-grid .album-card:nth-child(3) { animation-delay: 0.10s; }
+.albums-display-grid .album-card:nth-child(4) { animation-delay: 0.14s; }
+.albums-display-grid .album-card:nth-child(5) { animation-delay: 0.18s; }
+.albums-display-grid .album-card:nth-child(6) { animation-delay: 0.22s; }
+.albums-display-grid .album-card:nth-child(7) { animation-delay: 0.26s; }
+.albums-display-grid .album-card:nth-child(8) { animation-delay: 0.30s; }
+
+/* Léger zoom au survol des pochettes */
+.album-media-wrapper img,
+.album-cover img {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.album-card:hover .album-media-wrapper img,
+.album-card:hover .album-cover img {
+  transform: scale(1.04);
+}
+
+/* Respecter les préférences d'accessibilité (pas d'animation si demandé) */
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo, .splash-wordmark, .splash-loader,
+  .splash-loader-bar, .album-card { animation: none; }
+  .album-card { opacity: 1; }
+}
