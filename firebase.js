@@ -91,7 +91,6 @@ window.signInWithGoogle = async function() {
     await signInWithPopup(auth, provider);
   } catch(e) {
     console.error("Connexion Google (popup):", e);
-    // Fallback : si le popup est bloqué ou échoue, utiliser le redirect
     if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request") {
       showDebugToast("↪️ Redirection vers Google...", "#4fc3f7");
       try {
@@ -157,11 +156,13 @@ onAuthStateChanged(auth, async (user) => {
     startRealtimeSync(user);
     // Déclencher les syncs en attente (données ajoutées avant connexion)
     if (window._onSyncReady) window._onSyncReady();
+    if (window.applySpotifyVisibility) window.applySpotifyVisibility();
   } else {
     window._currentUser = null;
     if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
     clearProfileUI();
     if (window._loadLocalData) window._loadLocalData();
+    if (window.applySpotifyVisibility) window.applySpotifyVisibility();
   }
 });
 
