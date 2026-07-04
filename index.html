@@ -118,6 +118,10 @@
           <svg class="dropdown-item-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           <span>Partage & profil public</span>
         </button>
+        <button class="dropdown-item" onclick="document.getElementById('profile-dropdown-menu').classList.remove('visible'); openCommunityModal();">
+          <svg class="dropdown-item-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Communauté</span>
+        </button>
         <button class="dropdown-item" onclick="document.getElementById('profile-dropdown-menu').classList.remove('visible'); document.getElementById('settings-overlay').classList.add('visible'); if(window.updateSettingsUI) updateSettingsUI();">
           <svg class="dropdown-item-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span data-i18n="dropdown.settings">Paramètres</span>
@@ -614,6 +618,35 @@
         </button>
         <p class="share-modal-hint" id="share-link-hint">Connecte-toi pour obtenir ton lien.</p>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL COMMUNAUTÉ (recherche + abonnements/abonnés) -->
+  <div id="community-modal-overlay" class="share-modal-overlay" onclick="if(event.target===this)closeCommunityModal()">
+    <div class="share-modal community-modal">
+      <button class="share-modal-close" onclick="closeCommunityModal()" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="share-modal-header">
+        <div class="share-modal-icon">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h2 class="share-modal-title">Communauté</h2>
+        <p class="share-modal-sub">Trouve d'autres collectionneurs et suis leurs collections.</p>
+      </div>
+
+      <div class="community-search">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="community-search-input" placeholder="Rechercher un pseudo…" oninput="handleUserSearch(this.value)" autocomplete="off">
+      </div>
+      <div id="community-search-results"></div>
+
+      <div class="community-tabs">
+        <button class="community-tab active" id="tab-following" onclick="switchCommunityTab('following')">Abonnements</button>
+        <button class="community-tab" id="tab-followers" onclick="switchCommunityTab('followers')">Abonnés</button>
+      </div>
+      <div id="community-list"></div>
     </div>
   </div>
 
