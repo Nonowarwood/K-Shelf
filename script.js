@@ -518,8 +518,16 @@ function renderHomeStats() {
             <svg viewBox="0 0 24 24" width="15" height="15" fill="#D97757"><path d="M4.5 15.5 8.8 4.4a.6.6 0 0 1 1.12 0l4.3 11.1h-2.2l-.9-2.5H7.6l-.9 2.5zm3.8-4.4h2.9L9.75 7z"/><path d="M14.2 15.5 18.5 4.4a.6.6 0 0 1 1.12 0L24 15.5h-2.2z" opacity=".55"/></svg>
             Claude
           </span>
+          <span class="home-credit">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.65 1.65.24 2.87.12 3.17.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.62-5.49 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.82.58A12 12 0 0 0 24 12.5C24 5.87 18.63.5 12 .5z"/></svg>
+            GitHub
+          </span>
+          <span class="home-credit">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 8h8M12 8v9" stroke="var(--bg,#000)" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+            Val Town
+          </span>
         </div>
-        <span class="home-credits-author">by Nonowarwood</span>
+        <a class="home-credits-author" href="https://github.com/Nonowarwood" target="_blank" rel="noopener">by Nonowarwood</a>
       </div>
     </div>`;
 }
@@ -1716,10 +1724,6 @@ async function autofillFromSpotify() {
   const artist = document.getElementById("add-artist").value.trim();
   const statusEl = document.getElementById("spotify-autofill-status");
 
-  if (!spotifyAccessToken) {
-    if (statusEl) { statusEl.textContent = "Connecte-toi à Spotify d'abord (bouton dans la sidebar)."; statusEl.style.color = "#f87171"; statusEl.style.display = "block"; }
-    return;
-  }
   if (!title && !artist) {
     if (statusEl) { statusEl.textContent = "Renseigne au moins le titre ou l'artiste."; statusEl.style.color = "#f87171"; statusEl.style.display = "block"; }
     return;
@@ -1729,9 +1733,8 @@ async function autofillFromSpotify() {
   if (statusEl) { statusEl.style.display = "none"; }
 
   try {
-    // Requête combinée artiste + titre pour un meilleur match
-    const query = [artist, title].filter(Boolean).join(" ");
-    const album = await searchSpotifyAlbum(query);
+    // Passe par le proxy (fetchSpotifyAlbumData) → marche sans connexion Spotify
+    const album = await fetchSpotifyAlbumData(artist || title, title || artist);
 
     if (!album) {
       if (statusEl) { statusEl.textContent = "Aucun album trouvé sur Spotify."; statusEl.style.color = "#f87171"; statusEl.style.display = "block"; }
@@ -1895,7 +1898,10 @@ async function openAlbumModal(title, artist, agency, img, status) {
         <div class="modal-meta-block">
           ${spotifyUrl ? `<a class="modal-spotify-link" href="${spotifyUrl}" target="_blank">Ouvrir sur Spotify ↗</a>` : ""}
           ${sp ? `<button class="modal-play-btn spotify-feature" onclick="playAlbumOnSpotify('${artist.replace(/'/g,"\\'")}','${title.replace(/'/g,"\\'")}')">▶ Écouter</button>` : ""}
-          <button class="modal-edit-btn" onclick="openEditAlbum('${encodeURIComponent(agency)}','${encodeURIComponent(artist)}','${encodeURIComponent(title)}')">✎ Modifier</button>
+          <button class="modal-edit-btn" onclick="openEditAlbum('${encodeURIComponent(agency)}','${encodeURIComponent(artist)}','${encodeURIComponent(title)}')">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Modifier
+          </button>
         </div>
       </div>
       <div class="modal-right">
@@ -1985,7 +1991,9 @@ function openEditAlbum(encAgency, encArtist, encTitle) {
       <p id="edit-error" class="add-error" style="display:none"></p>
       <div class="edit-modal-actions">
         <button class="add-submit-btn" onclick="submitEditAlbum('${encAgency}','${encArtist}','${encodeURIComponent(title)}')">Enregistrer</button>
-        <button class="edit-delete-btn" onclick="deleteAlbum('${encAgency}','${encArtist}','${encodeURIComponent(title)}')">🗑 Supprimer</button>
+        <button class="edit-delete-btn" onclick="deleteAlbum('${encAgency}','${encArtist}','${encodeURIComponent(title)}')" title="Supprimer">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        </button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
