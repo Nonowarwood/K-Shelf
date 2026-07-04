@@ -1704,6 +1704,10 @@ function showConcerts() {
       <div class="breadcrumbs">collection</div>
       <h2 class="artist-main-title">concerts.</h2>
       <p class="album-total-count">${concertsData.length} concert(s) vécu(s)</p>
+      ${concertsData.length ? `<button class="concerts-map-btn" onclick="showConcertsMap()">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+        Voir la carte
+      </button>` : ""}
     </div>
     <div class="concerts-grid animate-fade">
       ${cardsHtml || `
@@ -1716,6 +1720,109 @@ function showConcerts() {
     </div>`;
 }
 window.showConcerts = showConcerts;
+
+// ==========================================
+// CARTE DES CONCERTS (Leaflet + géocodage Nominatim)
+// ==========================================
+const geocodeCache = JSON.parse(localStorage.getItem("kshelf_geocode_cache") || "{}");
+
+function saveGeocodeCache() {
+  try { localStorage.setItem("kshelf_geocode_cache", JSON.stringify(geocodeCache)); } catch(e) {}
+}
+
+async function geocodeVenue(venue) {
+  if (!venue) return null;
+  const key = venue.trim().toLowerCase();
+  if (geocodeCache[key]) return geocodeCache[key];
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(venue)}&format=json&limit=1`;
+    const res = await fetch(url, { headers: { "Accept": "application/json" } });
+    const data = await res.json();
+    if (data && data[0]) {
+      const coords = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+      geocodeCache[key] = coords;
+      saveGeocodeCache();
+      return coords;
+    }
+  } catch(e) { /* échec géocodage, on ignore ce lieu */ }
+  return null;
+}
+
+let concertMapInstance = null;
+
+async function showConcertsMap() {
+  document.getElementById("main-content").innerHTML = `
+    <div class="artist-view-header animate-fade">
+      <div class="breadcrumbs">collection · concerts</div>
+      <h2 class="artist-main-title">carte des concerts.</h2>
+      <p class="album-total-count">tes souvenirs à travers le monde</p>
+      <button class="concerts-map-btn" onclick="showConcerts()">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m0 0l7 7m-7-7l7-7"/></svg>
+        Retour à la liste
+      </button>
+    </div>
+    <div class="concert-map-wrapper animate-fade">
+      <div id="concert-map"></div>
+      <div class="concert-map-status" id="concert-map-status">Localisation des lieux en cours…</div>
+    </div>`;
+
+  // Attendre que le DOM soit prêt et que Leaflet soit chargé
+  if (typeof L === "undefined") {
+    document.getElementById("concert-map-status").textContent = "La carte n'a pas pu être chargée. Vérifie ta connexion.";
+    return;
+  }
+
+  // Initialiser la carte
+  if (concertMapInstance) { concertMapInstance.remove(); concertMapInstance = null; }
+  concertMapInstance = L.map("concert-map", { scrollWheelZoom: true }).setView([20, 0], 2);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    attribution: '© OpenStreetMap © CARTO',
+    maxZoom: 19,
+  }).addTo(concertMapInstance);
+
+  // Géocoder chaque concert avec un lieu
+  const withVenue = concertsData.filter(c => c.venue && c.venue.trim());
+  const statusEl = document.getElementById("concert-map-status");
+
+  if (!withVenue.length) {
+    statusEl.textContent = "Aucun de tes concerts n'a de lieu renseigné. Ajoute un lieu à tes concerts pour les voir ici !";
+    return;
+  }
+
+  const bounds = [];
+  let located = 0;
+
+  for (const c of withVenue) {
+    const coords = await geocodeVenue(c.venue);
+    if (coords) {
+      located++;
+      bounds.push([coords.lat, coords.lng]);
+      const marker = L.circleMarker([coords.lat, coords.lng], {
+        radius: 8,
+        fillColor: "#e040a0",
+        color: "#fff",
+        weight: 2,
+        fillOpacity: 0.85,
+      }).addTo(concertMapInstance);
+      marker.bindPopup(`
+        <div style="font-family:'Plus Jakarta Sans',sans-serif; min-width:140px">
+          <strong style="font-size:0.95rem">${c.artist}</strong><br>
+          <span style="font-size:0.8rem; color:#666">${c.venue}</span><br>
+          <span style="font-size:0.75rem; color:#999">${concertDateLabel(c.date)}</span>
+        </div>`);
+    }
+    // Pause pour respecter la limite de Nominatim (1 req/sec)
+    await new Promise(r => setTimeout(r, 1100));
+  }
+
+  if (bounds.length) {
+    concertMapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 6 });
+    statusEl.textContent = `${located} concert(s) localisé(s) sur ${withVenue.length}`;
+  } else {
+    statusEl.textContent = "Impossible de localiser tes lieux de concert.";
+  }
+}
+window.showConcertsMap = showConcertsMap;
 
 // ==========================================
 // MODAL AJOUT / EDITION CONCERT
