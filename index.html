@@ -4,6 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>k-shelf.</title>
+  <meta name="description" content="k-shelf — ma collection K-pop virtuelle. Cataloguez vos albums, photocards et concerts, avec vos stats d'écoute et vos badges.">
+  <meta name="theme-color" content="#a855f7">
+
+  <!-- Open Graph (aperçu au partage : Discord, WhatsApp, iMessage…) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="k-shelf.">
+  <meta property="og:description" content="Ma collection K-pop virtuelle — albums, photocards, concerts, stats d'écoute et badges.">
+  <meta property="og:url" content="https://nonowarwood.github.io/K-Shelf/">
+  <meta property="og:image" content="https://nonowarwood.github.io/K-Shelf/Untitled-design.jpeg">
+  <meta property="og:site_name" content="k-shelf.">
+
+  <!-- Twitter/X card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="k-shelf.">
+  <meta name="twitter:description" content="Ma collection K-pop virtuelle — albums, photocards, concerts, stats d'écoute et badges.">
+  <meta name="twitter:image" content="https://nonowarwood.github.io/K-Shelf/Untitled-design.jpeg">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234f8ef7'/%3E%3Cstop offset='0.5' stop-color='%23a855f7'/%3E%3Cstop offset='1' stop-color='%23e040a0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='38' y='62' text-anchor='middle' fill='%23fff' font-family='Syne,Arial,sans-serif' font-size='46' font-weight='800'%3Ek%3C/text%3E%3Crect x='58' y='30' width='7' height='34' rx='2' fill='%23fff'/%3E%3Crect x='67' y='26' width='7' height='38' rx='2' fill='%23fff' opacity='0.85'/%3E%3Crect x='30' y='70' width='44' height='5' rx='2' fill='%23fff'/%3E%3C/svg%3E">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;700&family=Fraunces:ital,wght@0,300;0,500;0,600;1,400&family=Playfair+Display:wght@500;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -11,6 +27,28 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- ÉCRAN DE CHARGEMENT -->
+  <div id="splash-screen">
+    <div class="splash-logo">
+      <svg viewBox="0 0 100 100" width="88" height="88">
+        <defs>
+          <linearGradient id="splash-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#4f8ef7"/>
+            <stop offset="0.5" stop-color="#a855f7"/>
+            <stop offset="1" stop-color="#e040a0"/>
+          </linearGradient>
+        </defs>
+        <rect width="100" height="100" rx="22" fill="url(#splash-grad)"/>
+        <text x="38" y="62" text-anchor="middle" fill="#fff" font-family="Syne,Arial,sans-serif" font-size="46" font-weight="800">k</text>
+        <rect x="58" y="30" width="7" height="34" rx="2" fill="#fff"/>
+        <rect x="67" y="26" width="7" height="38" rx="2" fill="#fff" opacity="0.85"/>
+        <rect x="30" y="70" width="44" height="5" rx="2" fill="#fff"/>
+      </svg>
+    </div>
+    <div class="splash-wordmark">k-shelf.</div>
+    <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+  </div>
 
   <!-- AURORA BACKGROUND -->
   <div class="apple-aurora">
