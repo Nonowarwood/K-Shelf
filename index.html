@@ -114,6 +114,10 @@
           <svg class="dropdown-item-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span data-i18n="dropdown.profile">Mon profil</span>
         </button>
+        <button class="dropdown-item" onclick="document.getElementById('profile-dropdown-menu').classList.remove('visible'); openShareModal();">
+          <svg class="dropdown-item-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Partage & profil public</span>
+        </button>
         <button class="dropdown-item" onclick="document.getElementById('profile-dropdown-menu').classList.remove('visible'); document.getElementById('settings-overlay').classList.add('visible'); if(window.updateSettingsUI) updateSettingsUI();">
           <svg class="dropdown-item-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span data-i18n="dropdown.settings">Paramètres</span>
@@ -572,9 +576,56 @@
 
   <audio id="local-audio-player"></audio>
 
+  <!-- MODAL PARTAGE & PROFIL PUBLIC -->
+  <div id="share-modal-overlay" class="share-modal-overlay" onclick="if(event.target===this)closeShareModal()">
+    <div class="share-modal">
+      <button class="share-modal-close" onclick="closeShareModal()" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="share-modal-header">
+        <div class="share-modal-icon">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </div>
+        <h2 class="share-modal-title">Partage & profil public</h2>
+        <p class="share-modal-sub">Partage ta collection avec un lien. Tu choisis ce que les visiteurs peuvent voir.</p>
+      </div>
+
+      <label class="share-toggle-row">
+        <span>Activer mon profil public</span>
+        <span class="share-switch">
+          <input type="checkbox" id="share-enabled" onchange="toggleShareEnabled(this.checked)">
+          <span class="share-slider"></span>
+        </span>
+      </label>
+
+      <div id="share-options">
+        <p class="share-options-label">Ce que je partage</p>
+        <label class="share-check"><input type="checkbox" id="share-albums" onchange="updateShareSetting('albums', this.checked)"> <span>Albums</span></label>
+        <label class="share-check"><input type="checkbox" id="share-photocards" onchange="updateShareSetting('photocards', this.checked)"> <span>Photocards</span></label>
+        <label class="share-check"><input type="checkbox" id="share-concerts" onchange="updateShareSetting('concerts', this.checked)"> <span>Concerts</span></label>
+        <label class="share-check"><input type="checkbox" id="share-stats" onchange="updateShareSetting('stats', this.checked)"> <span>Statistiques</span></label>
+      </div>
+
+      <div id="share-link-box">
+        <button class="share-copy-btn" onclick="copyShareLink()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copier mon lien de partage
+        </button>
+        <p class="share-modal-hint" id="share-link-hint">Connecte-toi pour obtenir ton lien.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- FIREBASE -->
   <script src="themes.js"></script>
   <script type="module" src="firebase.js"></script>
   <script src="script.js"></script>
+  <link rel="stylesheet" href="profile.css">
+  <script src="profile.js"></script>
+  <script>
+    // Si l'URL contient ?profile=, afficher le profil public au lieu de l'app
+    if (window.checkForPublicProfile) window.checkForPublicProfile();
+  </script>
 </body>
 </html>
