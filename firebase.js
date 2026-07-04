@@ -58,6 +58,7 @@ async function readFromFirestore(uid) {
       pseudo:      raw.pseudo      ?? null,
       photoURL:    raw.photoURL    ?? null,
       profileExtra: raw.profileExtra ?? null,
+      shareSettings: raw.shareSettings ? JSON.parse(raw.shareSettings) : null,
     };
   } catch(e) {
     console.error("❌ Firestore read error:", e);
@@ -75,6 +76,7 @@ async function writeToFirestore(uid, payload) {
     if (payload.pseudo        !== undefined) toWrite.pseudo        = payload.pseudo;
     if (payload.photoURL      !== undefined) toWrite.photoURL      = payload.photoURL;
     if (payload.profileExtra  !== undefined) toWrite.profileExtra  = payload.profileExtra;
+    if (payload.shareSettings !== undefined) toWrite.shareSettings = JSON.stringify(payload.shareSettings);
     await setDoc(userDocRef(uid), toWrite, { merge: true });
     return true;
   } catch(e) {
@@ -82,6 +84,80 @@ async function writeToFirestore(uid, payload) {
     return false;
   }
 }
+
+// ==========================================
+// PROFILS PUBLICS (partage de collection)
+// ==========================================
+// Préférences de partage par défaut (ce qui est public)
+function defaultShareSettings() {
+  return { enabled: true, albums: true, photocards: true, concerts: true, stats: false };
+}
+
+function publicDocRef(uid) {
+  return doc(db, "users_public", uid);
+}
+
+// Écrit la copie publique en respectant les préférences de partage.
+// N'expose QUE ce que l'utilisateur a accepté de montrer.
+async function syncPublicProfile(uid) {
+  try {
+    const share = window.shareSettings || defaultShareSettings();
+    // Si le partage est désactivé, on efface la vitrine publique.
+    if (!share.enabled) {
+      await setDoc(publicDocRef(uid), { enabled: false, updatedAt: Date.now() });
+      return true;
+    }
+    const pub = {
+      enabled: true,
+      updatedAt: Date.now(),
+      pseudo:   window._pseudo   || "",
+      photoURL: window._photoURL || "",
+    };
+    // On ne copie que les sections autorisées.
+    if (share.albums)     pub.collection = JSON.stringify(window.collectionData || {});
+    if (share.photocards) { pub.photocards = JSON.stringify(window.photocardsData || []); pub.binderPages = window.binderPages || 1; }
+    if (share.concerts)   pub.concerts = JSON.stringify(window.concertsData || []);
+    // Les "stats" se recalculent à la volée côté visiteur à partir des albums,
+    // donc rien de spécial à stocker ici ; on garde juste le flag.
+    pub.showStats = !!share.stats;
+    await setDoc(publicDocRef(uid), pub);
+    return true;
+  } catch(e) {
+    console.error("❌ sync profil public:", e);
+    return false;
+  }
+}
+window.syncPublicProfile = syncPublicProfile;
+window.defaultShareSettings = defaultShareSettings;
+
+// Lit le profil public d'un utilisateur (accessible à tous).
+async function readPublicProfile(uid) {
+  try {
+    const snap = await getDoc(publicDocRef(uid));
+    if (!snap.exists()) return null;
+    const raw = snap.data();
+    if (raw.enabled === false) return { enabled: false };
+    return {
+      enabled: true,
+      pseudo:      raw.pseudo   || "",
+      photoURL:    raw.photoURL || "",
+      showStats:   !!raw.showStats,
+      collection:  raw.collection  ? JSON.parse(raw.collection)  : null,
+      photocards:  raw.photocards  ? JSON.parse(raw.photocards)  : null,
+      binderPages: raw.binderPages ?? 1,
+      concerts:    raw.concerts    ? JSON.parse(raw.concerts)    : null,
+    };
+  } catch(e) {
+    console.error("❌ lecture profil public:", e);
+    return null;
+  }
+}
+window.readPublicProfile = readPublicProfile;
+
+// Sauvegarde les préférences de partage dans le doc privé
+window._writeShareSettings = async function(uid, settings) {
+  return writeToFirestore(uid, { shareSettings: settings });
+};
 
 // ==========================================
 // AUTH
@@ -152,6 +228,9 @@ onAuthStateChanged(auth, async (user) => {
   if (user) {
     window._currentUser = user;
     await initUserData(user);
+    // Infos publiques (pseudo + avatar) pour la vitrine partageable
+    window._pseudo   = localStorage.getItem(`kshelf_pseudo_${user.uid}`) || user.displayName || "Collectionneur";
+    window._photoURL = localStorage.getItem(`kshelf_photo_${user.uid}`) || user.photoURL || "";
     updateProfileUI(user);
     startRealtimeSync(user);
     // Déclencher les syncs en attente (données ajoutées avant connexion)
@@ -211,6 +290,9 @@ async function initUserData(user) {
     if (data.photoURL) {
       localStorage.setItem(`kshelf_photo_${user.uid}`, data.photoURL);
     }
+    // Préférences de partage (profil public)
+    window.shareSettings = data.shareSettings || defaultShareSettings();
+    localStorage.setItem("kshelf_share_settings", JSON.stringify(window.shareSettings));
   } else {
     showDebugToast("🆕 Première connexion, sauvegarde en cours...", "#f59e0b");
     // Forcer le chargement des données par défaut
@@ -341,6 +423,8 @@ window.syncToFirestore = async function() {
       profileExtra: JSON.stringify(window.profileExtra || {}),
     });
     if (ok) showDebugToast("☁️ Sauvegardé dans le cloud ✓", "#1db954");
+    // Met à jour la vitrine publique (profil partageable)
+    if (ok) syncPublicProfile(user.uid);
   } catch(e) {
     showDebugToast("❌ Sync: " + e.message?.slice(0,40), "#f87171");
     console.error("syncToFirestore error:", e);
