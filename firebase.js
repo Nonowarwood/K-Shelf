@@ -16,7 +16,13 @@ import {
   doc,
   getDoc,
   setDoc,
-  onSnapshot
+  onSnapshot,
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -59,6 +65,7 @@ async function readFromFirestore(uid) {
       photoURL:    raw.photoURL    ?? null,
       profileExtra: raw.profileExtra ?? null,
       shareSettings: raw.shareSettings ? JSON.parse(raw.shareSettings) : null,
+      following: raw.following ? (typeof raw.following === "string" ? JSON.parse(raw.following) : raw.following) : [],
     };
   } catch(e) {
     console.error("❌ Firestore read error:", e);
@@ -111,6 +118,7 @@ async function syncPublicProfile(uid) {
       enabled: true,
       updatedAt: Date.now(),
       pseudo:   window._pseudo   || "",
+      pseudo_lower: (window._pseudo || "").toLowerCase(),
       photoURL: window._photoURL || "",
     };
     // On ne copie que les sections autorisées.
@@ -120,6 +128,9 @@ async function syncPublicProfile(uid) {
     // Les "stats" se recalculent à la volée côté visiteur à partir des albums,
     // donc rien de spécial à stocker ici ; on garde juste le flag.
     pub.showStats = !!share.stats;
+    // Expose la liste des abonnements (pour calculer les abonnés des autres)
+    pub.following = JSON.stringify(window._following || []);
+    pub.following_contains = Array.isArray(window._following) ? window._following : [];
     await setDoc(publicDocRef(uid), pub);
     showDebugToast("🌐 Profil public synchronisé ✓", "#1db954");
     return true;
@@ -155,6 +166,122 @@ async function readPublicProfile(uid) {
   }
 }
 window.readPublicProfile = readPublicProfile;
+
+// ==========================================
+// SYSTÈME DE SUIVI
+// ==========================================
+
+// Accès sûr aux préférences de partage depuis firebase.js
+function getShareSettings_safe() {
+  return window.shareSettings || defaultShareSettings();
+}
+
+// Recherche d'utilisateurs par pseudo (annuaire public).
+async function searchUsers(term) {
+  const t = (term || "").trim().toLowerCase();
+  if (t.length < 2) return [];
+  try {
+    // Requête "commence par" via une plage sur pseudo_lower
+    const q = query(
+      collection(db, "users_public"),
+      where("pseudo_lower", ">=", t),
+      where("pseudo_lower", "<=", t + "\uf8ff"),
+      limit(20)
+    );
+    const snap = await getDocs(q);
+    const results = [];
+    snap.forEach(docSnap => {
+      const d = docSnap.data();
+      if (d.enabled === false) return;
+      results.push({ uid: docSnap.id, pseudo: d.pseudo || "", photoURL: d.photoURL || "" });
+    });
+    return results;
+  } catch(e) {
+    console.error("❌ recherche utilisateurs:", e);
+    return [];
+  }
+}
+window.searchUsers = searchUsers;
+
+// Récupère la liste des UID que l'utilisateur suit (depuis son doc privé).
+async function getFollowing(uid) {
+  try {
+    const snap = await getDoc(userDocRef(uid));
+    if (!snap.exists()) return [];
+    const raw = snap.data();
+    return Array.isArray(raw.following) ? raw.following : (raw.following ? JSON.parse(raw.following) : []);
+  } catch(e) {
+    console.error("❌ getFollowing:", e);
+    return [];
+  }
+}
+window.getFollowing = getFollowing;
+
+// Suivre / ne plus suivre un utilisateur.
+async function toggleFollow(targetUid) {
+  const user = window._currentUser;
+  if (!user) return { ok: false, following: false };
+  if (targetUid === user.uid) return { ok: false, following: false };
+  try {
+    const current = await getFollowing(user.uid);
+    let next;
+    let nowFollowing;
+    if (current.includes(targetUid)) {
+      next = current.filter(u => u !== targetUid);
+      nowFollowing = false;
+    } else {
+      next = [...current, targetUid];
+      nowFollowing = true;
+    }
+    await setDoc(userDocRef(user.uid), { following: JSON.stringify(next) }, { merge: true });
+    window._following = next;
+    // Met à jour la vitrine publique pour que "qui me suit" se calcule chez les autres
+    if (getShareSettings_safe().enabled) await syncPublicProfile(user.uid);
+    return { ok: true, following: nowFollowing };
+  } catch(e) {
+    console.error("❌ toggleFollow:", e);
+    return { ok: false, following: false };
+  }
+}
+window.toggleFollow = toggleFollow;
+
+// Récupère les profils publics d'une liste d'UID (pour afficher abonnements).
+async function getProfilesByUids(uids) {
+  if (!Array.isArray(uids) || !uids.length) return [];
+  const out = [];
+  for (const uid of uids) {
+    try {
+      const p = await readPublicProfile(uid);
+      if (p && p.enabled !== false) out.push({ uid, pseudo: p.pseudo, photoURL: p.photoURL });
+    } catch(e) {}
+  }
+  return out;
+}
+window.getProfilesByUids = getProfilesByUids;
+
+// Calcule qui suit l'utilisateur en parcourant l'annuaire public :
+// tous ceux dont la liste "following" contient mon UID.
+async function getFollowers(uid) {
+  try {
+    const q = query(
+      collection(db, "users_public"),
+      where("following_contains", "array-contains", uid),
+      limit(100)
+    );
+    const snap = await getDocs(q);
+    const out = [];
+    snap.forEach(docSnap => {
+      const d = docSnap.data();
+      if (d.enabled === false) return;
+      out.push({ uid: docSnap.id, pseudo: d.pseudo || "", photoURL: d.photoURL || "" });
+    });
+    return out;
+  } catch(e) {
+    console.error("❌ getFollowers:", e);
+    return [];
+  }
+}
+window.getFollowers = getFollowers;
 
 // Sauvegarde les préférences de partage dans le doc privé
 window._writeShareSettings = async function(uid, settings) {
@@ -295,6 +422,8 @@ async function initUserData(user) {
     // Préférences de partage (profil public)
     window.shareSettings = data.shareSettings || defaultShareSettings();
     localStorage.setItem("kshelf_share_settings", JSON.stringify(window.shareSettings));
+    // Liste des abonnements (qui l'utilisateur suit)
+    window._following = Array.isArray(data.following) ? data.following : [];
   } else {
     showDebugToast("🆕 Première connexion, sauvegarde en cours...", "#f59e0b");
     // Forcer le chargement des données par défaut
