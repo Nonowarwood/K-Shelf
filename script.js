@@ -793,6 +793,101 @@ function closeShareModal() {
 }
 window.closeShareModal = closeShareModal;
 
+// ==========================================
+// COMMUNAUTÉ — recherche + abonnements/abonnés
+// ==========================================
+let _communityTab = "following";
+let _searchTimer = null;
+
+function openCommunityModal() {
+  const user = window._currentUser;
+  if (!user) { showDebugToast("⚠️ Connecte-toi pour accéder à la communauté", "#f59e0b"); return; }
+  document.getElementById("community-modal-overlay").classList.add("visible");
+  document.getElementById("community-search-input").value = "";
+  document.getElementById("community-search-results").innerHTML = "";
+  switchCommunityTab("following");
+}
+window.openCommunityModal = openCommunityModal;
+
+function closeCommunityModal() {
+  document.getElementById("community-modal-overlay").classList.remove("visible");
+}
+window.closeCommunityModal = closeCommunityModal;
+
+// Rendu d'une ligne utilisateur (avatar + pseudo + action)
+function userRow(u, actionHtml) {
+  const avatar = u.photoURL
+    ? `<img src="${u.photoURL}" alt="" class="community-row-avatar">`
+    : `<div class="community-row-avatar community-row-avatar-fb">${(u.pseudo||"?")[0].toUpperCase()}</div>`;
+  return `
+    <div class="community-row">
+      <a href="?profile=${u.uid}" class="community-row-link">
+        ${avatar}
+        <span class="community-row-name">${u.pseudo || "Collectionneur"}</span>
+      </a>
+      ${actionHtml || ""}
+    </div>`;
+}
+
+// Recherche d'utilisateurs (avec debounce)
+function handleUserSearch(term) {
+  clearTimeout(_searchTimer);
+  const box = document.getElementById("community-search-results");
+  if (!term || term.trim().length < 2) { box.innerHTML = ""; return; }
+  box.innerHTML = `<p class="community-hint">Recherche…</p>`;
+  _searchTimer = setTimeout(async () => {
+    const results = await window.searchUsers(term);
+    const me = window._currentUser;
+    const following = window._following || [];
+    if (!results.length) { box.innerHTML = `<p class="community-hint">Aucun collectionneur trouvé.</p>`; return; }
+    box.innerHTML = results.map(u => {
+      if (me && u.uid === me.uid) return userRow(u, `<span class="community-badge">toi</span>`);
+      const isF = following.includes(u.uid);
+      return userRow(u, `<button class="community-follow-btn ${isF?'following':''}" onclick="quickFollow('${u.uid}', this)">${isF?'Abonné':'Suivre'}</button>`);
+    }).join("");
+  }, 350);
+}
+window.handleUserSearch = handleUserSearch;
+
+async function quickFollow(uid, btn) {
+  btn.disabled = true;
+  const res = await window.toggleFollow(uid);
+  btn.disabled = false;
+  if (res.ok) {
+    btn.classList.toggle("following", res.following);
+    btn.textContent = res.following ? "Abonné" : "Suivre";
+  }
+}
+window.quickFollow = quickFollow;
+
+async function switchCommunityTab(tab) {
+  _communityTab = tab;
+  document.getElementById("tab-following").classList.toggle("active", tab === "following");
+  document.getElementById("tab-followers").classList.toggle("active", tab === "followers");
+  const list = document.getElementById("community-list");
+  list.innerHTML = `<p class="community-hint">Chargement…</p>`;
+
+  const user = window._currentUser;
+  if (!user) { list.innerHTML = ""; return; }
+
+  if (tab === "following") {
+    const uids = window._following || (await window.getFollowing(user.uid));
+    if (!uids.length) { list.innerHTML = `<p class="community-hint">Tu ne suis personne pour l'instant. Cherche un pseudo ci-dessus !</p>`; return; }
+    const profiles = await window.getProfilesByUids(uids);
+    list.innerHTML = profiles.map(u => userRow(u, `<button class="community-follow-btn following" onclick="quickFollow('${u.uid}', this)">Abonné</button>`)).join("")
+      || `<p class="community-hint">Tes abonnements ne sont plus disponibles.</p>`;
+  } else {
+    const followers = await window.getFollowers(user.uid);
+    if (!followers.length) { list.innerHTML = `<p class="community-hint">Personne ne te suit encore. Partage ton profil !</p>`; return; }
+    const following = window._following || [];
+    list.innerHTML = followers.map(u => {
+      const isF = following.includes(u.uid);
+      return userRow(u, `<button class="community-follow-btn ${isF?'following':''}" onclick="quickFollow('${u.uid}', this)">${isF?'Abonné':'Suivre'}</button>`);
+    }).join("");
+  }
+}
+window.switchCommunityTab = switchCommunityTab;
+
 
 // ==========================================
 // SELECT ARTIST
