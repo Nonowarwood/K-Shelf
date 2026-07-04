@@ -6057,3 +6057,91 @@ a.home-credits-author:hover {
   .splash-loader-bar, .album-card { animation: none; }
   .album-card { opacity: 1; }
 }
+
+/* ==========================================
+   ÉTAT VIDE UNIFIÉ — soigné
+   ========================================== */
+
+.empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 70px 24px;
+  animation: cardRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.empty-state-icon {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #4f8ef7, #a855f7, #e040a0);
+  box-shadow: 0 12px 36px rgba(168, 85, 247, 0.3);
+  position: relative;
+}
+/* Halo pulsant autour de l'icône */
+.empty-state-icon::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f8ef7, #a855f7, #e040a0);
+  opacity: 0.18;
+  z-index: -1;
+  animation: emptyPulse 2.6s ease-in-out infinite;
+}
+@keyframes emptyPulse {
+  0%, 100% { transform: scale(1); opacity: 0.18; }
+  50% { transform: scale(1.15); opacity: 0.08; }
+}
+
+.empty-state-title {
+  font-family: var(--font-display, 'Syne', sans-serif);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-primary, #fff);
+  margin: 0;
+}
+
+.empty-state-desc {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-secondary, #808799);
+  max-width: 340px;
+  margin: 0 0 8px;
+}
+
+.empty-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 100px;
+  background: linear-gradient(135deg, #4f8ef7, #a855f7, #e040a0);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
+}
+.empty-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(168, 85, 247, 0.42);
+}
+.empty-action-btn svg { flex-shrink: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .empty-state, .empty-state-icon::before { animation: none; }
+}
