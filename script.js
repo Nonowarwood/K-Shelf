@@ -56,6 +56,30 @@ function agencyTitleColor(agency) {
   return brand;
 }
 
+// ==========================================
+// ÉTAT VIDE UNIFIÉ (composant réutilisable)
+// ==========================================
+// icon : chemin SVG (contenu intérieur d'un <svg> 24x24 stroke)
+// title, desc : textes ; action (optionnel) : { label, onclick }
+function emptyState(icon, title, desc, action) {
+  const btn = action
+    ? `<button class="empty-action-btn" onclick="${action.onclick}">
+         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+         ${action.label}
+       </button>`
+    : "";
+  return `
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${icon}</svg>
+      </div>
+      <p class="empty-state-title">${title}</p>
+      <p class="empty-state-desc">${desc}</p>
+      ${btn}
+    </div>`;
+}
+window.emptyState = emptyState;
+
 const defaultCollectionData = {
   HYBE: {
     NewJeans: [
@@ -754,7 +778,12 @@ function renderAlbumGrid(agency, artist, albums) {
       <p class="album-total-count">${albums.length} disque(s)</p>
     </div>
     <div class="albums-display-grid animate-fade">
-      ${cardsHtml || '<p class="no-result">Aucun album trouvé.</p>'}
+      ${cardsHtml || emptyState(
+        '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>',
+        "Aucun album ici",
+        "Cet artiste n'a pas encore d'album dans ta collection.",
+        { label: "Ajouter un album", onclick: "openAddModal()" }
+      )}
     </div>`;
 }
 
@@ -784,7 +813,12 @@ function handleSearch() {
       <p class="album-total-count">${results.length} album(s) trouvé(s)</p>
     </div>
     <div class="albums-display-grid animate-fade">
-      ${cardsHtml || '<p class="no-result">Aucun résultat.</p>'}
+      ${cardsHtml || emptyState(
+        '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>',
+        "Aucun résultat",
+        "Essaie un autre nom d'artiste, d'album ou d'agence.",
+        null
+      )}
     </div>`;
 }
 
@@ -855,13 +889,12 @@ function showLightsticks() {
       <span class="lightstick-artist">${ls.artist}</span>
     </div>`).join("");
 
-  const emptyHtml = `
-    <div class="concerts-empty-state">
-      <div class="concerts-empty-icon">🪄</div>
-      <p class="concerts-empty-title">Aucun lightstick pour l'instant</p>
-      <p class="concerts-empty-desc">Ajoute tes lightsticks officiels !</p>
-      <button class="add-submit-btn" style="max-width:280px" onclick="openAddLightstick()">+ Ajouter un lightstick</button>
-    </div>`;
+  const emptyHtml = emptyState(
+    '<path d="M9 2h6v6l-1 1v11a2 2 0 0 1-4 0V9L9 8z"/><line x1="9" y1="6" x2="15" y2="6"/>',
+    "Aucun lightstick pour l'instant",
+    "Ajoute les lightsticks officiels de tes groupes préférés à ta collection.",
+    { label: "Ajouter un lightstick", onclick: "openAddLightstick()" }
+  );
 
   document.getElementById("main-content").innerHTML = `
     <div class="artist-view-header animate-fade">
@@ -2188,13 +2221,12 @@ function showConcerts() {
       </button>` : ""}
     </div>
     <div class="concerts-grid animate-fade">
-      ${cardsHtml || `
-        <div class="concerts-empty-state">
-          <div class="concerts-empty-icon">🎫</div>
-          <p class="concerts-empty-title">Aucun concert pour l'instant</p>
-          <p class="concerts-empty-desc">Ajoute ton premier souvenir de concert !</p>
-          <button class="add-submit-btn" style="max-width:280px" onclick="openAddConcert()">+ Ajouter un concert</button>
-        </div>`}
+      ${cardsHtml || emptyState(
+        '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+        "Aucun concert pour l'instant",
+        "Immortalise tes souvenirs de lives : artiste, date, lieu et photos.",
+        { label: "Ajouter un concert", onclick: "openAddConcert()" }
+      )}
     </div>`;
 }
 window.showConcerts = showConcerts;
@@ -2678,11 +2710,12 @@ function showFavorites(filter = "all") {
   }
 
   if (!html) {
-    html = `<div class="concerts-empty-state">
-      <div class="concerts-empty-icon">⭐</div>
-      <p class="concerts-empty-title">Aucun favori pour l'instant</p>
-      <p class="concerts-empty-desc">Clique sur ★ sur un album ou une photocard !</p>
-    </div>`;
+    html = emptyState(
+      '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>',
+      "Aucun favori pour l'instant",
+      "Marque tes albums et photocards préférés d'un ★ pour les retrouver ici.",
+      null
+    );
   }
 
   document.getElementById("main-content").innerHTML = `
