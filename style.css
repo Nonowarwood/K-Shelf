@@ -5858,3 +5858,12 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
   .stats-recent-grid { grid-template-columns: repeat(2, 1fr); }
   .stats-podium { gap: 10px; }
 }
+
+/* ==========================================
+   VISIBILITÉ DES FONCTIONNALITÉS SPOTIFY
+   Masquées par défaut, révélées seulement si l'email
+   est dans la liste blanche (body.spotify-allowed)
+   ========================================== */
+.spotify-feature { display: none !important; }
+body.spotify-allowed .mini-player.spotify-feature { display: flex !important; }
+body.spotify-allowed .header-tab.spotify-feature { display: inline-flex !important; }
