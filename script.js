@@ -643,6 +643,31 @@ function loadDemoCollection() {
 }
 window.loadDemoCollection = loadDemoCollection;
 
+// Vide entièrement la collection (irréversible)
+function clearCollection() {
+  const total = Object.values(collectionData).reduce((sum, ag) => {
+    if (!ag || typeof ag !== "object") return sum;
+    return sum + Object.values(ag).reduce((s, list) => s + (Array.isArray(list) ? list.length : 0), 0);
+  }, 0);
+
+  if (total === 0) {
+    showDebugToast("Ta collection est déjà vide", "#808799");
+    return;
+  }
+
+  const ok = confirm(`Supprimer définitivement tes ${total} album(s) ?\n\nCette action est irréversible.`);
+  if (!ok) return;
+
+  collectionData = {};
+  saveCollection();
+  if (window.syncToFirestore) window.syncToFirestore();
+  initSidebar();
+  closeSettings();
+  showDashboard();
+  showDebugToast("🗑 Collection vidée", "#ef4444");
+}
+window.clearCollection = clearCollection;
+
 
 // ==========================================
 // SELECT ARTIST
@@ -1796,28 +1821,38 @@ function totalDuration(tracks) {
   return `${Math.floor(tracks.reduce((a,t)=>a+(t.duration_ms||0),0)/60000)} min`;
 }
 
+// URL du proxy Spotify (Val Town) — récupère les infos d'album sans
+// que l'utilisateur ait besoin de se connecter à Spotify.
+const SPOTIFY_PROXY_URL = "https://nonowarwood--954f2bba77a211f19bd91607ee4eb77e.web.val.run";
+
 async function fetchSpotifyAlbumData(artistName, albumTitle) {
-  if (!spotifyAccessToken) return null;
   const clean = albumTitle.replace(/\s*\(.*?\)\s*/g,"").replace(/\s*\[.*?\]\s*/g,"").replace(new RegExp(`^${artistName}\\s*[-–]\\s*`,"i"),"").trim();
-  const queries = [`album:"${clean}" artist:"${artistName}"`, `album:${clean} artist:${artistName}`, `${clean} ${artistName}`, clean];
-  let albumData = null;
-  for (const q of queries) {
-    try {
-      const r = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&type=album&limit=1`, { headers:{ Authorization:`Bearer ${spotifyAccessToken}` } });
-      const found = (await r.json()).albums?.items?.[0];
-      if (found) { albumData = found; break; }
-    } catch(e) {}
+  try {
+    const url = `${SPOTIFY_PROXY_URL}/?artist=${encodeURIComponent(artistName)}&title=${encodeURIComponent(clean)}`;
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const data = await r.json();
+    if (!data || !data.found) return null;
+
+    // Adapter la réponse du proxy au format attendu par openAlbumModal
+    return {
+      id: null,
+      name: data.name,
+      images: data.images || [],
+      release_date: data.release_date || "",
+      total_tracks: data.total_tracks || 0,
+      label: data.label || "",
+      external_urls: { spotify: data.external_url || "" },
+      artists: (data.artists || []).map(n => ({ name: n })),
+      trackList: (data.tracks || []).map(t => ({ name: t.name, duration_ms: t.duration_ms })),
+      artistData: {
+        genres: data.genres || [],
+        popularity: data.popularity,
+      },
+    };
+  } catch(e) {
+    return null;
   }
-  if (!albumData) return null;
-  try {
-    const tr = await fetch(`https://api.spotify.com/v1/albums/${albumData.id}/tracks?limit=50`, { headers:{ Authorization:`Bearer ${spotifyAccessToken}` } });
-    albumData.trackList = (await tr.json()).items || [];
-  } catch(e) { albumData.trackList = []; }
-  try {
-    const aid = albumData.artists?.[0]?.id;
-    if (aid) { const ar = await fetch(`https://api.spotify.com/v1/artists/${aid}`, { headers:{ Authorization:`Bearer ${spotifyAccessToken}` } }); albumData.artistData = await ar.json(); }
-  } catch(e) {}
-  return albumData;
 }
 
 async function openAlbumModal(title, artist, agency, img, status) {
@@ -1828,21 +1863,27 @@ async function openAlbumModal(title, artist, agency, img, status) {
   setTimeout(() => overlay.classList.add("visible"), 10);
   overlay.addEventListener("click", e => { if (e.target === overlay) closeAlbumModal(); });
 
-  const sp = await fetchSpotifyAlbumData(artist, title);
+  // Le proxy Spotify (Val Town) enrichit la fiche pour TOUS les visiteurs,
+  // sans qu'ils aient besoin de se connecter à Spotify.
+  let sp = null;
+  try { sp = await fetchSpotifyAlbumData(artist, title); } catch(e) { sp = null; }
+  // Retrouver l'année stockée dans la collection si le proxy ne répond pas
+  const stored = findAlbum(agency, artist, title);
+  const storedYear = stored?.album?.year || null;
+
   const coverUrl   = sp?.images?.[0]?.url || img || "";
-  const releaseYear = (sp?.release_date || "—").split("-")[0];
+  const releaseYear = (sp?.release_date || "").split("-")[0] || storedYear || "—";
   const totalTracks = sp?.total_tracks || "—";
   const label       = sp?.label || agency;
   const duration    = sp?.trackList?.length ? totalDuration(sp.trackList) : "—";
   const spotifyUrl  = sp?.external_urls?.spotify || "";
   const genres      = sp?.artistData?.genres?.slice(0,3).join(", ") || "";
   const popularity  = sp?.artistData?.popularity;
-  const statusLabel = status === "owned" ? "● possédé" : "○ wishlist";
   const cleanTitle  = title.replace(/\s*\(.*?\)\s*/g,"").replace(/\s*\[.*?\]\s*/g,"").replace(new RegExp(`^${artist}\\s*[-–]\\s*`,"i"),"").trim();
 
   const tracklistHtml = sp?.trackList?.length
     ? sp.trackList.map((t,i) => `<div class="modal-track"><span class="modal-track-num">${i+1}</span><span class="modal-track-name">${t.name}</span><span class="modal-track-dur">${msToMinSec(t.duration_ms)}</span></div>`).join("")
-    : `<p class="modal-no-spotify">${spotifyAccessToken ? "Album non trouvé sur Spotify" : "Connecte-toi à Spotify pour voir la tracklist"}</p>`;
+    : "";
 
   document.getElementById("album-modal").innerHTML = `
     <button class="modal-close" onclick="closeAlbumModal()">✕</button>
@@ -1852,9 +1893,9 @@ async function openAlbumModal(title, artist, agency, img, status) {
           ${coverUrl ? `<img src="${coverUrl}" class="modal-cover" alt="${title}">` : `<div class="modal-cover-placeholder">💿</div>`}
         </div>
         <div class="modal-meta-block">
-          <span class="status-badge ${status}">${statusLabel}</span>
           ${spotifyUrl ? `<a class="modal-spotify-link" href="${spotifyUrl}" target="_blank">Ouvrir sur Spotify ↗</a>` : ""}
-          ${sp ? `<button class="modal-play-btn" onclick="playAlbumOnSpotify('${artist.replace(/'/g,"\\'")}','${title.replace(/'/g,"\\'")}')">▶ Écouter</button>` : ""}
+          ${sp ? `<button class="modal-play-btn spotify-feature" onclick="playAlbumOnSpotify('${artist.replace(/'/g,"\\'")}','${title.replace(/'/g,"\\'")}')">▶ Écouter</button>` : ""}
+          <button class="modal-edit-btn" onclick="openEditAlbum('${encodeURIComponent(agency)}','${encodeURIComponent(artist)}','${encodeURIComponent(title)}')">✎ Modifier</button>
         </div>
       </div>
       <div class="modal-right">
@@ -1865,16 +1906,17 @@ async function openAlbumModal(title, artist, agency, img, status) {
         </div>
         <div class="modal-stats">
           <div class="modal-stat"><span class="modal-stat-value">${releaseYear}</span><span class="modal-stat-label">Sortie</span></div>
-          <div class="modal-stat"><span class="modal-stat-value">${totalTracks}</span><span class="modal-stat-label">Titres</span></div>
-          <div class="modal-stat"><span class="modal-stat-value">${duration}</span><span class="modal-stat-label">Durée</span></div>
+          ${totalTracks !== "—" ? `<div class="modal-stat"><span class="modal-stat-value">${totalTracks}</span><span class="modal-stat-label">Titres</span></div>` : ""}
+          ${duration !== "—" ? `<div class="modal-stat"><span class="modal-stat-value">${duration}</span><span class="modal-stat-label">Durée</span></div>` : ""}
           ${popularity != null ? `<div class="modal-stat"><span class="modal-stat-value">${popularity}<span style="font-size:.9rem">/100</span></span><span class="modal-stat-label">Popularité</span></div>` : ""}
         </div>
         ${label ? `<p class="modal-label-line">Label · ${label}</p>` : ""}
         ${genres ? `<p class="modal-genres">${genres}</p>` : ""}
+        ${tracklistHtml ? `
         <div class="modal-tracklist">
           <h3 class="modal-section-title">Tracklist</h3>
           <div class="modal-tracks-container">${tracklistHtml}</div>
-        </div>
+        </div>` : ""}
       </div>
     </div>`;
 }
@@ -1888,6 +1930,145 @@ function closeAlbumModal() {
 
 window.openAlbumModal  = openAlbumModal;
 window.closeAlbumModal = closeAlbumModal;
+
+// ==========================================
+// ÉDITION D'ALBUM
+// ==========================================
+// Retrouve un album et son index à partir de agency/artist/title
+function findAlbum(agency, artist, title) {
+  if (!collectionData[agency] || !Array.isArray(collectionData[agency][artist])) return null;
+  const list = collectionData[agency][artist];
+  const idx = list.findIndex(a => a && a.title === title);
+  if (idx === -1) return null;
+  return { list, idx, album: list[idx] };
+}
+
+function openEditAlbum(encAgency, encArtist, encTitle) {
+  const agency = decodeURIComponent(encAgency);
+  const artist = decodeURIComponent(encArtist);
+  const title  = decodeURIComponent(encTitle);
+  const found = findAlbum(agency, artist, title);
+  if (!found) { showDebugToast("Album introuvable", "#ef4444"); return; }
+  const alb = found.album;
+
+  closeAlbumModal();
+
+  const overlay = document.createElement("div");
+  overlay.id = "edit-modal-overlay";
+  overlay.className = "add-modal-overlay visible";
+  overlay.innerHTML = `
+    <div class="add-modal">
+      <button class="modal-close" onclick="closeEditAlbum()">✕</button>
+      <h2 class="add-modal-title">Modifier l'album</h2>
+      <div class="add-form-group">
+        <label>Titre</label>
+        <input type="text" id="edit-title" value="${(alb.title||'').replace(/"/g,'&quot;')}">
+      </div>
+      <div class="add-form-row">
+        <div class="add-form-group">
+          <label>Artiste</label>
+          <input type="text" id="edit-artist" value="${(artist||'').replace(/"/g,'&quot;')}">
+        </div>
+        <div class="add-form-group">
+          <label>Agence</label>
+          <input type="text" id="edit-agency" value="${(agency||'').replace(/"/g,'&quot;')}">
+        </div>
+      </div>
+      <div class="add-form-group">
+        <label>URL de la cover</label>
+        <input type="text" id="edit-img" value="${(alb.img||'').replace(/"/g,'&quot;')}">
+      </div>
+      <div class="add-form-group">
+        <label>Année de sortie</label>
+        <input type="number" id="edit-year" value="${alb.year||''}" min="1990" max="2030">
+      </div>
+      <p id="edit-error" class="add-error" style="display:none"></p>
+      <div class="edit-modal-actions">
+        <button class="add-submit-btn" onclick="submitEditAlbum('${encAgency}','${encArtist}','${encodeURIComponent(title)}')">Enregistrer</button>
+        <button class="edit-delete-btn" onclick="deleteAlbum('${encAgency}','${encArtist}','${encodeURIComponent(title)}')">🗑 Supprimer</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeEditAlbum(); });
+}
+window.openEditAlbum = openEditAlbum;
+
+function closeEditAlbum() {
+  const o = document.getElementById("edit-modal-overlay");
+  if (o) { o.classList.remove("visible"); setTimeout(() => o.remove(), 200); }
+}
+window.closeEditAlbum = closeEditAlbum;
+
+function submitEditAlbum(encAgency, encArtist, encTitle) {
+  const oldAgency = decodeURIComponent(encAgency);
+  const oldArtist = decodeURIComponent(encArtist);
+  const oldTitle  = decodeURIComponent(encTitle);
+  const found = findAlbum(oldAgency, oldArtist, oldTitle);
+  if (!found) { showDebugToast("Album introuvable", "#ef4444"); return; }
+
+  const newTitle  = document.getElementById("edit-title").value.trim();
+  const newArtist = document.getElementById("edit-artist").value.trim();
+  const newAgency = document.getElementById("edit-agency").value.trim();
+  const newImg    = document.getElementById("edit-img").value.trim();
+  const newYearEl = document.getElementById("edit-year");
+  const newYear   = newYearEl && newYearEl.value ? parseInt(newYearEl.value) : null;
+  const errEl = document.getElementById("edit-error");
+
+  if (!newTitle || !newArtist || !newAgency) {
+    errEl.textContent = "Titre, artiste et agence sont obligatoires.";
+    errEl.style.display = "block"; return;
+  }
+
+  // Album mis à jour (on garde le statut et le mp3 existants)
+  const updated = { ...found.album, title: newTitle, img: newImg, year: newYear };
+
+  // Si l'artiste ou l'agence a changé, on déplace l'album
+  if (newAgency !== oldAgency || newArtist !== oldArtist) {
+    // Retirer de l'ancien emplacement
+    found.list.splice(found.idx, 1);
+    // Nettoyer les structures vides
+    if (found.list.length === 0) delete collectionData[oldAgency][oldArtist];
+    if (collectionData[oldAgency] && Object.keys(collectionData[oldAgency]).length === 0) delete collectionData[oldAgency];
+    // Ajouter au nouvel emplacement
+    if (!collectionData[newAgency]) collectionData[newAgency] = {};
+    if (!collectionData[newAgency][newArtist]) collectionData[newAgency][newArtist] = [];
+    collectionData[newAgency][newArtist].push(updated);
+  } else {
+    // Même emplacement : mise à jour directe
+    found.list[found.idx] = updated;
+  }
+
+  saveCollection();
+  if (window.syncToFirestore) window.syncToFirestore();
+  initSidebar();
+  closeEditAlbum();
+  showDashboard();
+  showDebugToast("✓ Album modifié", "#34d399");
+}
+window.submitEditAlbum = submitEditAlbum;
+
+function deleteAlbum(encAgency, encArtist, encTitle) {
+  const agency = decodeURIComponent(encAgency);
+  const artist = decodeURIComponent(encArtist);
+  const title  = decodeURIComponent(encTitle);
+  const found = findAlbum(agency, artist, title);
+  if (!found) { showDebugToast("Album introuvable", "#ef4444"); return; }
+
+  const ok = confirm(`Supprimer "${title}" de ta collection ?\n\nCette action est irréversible.`);
+  if (!ok) return;
+
+  found.list.splice(found.idx, 1);
+  if (found.list.length === 0) delete collectionData[agency][artist];
+  if (collectionData[agency] && Object.keys(collectionData[agency]).length === 0) delete collectionData[agency];
+
+  saveCollection();
+  if (window.syncToFirestore) window.syncToFirestore();
+  initSidebar();
+  closeEditAlbum();
+  showDashboard();
+  showDebugToast("🗑 Album supprimé", "#ef4444");
+}
+window.deleteAlbum = deleteAlbum;
 
 // ==========================================
 // EXPOSITION GLOBALE POUR FIREBASE SYNC
