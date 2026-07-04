@@ -121,9 +121,11 @@ async function syncPublicProfile(uid) {
     // donc rien de spécial à stocker ici ; on garde juste le flag.
     pub.showStats = !!share.stats;
     await setDoc(publicDocRef(uid), pub);
+    showDebugToast("🌐 Profil public synchronisé ✓", "#1db954");
     return true;
   } catch(e) {
     console.error("❌ sync profil public:", e);
+    showDebugToast("❌ Profil public: " + (e.code || e.message || "erreur"), "#f87171");
     return false;
   }
 }
