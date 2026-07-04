@@ -1335,7 +1335,7 @@ window.showLightsticks = showLightsticks;
 // ==========================================
 const SPOTIFY_CLIENT_ID   = "af102f75697746ccbc32cdd3e24e7a55";
 const SPOTIFY_REDIRECT_URI = "https://nonowarwood.github.io/K-Shelf/";
-const SPOTIFY_SCOPES = ["user-read-playback-state","user-modify-playback-state","user-read-currently-playing"].join(" ");
+const SPOTIFY_SCOPES = ["user-read-playback-state","user-modify-playback-state","user-read-currently-playing","user-top-read","user-read-recently-played"].join(" ");
 
 let spotifyAccessToken = null;
 let spotifyTokenExpiry = null;
@@ -1472,6 +1472,189 @@ async function searchSpotifyAlbum(q) {
   const r = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&type=album&limit=1`, { headers:{ Authorization:`Bearer ${spotifyAccessToken}` } });
   return (await r.json()).albums?.items?.[0] || null;
 }
+
+// ==========================================
+// STATS D'ÉCOUTE SPOTIFY
+// ==========================================
+let statsPeriod = "medium_term"; // short_term | medium_term | long_term
+
+async function spotifyGet(endpoint) {
+  const r = await fetch(`https://api.spotify.com/v1/${endpoint}`, {
+    headers: { Authorization: `Bearer ${spotifyAccessToken}` }
+  });
+  if (!r.ok) throw new Error("Spotify API " + r.status);
+  return r.json();
+}
+
+async function showStats() {
+  exitHome();
+  document.querySelectorAll(".header-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === "stats"));
+  const main = document.getElementById("main-content");
+
+  // Pas connecté à Spotify
+  if (!spotifyAccessToken) {
+    main.innerHTML = `
+      <div class="artist-view-header animate-fade">
+        <div class="breadcrumbs">écoute</div>
+        <h2 class="artist-main-title">mes stats.</h2>
+      </div>
+      <div class="stats-connect-prompt animate-fade">
+        <div class="stats-connect-icon">
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="#1DB954"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.52 17.34c-.24.36-.66.48-1.02.24-2.82-1.74-6.36-2.1-10.56-1.14-.42.12-.78-.18-.9-.54-.12-.42.18-.78.54-.9 4.56-1.02 8.52-.6 11.64 1.32.42.18.48.66.3 1.02zm1.44-3.3c-.3.42-.84.6-1.26.3-3.24-1.98-8.16-2.58-11.94-1.38-.48.12-1.02-.12-1.14-.6-.12-.48.12-1.02.6-1.14 4.38-1.32 9.78-.66 13.5 1.62.36.18.54.78.24 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.1 9.3c-.6.18-1.2-.18-1.38-.72-.18-.6.18-1.2.72-1.38 4.32-1.32 11.4-1.02 15.9 1.62.54.3.72 1.02.42 1.56-.3.42-1.02.6-1.56.36z"/></svg>
+        </div>
+        <p class="stats-connect-title">Connecte Spotify pour voir tes stats</p>
+        <p class="stats-connect-desc">Découvre tes artistes et titres les plus écoutés, façon Wrapped.</p>
+        <button class="add-submit-btn" style="max-width:280px" onclick="loginSpotify()">Connexion Spotify</button>
+      </div>`;
+    return;
+  }
+
+  // Structure de la page avec sélecteur de période
+  main.innerHTML = `
+    <div class="artist-view-header animate-fade">
+      <div class="breadcrumbs">écoute</div>
+      <h2 class="artist-main-title">mes stats.</h2>
+      <p class="album-total-count">tes écoutes Spotify, façon Wrapped</p>
+      <div class="stats-period-selector">
+        <button class="stats-period-btn ${statsPeriod==='short_term'?'active':''}" onclick="setStatsPeriod('short_term')">4 semaines</button>
+        <button class="stats-period-btn ${statsPeriod==='medium_term'?'active':''}" onclick="setStatsPeriod('medium_term')">6 mois</button>
+        <button class="stats-period-btn ${statsPeriod==='long_term'?'active':''}" onclick="setStatsPeriod('long_term')">tout le temps</button>
+      </div>
+    </div>
+    <div id="stats-content" class="stats-content animate-fade">
+      <div class="stats-loading"><div class="modal-spinner"></div><span>Chargement de tes stats…</span></div>
+    </div>`;
+
+  try {
+    const [topArtists, topTracks, recent] = await Promise.all([
+      spotifyGet(`me/top/artists?time_range=${statsPeriod}&limit=10`),
+      spotifyGet(`me/top/tracks?time_range=${statsPeriod}&limit=10`),
+      spotifyGet(`me/player/recently-played?limit=8`)
+    ]);
+    renderStatsContent(topArtists.items || [], topTracks.items || [], recent.items || []);
+  } catch(e) {
+    document.getElementById("stats-content").innerHTML = `
+      <div class="stats-connect-prompt">
+        <p class="stats-connect-title">Impossible de charger les stats</p>
+        <p class="stats-connect-desc">Reconnecte-toi à Spotify (les permissions ont peut-être changé) : déconnecte puis reconnecte via le bouton dans la sidebar.</p>
+        <button class="add-submit-btn" style="max-width:280px" onclick="disconnectSpotify(); loginSpotify()">Reconnecter Spotify</button>
+      </div>`;
+  }
+}
+window.showStats = showStats;
+
+function setStatsPeriod(period) {
+  statsPeriod = period;
+  showStats();
+}
+window.setStatsPeriod = setStatsPeriod;
+
+// Vérifie si un artiste est dans la collection physique
+function artistInCollection(artistName) {
+  const target = artistName.trim().toLowerCase();
+  for (const agency in collectionData) {
+    if (!collectionData[agency] || typeof collectionData[agency] !== "object") continue;
+    for (const artist in collectionData[agency]) {
+      if (artist.trim().toLowerCase() === target) {
+        const list = collectionData[agency][artist];
+        return Array.isArray(list) ? list.length : 0;
+      }
+    }
+  }
+  return 0;
+}
+
+function renderStatsContent(artists, tracks, recent) {
+  const content = document.getElementById("stats-content");
+  if (!content) return;
+
+  if (!artists.length && !tracks.length) {
+    content.innerHTML = `<div class="stats-connect-prompt">
+      <p class="stats-connect-title">Pas encore assez de données</p>
+      <p class="stats-connect-desc">Écoute un peu de musique sur Spotify et reviens plus tard !</p>
+    </div>`;
+    return;
+  }
+
+  // PODIUM top 3 artistes
+  const podiumOrder = [1, 0, 2]; // 2e, 1er, 3e pour l'effet podium
+  const podiumHtml = artists.length >= 1 ? `
+    <div class="stats-section">
+      <p class="dash-section-label">top artistes</p>
+      <div class="stats-podium">
+        ${podiumOrder.map(i => {
+          const a = artists[i];
+          if (!a) return "";
+          const rank = i + 1;
+          const img = a.images?.[0]?.url || "";
+          const owned = artistInCollection(a.name);
+          return `
+            <div class="podium-spot podium-rank-${rank}">
+              <div class="podium-avatar">
+                ${img ? `<img src="${img}" alt="${a.name}">` : `<div class="podium-avatar-empty">${a.name[0]}</div>`}
+                <span class="podium-medal">${rank}</span>
+              </div>
+              <span class="podium-name">${a.name}</span>
+              ${owned ? `<span class="podium-owned">💿 ${owned} album${owned>1?'s':''}</span>` : ""}
+            </div>`;
+        }).join("")}
+      </div>
+    </div>` : "";
+
+  // Reste des artistes (4-10) en liste
+  const restArtists = artists.slice(3);
+  const restArtistsHtml = restArtists.length ? `
+    <div class="stats-list">
+      ${restArtists.map((a, idx) => {
+        const owned = artistInCollection(a.name);
+        return `
+          <div class="stats-list-row">
+            <span class="stats-list-rank">${idx + 4}</span>
+            <img class="stats-list-img" src="${a.images?.[2]?.url || a.images?.[0]?.url || ''}" alt="${a.name}">
+            <span class="stats-list-name">${a.name}</span>
+            ${owned ? `<span class="stats-list-badge">💿 ${owned}</span>` : ""}
+          </div>`;
+      }).join("")}
+    </div>` : "";
+
+  // TOP TITRES
+  const tracksHtml = tracks.length ? `
+    <div class="stats-section">
+      <p class="dash-section-label">top titres</p>
+      <div class="stats-list">
+        ${tracks.map((t, idx) => `
+          <div class="stats-list-row">
+            <span class="stats-list-rank">${idx + 1}</span>
+            <img class="stats-list-img" src="${t.album?.images?.[2]?.url || t.album?.images?.[0]?.url || ''}" alt="${t.name}">
+            <div class="stats-list-track">
+              <span class="stats-list-name">${t.name}</span>
+              <span class="stats-list-artist">${t.artists?.map(a=>a.name).join(", ")}</span>
+            </div>
+          </div>`).join("")}
+      </div>
+    </div>` : "";
+
+  // RÉCEMMENT ÉCOUTÉS
+  const recentHtml = recent.length ? `
+    <div class="stats-section">
+      <p class="dash-section-label">récemment écoutés</p>
+      <div class="stats-recent-grid">
+        ${recent.map(r => {
+          const t = r.track;
+          if (!t) return "";
+          return `
+            <div class="stats-recent-card" title="${t.name} — ${t.artists?.map(a=>a.name).join(', ')}">
+              <img src="${t.album?.images?.[1]?.url || t.album?.images?.[0]?.url || ''}" alt="${t.name}">
+              <span class="stats-recent-name">${t.name}</span>
+              <span class="stats-recent-artist">${t.artists?.[0]?.name || ''}</span>
+            </div>`;
+        }).join("")}
+      </div>
+    </div>` : "";
+
+  content.innerHTML = podiumHtml + restArtistsHtml + tracksHtml + recentHtml;
+}
+window.renderStatsContent = renderStatsContent;
 
 // Auto-remplir année + cover depuis Spotify dans le formulaire d'ajout
 async function autofillFromSpotify() {
