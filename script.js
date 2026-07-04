@@ -1,6 +1,32 @@
 // ==========================================
 // CONFIGURATION ET BASE DE DONNÉES K-SHELF
 // ==========================================
+
+// --- Liste blanche Spotify ---
+// Seuls ces emails voient les fonctionnalités Spotify (player + onglet Stats).
+// Pour autoriser quelqu'un : ajoute son email Google (en minuscules) à cette liste.
+const SPOTIFY_ALLOWLIST = [
+  "noahguerbois@gmail.com",
+  // "ami1@gmail.com",
+  // "ami2@gmail.com",
+];
+
+// Renvoie true si l'utilisateur connecté a le droit d'utiliser Spotify
+function spotifyAccessAllowed() {
+  const user = window._currentUser;
+  if (!user || !user.email) return false;
+  return SPOTIFY_ALLOWLIST.includes(user.email.trim().toLowerCase());
+}
+window.spotifyAccessAllowed = spotifyAccessAllowed;
+
+// Applique la visibilité des éléments Spotify selon la liste blanche
+function applySpotifyVisibility() {
+  const allowed = spotifyAccessAllowed();
+  document.body.classList.toggle("spotify-allowed", allowed);
+  document.body.classList.toggle("spotify-denied", !allowed);
+}
+window.applySpotifyVisibility = applySpotifyVisibility;
+
 const agencyThemes = {
   HYBE: "#F5FF00",
   "SM Entertainment": "#de6b7f",
@@ -1488,6 +1514,8 @@ async function spotifyGet(endpoint) {
 
 async function showStats() {
   exitHome();
+  // Sécurité : accès réservé aux comptes autorisés
+  if (!spotifyAccessAllowed()) { showDashboard(); return; }
   document.querySelectorAll(".header-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === "stats"));
   const main = document.getElementById("main-content");
 
@@ -2686,6 +2714,7 @@ window.openPublicProfile = openPublicProfile;
 // ==========================================
 initSidebar();
 showDashboard();
+applySpotifyVisibility();
 
 // ==========================================
 // RECHERCHE MOBILE
