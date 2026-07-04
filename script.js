@@ -283,6 +283,82 @@ function exitHome() {
 }
 window.exitHome = exitHome;
 
+// ==========================================
+// SYSTÈME DE BADGES / ACHIEVEMENTS
+// ==========================================
+const BADGE_DEFS = [
+  { id: "first_album", name: "Premier pas", desc: "Ajoute ton premier album", color: "#6366f1",
+    icon: '<path d="M12 2v20M2 12h20"/>', check: s => s.totalAlbums >= 1 },
+  { id: "collector_10", name: "Collectionneur", desc: "10 albums dans ta collection", color: "#8b5cf6",
+    icon: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>', check: s => s.totalAlbums >= 10 },
+  { id: "collector_25", name: "Passionné", desc: "25 albums dans ta collection", color: "#a855f7",
+    icon: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>', check: s => s.totalAlbums >= 25 },
+  { id: "collector_50", name: "Encyclopédie", desc: "50 albums dans ta collection", color: "#ec4899",
+    icon: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>', check: s => s.totalAlbums >= 50 },
+  { id: "multi_agency", name: "Éclectique", desc: "Des albums de 3 agences différentes", color: "#f97316",
+    icon: '<path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>', check: s => s.totalAgencies >= 3 },
+  { id: "loyal_fan", name: "Fan dévoué", desc: "5 albums d'un même artiste", color: "#ef4444",
+    icon: '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>', check: s => s.maxArtistAlbums >= 5 },
+  { id: "favorite_lover", name: "Coup de cœur", desc: "Marque 5 albums en favori", color: "#fbbf24",
+    icon: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>', check: s => s.favCount >= 5 },
+  { id: "concert_goer", name: "Live addict", desc: "Vis ton premier concert", color: "#10b981",
+    icon: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>', check: s => s.concertCount >= 1 },
+  { id: "concert_veteran", name: "Vétéran des lives", desc: "5 concerts vécus", color: "#14b8a6",
+    icon: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>', check: s => s.concertCount >= 5 },
+  { id: "photocard_starter", name: "Binder ouvert", desc: "Ajoute ta première photocard", color: "#f472b6",
+    icon: '<rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="9" r="3"/><path d="M7 19c1.5-2.5 8.5-2.5 10 0"/>', check: s => s.pcCount >= 1 },
+  { id: "photocard_collector", name: "Chasseur de PC", desc: "10 photocards collectionnées", color: "#e879f9",
+    icon: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20"/><circle cx="7" cy="14" r="1.5"/>', check: s => s.pcCount >= 10 },
+  { id: "globetrotter", name: "Globe-trotter", desc: "Des concerts dans 3 lieux différents", color: "#3b82f6",
+    icon: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>', check: s => s.uniqueVenues >= 3 },
+];
+
+function computeCollectionStats() {
+  let totalAlbums = 0, favCount = 0, maxArtistAlbums = 0;
+  const artistCounts = {};
+  const totalAgencies = Object.keys(collectionData).length;
+  for (const agency in collectionData) {
+    if (!collectionData[agency] || typeof collectionData[agency] !== "object") continue;
+    for (const artist in collectionData[agency]) {
+      const list = collectionData[agency][artist];
+      if (!Array.isArray(list)) continue;
+      artistCounts[artist] = (artistCounts[artist] || 0) + list.length;
+      for (const alb of list) {
+        if (!alb) continue;
+        totalAlbums++;
+        if (alb.status === "favorite") favCount++;
+      }
+    }
+  }
+  for (const a in artistCounts) if (artistCounts[a] > maxArtistAlbums) maxArtistAlbums = artistCounts[a];
+  const pcCount = (typeof photocardsData !== "undefined" && Array.isArray(photocardsData) ? photocardsData : []).length;
+  const concertCount = (typeof concertsData !== "undefined" && Array.isArray(concertsData) ? concertsData : []).length;
+  const uniqueVenues = (typeof concertsData !== "undefined" && Array.isArray(concertsData))
+    ? new Set(concertsData.filter(c => c.venue && c.venue.trim()).map(c => c.venue.trim().toLowerCase())).size
+    : 0;
+  return { totalAlbums, totalAgencies, favCount, maxArtistAlbums, pcCount, concertCount, uniqueVenues };
+}
+
+function renderBadgesHtml() {
+  const stats = computeCollectionStats();
+  const badges = BADGE_DEFS.map(b => ({ ...b, unlocked: b.check(stats) }));
+  const unlockedCount = badges.filter(b => b.unlocked).length;
+  const cards = badges.map(b => `
+    <div class="badge-card ${b.unlocked ? "unlocked" : "locked"}" title="${b.desc}">
+      <div class="badge-icon" style="${b.unlocked ? `background:${b.color}1a; color:${b.color}` : ""}">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${b.icon}</svg>
+      </div>
+      <span class="badge-name">${b.name}</span>
+      <span class="badge-desc">${b.desc}</span>
+      ${b.unlocked ? '<div class="badge-check">✓</div>' : '<div class="badge-lock">🔒</div>'}
+    </div>`).join("");
+  return `
+    <div class="home-section">
+      <p class="dash-section-label">badges · ${unlockedCount}/${BADGE_DEFS.length} débloqués</p>
+      <div class="badges-grid">${cards}</div>
+    </div>`;
+}
+
 function renderHomeStats() {
   // Collecte sécurisée
   let totalAlbums = 0, favCount = 0;
@@ -398,6 +474,8 @@ function renderHomeStats() {
         <p class="dash-section-label">ajoutés récemment</p>
         <div class="dash-mosaic home-mosaic">${mosaicHtml}</div>
       </div>` : ""}
+
+      ${renderBadgesHtml()}
 
       <div class="home-credits">
         <span class="home-credits-label">Propulsé par</span>
