@@ -747,10 +747,15 @@ function updateShareUI() {
 }
 window.updateShareUI = updateShareUI;
 
-function toggleShareEnabled(val) {
+async function toggleShareEnabled(val) {
   getShareSettings().enabled = val;
   persistShareSettings();
   updateShareUI();
+  // À l'activation, on crée immédiatement la vitrine publique
+  const user = window._currentUser;
+  if (val && user && window.syncPublicProfile) {
+    await window.syncPublicProfile(user.uid);
+  }
 }
 window.toggleShareEnabled = toggleShareEnabled;
 
@@ -760,10 +765,15 @@ function updateShareSetting(key, val) {
 }
 window.updateShareSetting = updateShareSetting;
 
-function copyShareLink() {
+async function copyShareLink() {
   const user = window._currentUser;
   if (!user) { showDebugToast("⚠️ Connecte-toi d'abord", "#f59e0b"); return; }
   if (!getShareSettings().enabled) { showDebugToast("⚠️ Active ton profil public d'abord", "#f59e0b"); return; }
+  // Force la création/mise à jour de la vitrine publique avant de partager
+  if (window.syncPublicProfile) {
+    showDebugToast("⏳ Préparation de ton profil…", "#a855f7");
+    await window.syncPublicProfile(user.uid);
+  }
   const link = `${location.origin}/K-Shelf/?profile=${user.uid}`;
   navigator.clipboard.writeText(link).then(
     () => showDebugToast("🔗 Lien copié !", "#1db954"),
