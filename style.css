@@ -6081,25 +6081,31 @@ a.home-credits-author:hover {
   align-items: center;
   justify-content: center;
   margin-bottom: 14px;
-  color: #fff;
-  background: linear-gradient(135deg, #4f8ef7, #a855f7, #e040a0);
-  box-shadow: 0 12px 36px rgba(168, 85, 247, 0.3);
+  color: var(--accent, #a855f7);
+  background: color-mix(in srgb, var(--accent, #a855f7) 14%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--accent, #a855f7) 30%, transparent);
   position: relative;
 }
-/* Halo pulsant autour de l'icône */
+/* Halo pulsant autour de l'icône, teinté par l'accent du thème */
 .empty-state-icon::before {
   content: "";
   position: absolute;
   inset: -8px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4f8ef7, #a855f7, #e040a0);
-  opacity: 0.18;
+  background: var(--accent, #a855f7);
+  opacity: 0.1;
   z-index: -1;
   animation: emptyPulse 2.6s ease-in-out infinite;
 }
 @keyframes emptyPulse {
-  0%, 100% { transform: scale(1); opacity: 0.18; }
-  50% { transform: scale(1.15); opacity: 0.08; }
+  0%, 100% { transform: scale(1); opacity: 0.1; }
+  50% { transform: scale(1.15); opacity: 0.04; }
+}
+
+/* Thèmes clairs : icône un peu plus contrastée */
+body.is-light .empty-state-icon {
+  background: color-mix(in srgb, var(--accent, #a855f7) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #a855f7) 35%, transparent);
 }
 
 .empty-state-title {
@@ -6126,18 +6132,19 @@ a.home-credits-author:hover {
   margin-top: 8px;
   padding: 12px 22px;
   border: none;
-  border-radius: 100px;
+  border-radius: var(--radius-btn, 100px);
   background: linear-gradient(135deg, #4f8ef7, #a855f7, #e040a0);
   color: #fff;
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
   box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
 }
 .empty-action-btn:hover {
   transform: translateY(-2px);
+  filter: brightness(1.06);
   box-shadow: 0 12px 30px rgba(168, 85, 247, 0.42);
 }
 .empty-action-btn svg { flex-shrink: 0; }
