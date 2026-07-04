@@ -2905,6 +2905,17 @@ initSidebar();
 showDashboard();
 applySpotifyVisibility();
 
+// Masquer l'écran de chargement une fois le site prêt
+(function hideSplash() {
+  const splash = document.getElementById("splash-screen");
+  if (!splash) return;
+  // Laisser le temps à l'animation du logo de s'afficher, puis fondu
+  setTimeout(() => {
+    splash.classList.add("splash-hidden");
+    setTimeout(() => splash.remove(), 600);
+  }, 700);
+})();
+
 // ==========================================
 // RECHERCHE MOBILE
 // ==========================================
