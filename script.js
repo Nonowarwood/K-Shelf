@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURATION ET BASE DE DONNÉES K-SHELF
 // ==========================================
- 
+
 // --- Liste blanche Spotify ---
 // Seuls ces emails voient les fonctionnalités Spotify (player + onglet Stats).
 // Pour autoriser quelqu'un : ajoute son email Google (en minuscules) à cette liste.
