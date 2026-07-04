@@ -245,8 +245,12 @@ function applyTheme(themeId) {
     // Body background + classe thème
     document.body.style.background = theme.vars["--bg"];
     document.body.className = document.body.className
-      .replace(/theme-\S+/g, "").trim();
+      .replace(/theme-\S+/g, "").replace(/is-(light|dark)/g, "").trim();
     if (themeId !== "dark") document.body.classList.add(`theme-${themeId}`);
+
+    // Classe de luminosité — permet de cibler tous les thèmes clairs d'un coup
+    const LIGHT_THEMES = ["grid", "editorial", "kpopping", "lemontang"];
+    document.body.classList.add(LIGHT_THEMES.includes(themeId) ? "is-light" : "is-dark");
 
     // Thème clair : cacher l'aurora
     const aurora = document.querySelector(".apple-aurora");
@@ -470,6 +474,8 @@ function updateSettingsUI() {
   // Accent
   const accentPicker = document.getElementById("accent-picker");
   // accent retiré
+  // Partage / profil public
+  if (window.updateShareUI) window.updateShareUI();
 }
 
 window.openSettings   = openSettings;
