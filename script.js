@@ -700,6 +700,89 @@ function clearCollection() {
 }
 window.clearCollection = clearCollection;
 
+// ==========================================
+// PARTAGE / PROFIL PUBLIC — réglages
+// ==========================================
+function getShareSettings() {
+  if (window.shareSettings) return window.shareSettings;
+  try {
+    const s = JSON.parse(localStorage.getItem("kshelf_share_settings"));
+    if (s) { window.shareSettings = s; return s; }
+  } catch(e) {}
+  window.shareSettings = (window.defaultShareSettings ? window.defaultShareSettings() : { enabled:true, albums:true, photocards:true, concerts:true, stats:false });
+  return window.shareSettings;
+}
+
+function persistShareSettings() {
+  localStorage.setItem("kshelf_share_settings", JSON.stringify(window.shareSettings));
+  // Sauvegarder dans Firestore + resynchroniser la vitrine publique
+  const user = window._currentUser;
+  if (user && window.syncPublicProfile) {
+    // Écrit shareSettings dans le doc privé puis régénère la copie publique
+    if (window._writeShareSettings) window._writeShareSettings(user.uid, window.shareSettings);
+    window.syncPublicProfile(user.uid);
+  }
+}
+
+function updateShareUI() {
+  const s = getShareSettings();
+  const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+  setChk("share-enabled", s.enabled);
+  setChk("share-albums", s.albums);
+  setChk("share-photocards", s.photocards);
+  setChk("share-concerts", s.concerts);
+  setChk("share-stats", s.stats);
+
+  const opts = document.getElementById("share-options");
+  if (opts) opts.style.opacity = s.enabled ? "1" : "0.4";
+  if (opts) opts.style.pointerEvents = s.enabled ? "auto" : "none";
+
+  const hint = document.getElementById("share-link-hint");
+  const user = window._currentUser;
+  if (hint) {
+    if (!user) hint.textContent = "Connecte-toi pour obtenir ton lien.";
+    else if (!s.enabled) hint.textContent = "Ton profil est privé. Active-le pour partager.";
+    else hint.textContent = "Ton lien est prêt ! Colle-le où tu veux (bio, story…).";
+  }
+}
+window.updateShareUI = updateShareUI;
+
+function toggleShareEnabled(val) {
+  getShareSettings().enabled = val;
+  persistShareSettings();
+  updateShareUI();
+}
+window.toggleShareEnabled = toggleShareEnabled;
+
+function updateShareSetting(key, val) {
+  getShareSettings()[key] = val;
+  persistShareSettings();
+}
+window.updateShareSetting = updateShareSetting;
+
+function copyShareLink() {
+  const user = window._currentUser;
+  if (!user) { showDebugToast("⚠️ Connecte-toi d'abord", "#f59e0b"); return; }
+  if (!getShareSettings().enabled) { showDebugToast("⚠️ Active ton profil public d'abord", "#f59e0b"); return; }
+  const link = `${location.origin}/K-Shelf/?profile=${user.uid}`;
+  navigator.clipboard.writeText(link).then(
+    () => showDebugToast("🔗 Lien copié !", "#1db954"),
+    () => { window.prompt("Copie ton lien :", link); }
+  );
+}
+window.copyShareLink = copyShareLink;
+
+function openShareModal() {
+  document.getElementById("share-modal-overlay").classList.add("visible");
+  updateShareUI();
+}
+window.openShareModal = openShareModal;
+
+function closeShareModal() {
+  document.getElementById("share-modal-overlay").classList.remove("visible");
+}
+window.closeShareModal = closeShareModal;
+
 
 // ==========================================
 // SELECT ARTIST
