@@ -769,16 +769,52 @@ async function copyShareLink() {
   const user = window._currentUser;
   if (!user) { showDebugToast("⚠️ Connecte-toi d'abord", "#f59e0b"); return; }
   if (!getShareSettings().enabled) { showDebugToast("⚠️ Active ton profil public d'abord", "#f59e0b"); return; }
-  // Force la création/mise à jour de la vitrine publique avant de partager
-  if (window.syncPublicProfile) {
-    showDebugToast("⏳ Préparation de ton profil…", "#a855f7");
-    await window.syncPublicProfile(user.uid);
-  }
+
   const link = `${location.origin}/K-Shelf/?profile=${user.uid}`;
-  navigator.clipboard.writeText(link).then(
-    () => showDebugToast("🔗 Lien copié !", "#1db954"),
-    () => { window.prompt("Copie ton lien :", link); }
-  );
+
+  // Sur mobile/iPad : utiliser la feuille de partage native (WhatsApp, Messages…)
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "Ma collection K-pop sur k-shelf.",
+        text: "Découvre ma collection K-pop !",
+        url: link,
+      });
+      // Sync en arrière-plan
+      if (window.syncPublicProfile) window.syncPublicProfile(user.uid);
+      return;
+    } catch(e) {
+      // L'utilisateur a annulé le partage, ou erreur → on tombe sur la copie
+      if (e && e.name === "AbortError") return;
+    }
+  }
+
+  // Sinon : copier dans le presse-papier
+  let copied = false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(link);
+      copied = true;
+    }
+  } catch(e) { copied = false; }
+
+  if (!copied) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = link;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      copied = document.execCommand("copy");
+      document.body.removeChild(ta);
+    } catch(e) { copied = false; }
+  }
+
+  if (copied) showDebugToast("🔗 Lien copié !", "#1db954");
+  else window.prompt("Copie ton lien de partage :", link);
+
+  if (window.syncPublicProfile) window.syncPublicProfile(user.uid);
 }
 window.copyShareLink = copyShareLink;
 
