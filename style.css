@@ -5884,8 +5884,12 @@ body.spotify-allowed .header-tab.spotify-feature { display: inline-flex !importa
    ========================================== */
 
 .modal-edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
-  padding: 10px 16px;
+  padding: 11px 16px;
   margin-top: 8px;
   background: var(--surface-hover, rgba(255,255,255,0.06));
   border: 1px solid var(--border, rgba(255,255,255,0.12));
@@ -5897,8 +5901,10 @@ body.spotify-allowed .header-tab.spotify-feature { display: inline-flex !importa
   cursor: pointer;
   transition: all 0.2s;
 }
+.modal-edit-btn svg { flex-shrink: 0; }
 .modal-edit-btn:hover {
   background: var(--surface-hover, rgba(255,255,255,0.12));
+  border-color: var(--border-hover, rgba(255,255,255,0.2));
   transform: translateY(-1px);
 }
 
@@ -5910,6 +5916,9 @@ body.spotify-allowed .header-tab.spotify-feature { display: inline-flex !importa
 .edit-modal-actions .add-submit-btn { flex: 1; margin: 0; }
 
 .edit-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 13px 18px;
   background: rgba(239,68,68,0.1);
   border: 1px solid rgba(239,68,68,0.3);
@@ -5925,4 +5934,16 @@ body.spotify-allowed .header-tab.spotify-feature { display: inline-flex !importa
 .edit-delete-btn:hover {
   background: rgba(239,68,68,0.18);
   border-color: rgba(239,68,68,0.5);
+}
+
+/* Pseudo cliquable dans les crédits → GitHub */
+a.home-credits-author {
+  text-decoration: none;
+  transition: color 0.2s, opacity 0.2s;
+  cursor: pointer;
+}
+a.home-credits-author:hover {
+  color: var(--accent, #e040a0);
+  opacity: 1;
+  text-decoration: underline;
 }
