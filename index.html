@@ -245,8 +245,164 @@
 
   </div>
 
-  <!-- PAGE PROFIL (style Kpopping) -->
+  <!-- PAGE PROFIL (fan card v2) -->
   <div id="profile-modal-overlay" class="profile-page-overlay">
+
+  <!-- ═══════════════════════════════════════════════════════════════
+     K-SHELF — PROFIL V2 (fan card + top 3 + badges)
+     Remplace ENTIÈREMENT le bloc <div id="profile-logged-in" ...>
+     existant dans index.html (l'état non connecté ne change pas).
+     Tous les IDs utilisés par firebase.js / script.js sont conservés.
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="profile-logged-in" class="kprofile-page profile-hidden">
+
+  <button class="profile-page-close kprofile-close" onclick="closeProfileModal()"><span data-i18n="profile.close">✕ Fermer</span></button>
+
+  <!-- Bannière gradient (adaptative au thème) -->
+  <div class="kprofile-banner"></div>
+
+  <div class="kprofile-body">
+
+    <!-- COLONNE GAUCHE -->
+    <div class="kprofile-left">
+
+      <!-- FAN CARD (identité, style photocard) -->
+      <div class="kfc-frame">
+        <div class="kfc-card" id="kfc-card">
+          <div class="kfc-shine"></div>
+          <div class="kfc-top">
+            <span class="kfc-serial">fan card № 001</span>
+            <span class="kfc-holo">★ holo</span>
+          </div>
+
+          <div class="kprofile-avatar-wrap kfc-photo">
+            <div class="profile-avatar-large" id="profile-avatar-large">
+              <span id="profile-large-letter"></span>
+              <img id="profile-large-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:16px;">
+            </div>
+            <label class="kprofile-avatar-edit" for="profile-photo-input">✎</label>
+            <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+          </div>
+
+          <input type="text" id="profile-pseudo-input" class="kprofile-name-input" placeholder="Ton pseudo">
+          <p class="kprofile-email" id="profile-email-display-text"></p>
+          <input type="text" id="profile-email-display" style="display:none">
+
+          <div class="kprofile-fav-row">
+            <div class="kprofile-fav-item">
+              <span class="kprofile-fav-label">Groupe favori</span>
+              <input type="text" id="profile-fav-group" placeholder="NewJeans">
+            </div>
+            <div class="kprofile-fav-item">
+              <span class="kprofile-fav-label">Album favori</span>
+              <input type="text" id="profile-fav-album" placeholder="How Sweet">
+            </div>
+          </div>
+
+          <div class="kfc-footer">
+            <span class="kfc-logo">k-shelf<span class="kfc-dot">.</span></span>
+            <span class="kfc-copy">© 2026 — collector</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="kfc-share-btn" onclick="shareFanCard()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Partager ma fan card
+      </button>
+
+      <!-- Biases (IDs + rendu existants : renderBiasesGrid) -->
+      <div class="kprofile-card">
+        <div class="kprofile-card-header">
+          <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="#FF5C8A"><path d="M12 21.593c-.525-.445-4.783-4.144-6.622-5.672-1.839-1.529-3.378-3.538-3.378-6.021 0-2.583 2.099-4.5 4.5-4.5 1.485 0 2.886.699 3.5 1.706.614-1.007 2.015-1.706 3.5-1.706 2.401 0 4.5 1.917 4.5 4.5 0 2.483-1.539 4.492-3.378 6.021-1.839 1.528-6.097 5.227-6.622 5.672z"/></svg>
+          <span class="kprofile-card-title">Mes biases</span>
+          <span class="kprofile-card-count" id="biases-count">0/6</span>
+        </div>
+        <div id="biases-grid" class="biases-grid"></div>
+        <div class="bias-add-row">
+          <input type="text" id="bias-name-input" placeholder="Nom (ex: Minji)">
+          <input type="text" id="bias-group-input" placeholder="Groupe (ex: NewJeans)">
+          <button class="concert-add-url-btn" onclick="addBias()">+ Ajouter</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLONNE DROITE -->
+    <div class="kprofile-right">
+
+      <!-- Ma collection (rendu existant : renderKprofileStats) -->
+      <div class="kprofile-card">
+        <div class="kprofile-card-header">
+          <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span class="kprofile-card-title">Ma collection</span>
+        </div>
+        <div class="kprofile-stats-grid" id="kprofile-stats-grid"></div>
+      </div>
+
+      <!-- NOUVEAU : Top 3 albums -->
+      <div class="kprofile-card">
+        <div class="kprofile-card-header">
+          <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="#fbbf24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span class="kprofile-card-title">Top 3 albums</span>
+          <span class="kprofile-card-count">favoris ★</span>
+        </div>
+        <div class="kp2-top3-grid" id="kp2-top3-grid"></div>
+      </div>
+
+      <!-- NOUVEAU : Badges de collection -->
+      <div class="kprofile-card">
+        <div class="kprofile-card-header">
+          <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          <span class="kprofile-card-title">Badges</span>
+          <span class="kprofile-card-count" id="kp2-badges-count">0/12</span>
+        </div>
+        <div class="kp2-badges-grid" id="kp2-badges-grid"></div>
+      </div>
+
+      <!-- Réseaux sociaux (IDs existants) -->
+      <div class="kprofile-card">
+        <div class="kprofile-card-header">
+          <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span class="kprofile-card-title">Réseaux sociaux</span>
+        </div>
+        <div class="kprofile-socials-grid">
+          <div class="kprofile-social-item">
+            <span class="kprofile-social-icon kprofile-icon-yt">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </span>
+            <input type="text" id="profile-youtube" placeholder="@nonowarwood">
+          </div>
+          <div class="kprofile-social-item">
+            <span class="kprofile-social-icon kprofile-icon-tt">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.83a8.16 8.16 0 0 0 4.77 1.52V6.9a4.85 4.85 0 0 1-1-.21z"/></svg>
+            </span>
+            <input type="text" id="profile-tiktok" placeholder="@nonowarwood">
+          </div>
+          <div class="kprofile-social-item">
+            <span class="kprofile-social-icon kprofile-icon-pin">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="#E60023"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+            </span>
+            <input type="text" id="profile-pinterest" placeholder="nonowarwood">
+          </div>
+          <div class="kprofile-social-item">
+            <span class="kprofile-social-icon kprofile-icon-kp">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><circle cx="12" cy="12" r="12" fill="#FF5C8A"/><path d="M7 12.5c0-2.76 2.24-5 5-5s5 2.24 5 5-2.24 5-5 5-5-2.24-5-5z" fill="#fff" opacity=".9"/><circle cx="12" cy="12.5" r="2.2" fill="#FF5C8A"/></svg>
+            </span>
+            <input type="text" id="profile-kpopping" placeholder="nonowarwood">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bouton sauvegarder flottant -->
+  <div class="kprofile-save-bar">
+    <button class="add-submit-btn" onclick="saveProfile()"><span data-i18n="profile.save">Sauvegarder les modifications</span></button>
+  </div>
+
+</div>
 
     <!-- État non connecté -->
     <div id="profile-logged-out" class="profile-page-center">
@@ -271,117 +427,6 @@
       </div>
     </div>
 
-    <!-- État connecté — style Kpopping -->
-    <div id="profile-logged-in" class="kprofile-page profile-hidden">
-
-      <button class="profile-page-close kprofile-close" onclick="closeProfileModal()"><span data-i18n="profile.close">✕ Fermer</span></button>
-
-      <!-- Bannière gradient (adaptative au thème) -->
-      <div class="kprofile-banner"></div>
-
-      <div class="kprofile-body">
-
-        <!-- COLONNE GAUCHE -->
-        <div class="kprofile-left">
-
-          <div class="kprofile-identity-card">
-            <div class="kprofile-avatar-wrap">
-              <div class="profile-avatar-large" id="profile-avatar-large">
-                <span id="profile-large-letter"></span>
-                <img id="profile-large-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:16px;">
-              </div>
-              <label class="kprofile-avatar-edit" for="profile-photo-input">✎</label>
-              <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
-            </div>
-
-            <input type="text" id="profile-pseudo-input" class="kprofile-name-input" placeholder="Ton pseudo">
-            <p class="kprofile-email" id="profile-email-display-text"></p>
-            <input type="text" id="profile-email-display" style="display:none">
-
-            <div class="kprofile-fav-row">
-              <div class="kprofile-fav-item">
-                <span class="kprofile-fav-label">Groupe favori</span>
-                <input type="text" id="profile-fav-group" placeholder="NewJeans">
-              </div>
-              <div class="kprofile-fav-item">
-                <span class="kprofile-fav-label">Album favori</span>
-                <input type="text" id="profile-fav-album" placeholder="How Sweet">
-              </div>
-            </div>
-          </div>
-
-          <!-- Biases -->
-          <div class="kprofile-card">
-            <div class="kprofile-card-header">
-              <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="#FF5C8A"><path d="M12 21.593c-.525-.445-4.783-4.144-6.622-5.672-1.839-1.529-3.378-3.538-3.378-6.021 0-2.583 2.099-4.5 4.5-4.5 1.485 0 2.886.699 3.5 1.706.614-1.007 2.015-1.706 3.5-1.706 2.401 0 4.5 1.917 4.5 4.5 0 2.483-1.539 4.492-3.378 6.021-1.839 1.528-6.097 5.227-6.622 5.672z"/></svg>
-              <span class="kprofile-card-title">Mes biases</span>
-              <span class="kprofile-card-count" id="biases-count">0/6</span>
-            </div>
-            <div id="biases-grid" class="biases-grid"></div>
-            <div class="bias-add-row">
-              <input type="text" id="bias-name-input" placeholder="Nom (ex: Minji)">
-              <input type="text" id="bias-group-input" placeholder="Groupe (ex: NewJeans)">
-              <button class="concert-add-url-btn" onclick="addBias()">+ Ajouter</button>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- COLONNE DROITE -->
-        <div class="kprofile-right">
-
-          <!-- Réseaux sociaux -->
-          <div class="kprofile-card">
-            <div class="kprofile-card-header">
-              <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              <span class="kprofile-card-title">Réseaux sociaux</span>
-            </div>
-            <div class="kprofile-socials-grid">
-              <div class="kprofile-social-item">
-                <span class="kprofile-social-icon kprofile-icon-yt">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                </span>
-                <input type="text" id="profile-youtube" placeholder="@nonowarwood">
-              </div>
-              <div class="kprofile-social-item">
-                <span class="kprofile-social-icon kprofile-icon-tt">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.83a8.16 8.16 0 0 0 4.77 1.52V6.9a4.85 4.85 0 0 1-1-.21z"/></svg>
-                </span>
-                <input type="text" id="profile-tiktok" placeholder="@nonowarwood">
-              </div>
-              <div class="kprofile-social-item">
-                <span class="kprofile-social-icon kprofile-icon-pin">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="#E60023"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
-                </span>
-                <input type="text" id="profile-pinterest" placeholder="nonowarwood">
-              </div>
-              <div class="kprofile-social-item">
-                <span class="kprofile-social-icon kprofile-icon-kp">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><circle cx="12" cy="12" r="12" fill="#FF5C8A"/><path d="M7 12.5c0-2.76 2.24-5 5-5s5 2.24 5 5-2.24 5-5 5-5-2.24-5-5z" fill="#fff" opacity=".9"/><circle cx="12" cy="12.5" r="2.2" fill="#FF5C8A"/></svg>
-                </span>
-                <input type="text" id="profile-kpopping" placeholder="nonowarwood">
-              </div>
-            </div>
-          </div>
-
-          <!-- Stats -->
-          <div class="kprofile-card">
-            <div class="kprofile-card-header">
-              <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-              <span class="kprofile-card-title">Ma collection</span>
-            </div>
-            <div class="kprofile-stats-grid" id="kprofile-stats-grid"></div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Bouton sauvegarder flottant -->
-      <div class="kprofile-save-bar">
-        <button class="add-submit-btn" onclick="saveProfile()"><span data-i18n="profile.save">Sauvegarder les modifications</span></button>
-      </div>
-
-    </div>
   </div>
 
     <!-- MODAL AJOUT ALBUM -->
@@ -702,6 +747,7 @@
   <script src="script.js"></script>
   <link rel="stylesheet" href="profile.css">
   <script src="profile.js"></script>
+  <script src="kprofile-v2.js"></script>
   <script>
     // Si l'URL contient ?profile=, afficher le profil public au lieu de l'app
     if (window.checkForPublicProfile) window.checkForPublicProfile();

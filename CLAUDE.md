@@ -56,3 +56,15 @@ Self-contained section in `script.js` (list view, Leaflet-based map view with No
 ### Local audio files
 
 `musique/` contains local MP3s referenced by filename from album entries (`mp3: "musique/..."` fields in collection data) and played through the local audio player wired up in the "SYSTEME AUDIO LOCAL" section of `script.js`.
+
+### Profile surfaces — three distinct UIs, easy to conflate
+
+"The profile page" is ambiguous in this codebase — there are three separate implementations, each with its own markup/CSS namespace and data source. Before touching "the profile page," confirm which one is meant:
+
+1. **Own editable profile ("Mon profil")** — `#profile-modal-overlay` / `.kprofile-*` classes in `index.html`, opened via `openProfilePage()` in `script.js` (bound to the avatar dropdown). Lets the signed-in user edit pseudo, avatar, favorite group/album, biases, and social links, and shows their own stats (`renderKprofileStats()` → `#kprofile-stats-grid`). Backed by `profileExtra` (`kshelf_profile_extra` in localStorage, see "PROFIL ENRICHI — BIASES & RÉSEAUX" section of `script.js`). Styling is CSS-variable-driven (`--surface`, `--border`, `--accent`, `--bg`, `--text-primary`, `--text-secondary`) so it re-skins automatically across `body.theme-*` classes — per-theme overrides for `.kprofile-banner` etc. live further down in `style.css`. When adding new visual elements here, use those CSS vars (or reuse existing classes like `.badges-grid`/`.badge-card`) rather than hardcoding colors, or the new element will look wrong on the light themes (`theme-grid`, `theme-editorial`, `theme-kpopping`).
+2. **Own public-card preview** — `#public-profile-overlay` / `.public-profile-*` classes, opened via `openPublicProfile()` in `script.js` ("PROFIL PUBLIC" section). A read-only modal preview of how the current user's own card looks, built from the same `profileExtra` + live `collectionData`/`concertsData`/`photocardsData`.
+3. **Visitor-facing public profile** — `profile.js` + `profile.css` (`.pp-*` classes), triggered by `?profile=<uid>` in the URL (`checkForPublicProfile()`), replaces the *entire page* (`#public-profile-view`). Renders another user's shared collection read-only from the sanitized public Firestore doc (see "Public profile sharing" above) — independent of `script.js`'s authenticated state entirely.
+
+### Badge/achievement system
+
+`BADGE_DEFS` (array of `{id, name, desc, color, icon, check}`) and `computeCollectionStats()` in `script.js` ("SYSTÈME DE BADGES / ACHIEVEMENTS" section) compute unlock state from live collection/concert/photocard data. `renderBadgesHtml()` returns a ready-made `.home-section` block (used on the dashboard); it's reusable elsewhere by injecting its return value into any container's `innerHTML` — it doesn't need its own container markup since the label/count are baked into the returned HTML.

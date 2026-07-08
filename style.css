@@ -6380,3 +6380,238 @@ body.is-light .empty-state-icon {
 }
 .pp-follow-guest { background: rgba(255,255,255,0.08); color: #c5cad4; border: 1px solid rgba(255,255,255,0.18); box-shadow: none; }
 .pp-follow-self { font-size: 0.85rem; color: #808799; }
+
+/* ═══════════════════════════════════════════════════════════════
+   K-SHELF — PROFIL V2 (fan card + top 3 + badges)
+   À AJOUTER à la fin de style.css.
+   Utilise les variables de thème existantes (--surface, --accent,
+   --text-primary, --text-secondary) → compatible avec les 6 thèmes.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* --- FAN CARD --- */
+.kfc-frame {
+  position: relative;
+  border-radius: 24px;
+  padding: 2px;
+  background: linear-gradient(120deg, #4f8ef7, #e040a0, #f5ff00, #34d399, #4f8ef7);
+  background-size: 300% 300%;
+  animation: kfcHolo 7s ease infinite;
+  transform: rotate(-1.4deg);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.kfc-frame:hover { transform: rotate(0deg) scale(1.015); }
+@keyframes kfcHolo {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.kfc-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--surface, rgba(13, 17, 23, 0.96));
+  backdrop-filter: var(--blur, blur(20px));
+  padding: 18px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.kfc-shine {
+  position: absolute;
+  top: -40%;
+  left: 0;
+  width: 60px;
+  height: 180%;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.12), rgba(255,255,255,0));
+  animation: kfcShine 4.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+@keyframes kfcShine {
+  0% { transform: translateX(-120%) rotate(18deg); }
+  100% { transform: translateX(520%) rotate(18deg); }
+}
+
+.kfc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kfc-serial {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #808799);
+}
+.kfc-holo {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fbbf24;
+}
+
+/* Photo pleine largeur dans la carte (réutilise .profile-avatar-large) */
+.kfc-photo {
+  width: 100% !important;
+  height: 240px;
+  margin: 0 !important;
+}
+.kfc-photo .profile-avatar-large {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 16px;
+  font-size: 3rem;
+}
+.kfc-photo .kprofile-avatar-edit { bottom: 10px; right: 10px; }
+
+.kfc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+}
+.kfc-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--text-primary, #fff);
+}
+.kfc-dot { color: #f5ff00; }
+.kfc-copy {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary, #808799);
+}
+
+.kfc-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 13px 20px;
+  margin-top: 14px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: var(--text-primary, #f6f6f8);
+  color: var(--bg, #08090c);
+  transition: transform 0.2s, opacity 0.2s;
+}
+.kfc-share-btn:hover { transform: translateY(-1px); opacity: 0.92; }
+
+/* --- TOP 3 ALBUMS --- */
+.kp2-top3-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.kp2-top3-item { position: relative; cursor: pointer; }
+.kp2-top3-cover {
+  aspect-ratio: 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.kp2-top3-cover img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  transition: transform 0.35s;
+}
+.kp2-top3-item:hover .kp2-top3-cover img { transform: scale(1.05); }
+.kp2-top3-rank {
+  position: absolute;
+  top: -9px; left: -9px;
+  width: 30px; height: 30px;
+  border-radius: 100px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+.kp2-rank-1 { background: #f5ff00; color: #08090c; }
+.kp2-rank-2 { background: #d6d6dc; color: #08090c; }
+.kp2-rank-3 { background: #a06b3c; color: #fff; }
+.kp2-top3-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin: 8px 0 0;
+  color: var(--text-primary, #fff);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kp2-top3-artist {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #808799);
+  margin: 3px 0 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kp2-top3-empty {
+  grid-column: 1 / -1;
+  color: var(--text-secondary, #808799);
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 18px 0;
+}
+
+/* --- BADGES (compact) --- */
+.kp2-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.kp2-badge {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  min-width: 0;
+}
+.kp2-badge.unlocked {
+  border-color: rgba(245, 255, 0, 0.22);
+  background: linear-gradient(160deg, rgba(245, 255, 0, 0.05), rgba(255, 255, 255, 0.02) 60%);
+}
+.kp2-badge.locked { opacity: 0.42; }
+.kp2-badge-icon {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.kp2-badge-name {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+  margin: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kp2-badge-desc {
+  font-size: 0.65rem;
+  color: var(--text-secondary, #808799);
+  margin: 2px 0 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+@media (max-width: 700px) {
+  .kp2-badges-grid { grid-template-columns: 1fr; }
+  .kfc-frame { transform: none; }
+}
