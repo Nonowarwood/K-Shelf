@@ -517,7 +517,7 @@ body {
   padding: 40px 0;
 }
 
-/* FOOTER CARTE ALBUM — agency tag + bouton Spotify */
+/* FOOTER CARTE ALBUM â€” agency tag + bouton Spotify */
 .album-card-footer {
   display: flex;
   align-items: center;
@@ -525,7 +525,7 @@ body {
   gap: 8px;
 }
 
-/* BOUTON ÉCOUTER SUR SPOTIFY */
+/* BOUTON Ã‰COUTER SUR SPOTIFY */
 .spotify-album-btn {
   display: inline-flex;
   align-items: center;
@@ -643,7 +643,7 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Layout intérieur */
+/* Layout intÃ©rieur */
 .modal-inner {
   display: flex;
   height: 100%;
@@ -904,7 +904,7 @@ body {
   pointer-events: none;
 }
 
-/* covers : règles consolidées plus haut */
+/* covers : rÃ¨gles consolidÃ©es plus haut */
 
 /* ==========================================
    MODAL AJOUT ALBUM
@@ -1176,7 +1176,7 @@ body {
 
 
 /* ==========================================
-   BINDER PHOTOCARDS — APPLE PREMIUM
+   BINDER PHOTOCARDS â€” APPLE PREMIUM
    ========================================== */
 
 .binder-toolbar {
@@ -1331,13 +1331,13 @@ body {
   gap: 14px;
 }
 
-/* ---- WRAPPER (gère aura sans clip) ---- */
+/* ---- WRAPPER (gÃ¨re aura sans clip) ---- */
 .binder-slot-wrapper {
   position: relative;
   aspect-ratio: 55 / 85;
 }
 
-/* aura par groupe → voir section AURA COLORÉE en bas */
+/* aura par groupe â†’ voir section AURA COLORÃ‰E en bas */
 
 /* ---- SLOT VIDE ---- */
 .binder-slot.empty {
@@ -1409,7 +1409,7 @@ body {
   border-radius: 10px;
 }
 
-/* Couche holo — FAVORIS SEULEMENT, par-dessus l'image */
+/* Couche holo â€” FAVORIS SEULEMENT, par-dessus l'image */
 .holo-layer {
   position: absolute;
   inset: 0;
@@ -1418,7 +1418,7 @@ body {
   opacity: 0;
   transition: opacity 0.2s;
   z-index: 2;
-  /* Le background est injecté dynamiquement par JS */
+  /* Le background est injectÃ© dynamiquement par JS */
 }
 
 /* Infos */
@@ -1681,7 +1681,7 @@ body {
 }
 
 /* ==========================================
-   AURA COLORÉE PAR GROUPE (favoris)
+   AURA COLORÃ‰E PAR GROUPE (favoris)
    ========================================== */
 
 .group-aura {
@@ -1711,7 +1711,7 @@ body {
 }
 
 /* ==========================================
-   CSS VARIABLES THÈMES
+   CSS VARIABLES THÃˆMES
    ========================================== */
 
 :root {
@@ -1731,7 +1731,7 @@ body {
 }
 
 /* ==========================================
-   TOPBAR — BOUTON SETTINGS
+   TOPBAR â€” BOUTON SETTINGS
    ========================================== */
 
 .topbar-settings-btn {
@@ -1848,7 +1848,7 @@ body {
   box-shadow: 0 0 0 1px var(--accent);
 }
 
-/* Preview miniature du thème */
+/* Preview miniature du thÃ¨me */
 .theme-preview {
   display: flex;
   height: 80px;
@@ -2055,7 +2055,7 @@ body {
 .toggle-switch input:checked + .toggle-knob::before { transform: translateX(20px); }
 
 /* ==========================================
-   ADAPTATIONS THÈME GRID (clair)
+   ADAPTATIONS THÃˆME GRID (clair)
    ========================================== */
 
 body.theme-grid {
@@ -2079,7 +2079,7 @@ body.theme-grid .breadcrumbs,
 body.theme-grid .album-total-count { color: #555; }
 body.theme-grid .player-btn { color: #333; }
 body.theme-grid .mini-player { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); }
-/* Couverture étendue — modals, settings, profil, binder, lightsticks */
+/* Couverture Ã©tendue â€” modals, settings, profil, binder, lightsticks */
 body.theme-grid .sidebar-header p,
 body.theme-grid .welcome-desc,
 body.theme-grid .agency-title,
@@ -2126,7 +2126,7 @@ body.theme-grid .binder-page-sheet { background: rgba(240,237,232,0.9); }
 body.theme-grid .binder-spine { background: rgba(0,0,0,0.06); }
 
 /* ==========================================
-   ADAPTATIONS THÈME EDITORIAL (blanc)
+   ADAPTATIONS THÃˆME EDITORIAL (blanc)
    ========================================== */
 
 body.theme-editorial {
@@ -2151,7 +2151,7 @@ body.theme-editorial .player-btn { color: #333; }
 body.theme-editorial .mini-player { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.07); }
 body.theme-editorial .status-badge.owned { background: rgba(0,0,0,0.06); color: #0a0a0a; }
 body.theme-editorial .status-badge.wishlist { background: rgba(0,0,0,0.04); color: #6b6b6b; }
-/* Couverture étendue */
+/* Couverture Ã©tendue */
 body.theme-editorial .sidebar-header p,
 body.theme-editorial .welcome-desc,
 body.theme-editorial .agency-title,
@@ -2224,7 +2224,7 @@ body.theme-editorial .binder-spine { background: rgba(0,0,0,0.04); }
 }
 
 /* ==========================================
-   THÈME LEMONTANG — Y2K FRUTIGER AERO
+   THÃˆME LEMONTANG â€” Y2K FRUTIGER AERO
    ========================================== */
 
 body.theme-lemontang {
@@ -2232,7 +2232,7 @@ body.theme-lemontang {
   color: var(--text-primary);
 }
 
-/* Couche photo du groupe — désactivée par défaut, activée via --lemontang-bg-image */
+/* Couche photo du groupe â€” dÃ©sactivÃ©e par dÃ©faut, activÃ©e via --lemontang-bg-image */
 body.theme-lemontang::before {
   content: '';
   position: fixed;
@@ -2246,7 +2246,7 @@ body.theme-lemontang::before {
   pointer-events: none;
 }
 
-/* Voile glassy par-dessus la photo pour garder la lisibilité (effet frutiger aero) */
+/* Voile glassy par-dessus la photo pour garder la lisibilitÃ© (effet frutiger aero) */
 body.theme-lemontang::after {
   content: '';
   position: fixed;
@@ -2262,16 +2262,16 @@ body.theme-lemontang::after {
   pointer-events: none;
 }
 
-/* .app-fullscreen est déjà position:relative par défaut dans le CSS de base.
+/* .app-fullscreen est dÃ©jÃ  position:relative par dÃ©faut dans le CSS de base.
    Les overlays (.settings-overlay, .add-modal-overlay, #album-modal-overlay)
-   doivent rester en position:fixed (héritée de leur classe de base) —
-   ne JAMAIS leur remettre position:relative ici, ça casse leur ancrage viewport. */
+   doivent rester en position:fixed (hÃ©ritÃ©e de leur classe de base) â€”
+   ne JAMAIS leur remettre position:relative ici, Ã§a casse leur ancrage viewport. */
 
 body.theme-lemontang .topbar {
   z-index: 500;
 }
 
-/* Glass panels — effet bulle savon translucide */
+/* Glass panels â€” effet bulle savon translucide */
 body.theme-lemontang .glass-panel {
   background: rgba(255,255,255,0.25);
   border: 1.5px solid rgba(255,255,255,0.55);
@@ -2280,7 +2280,7 @@ body.theme-lemontang .glass-panel {
     inset 0 1px 0 rgba(255,255,255,0.6);
 }
 
-/* Titres — dégradé bleu→jaune façon logo Lemon Tang */
+/* Titres â€” dÃ©gradÃ© bleuâ†’jaune faÃ§on logo Lemon Tang */
 body.theme-lemontang .sidebar-header h1,
 body.theme-lemontang .welcome-title,
 body.theme-lemontang .artist-main-title {
@@ -2343,7 +2343,7 @@ body.theme-lemontang .modal-track-name {
   color: var(--text-primary);
 }
 
-/* Texte sur les photocards : toujours blanc, car affiché sur overlay sombre par-dessus l'image */
+/* Texte sur les photocards : toujours blanc, car affichÃ© sur overlay sombre par-dessus l'image */
 body.theme-lemontang .binder-card-member { color: #ffffff; }
 body.theme-lemontang .binder-card-artist { color: rgba(255,255,255,0.7); }
 
@@ -2353,7 +2353,7 @@ body.theme-lemontang .mini-player {
   border-color: rgba(255,255,255,0.45);
 }
 
-/* Status badges — bleu eau / jaune citron */
+/* Status badges â€” bleu eau / jaune citron */
 body.theme-lemontang .status-badge.owned {
   background: rgba(79,195,247,0.25);
   color: #0d5878;
@@ -2363,7 +2363,7 @@ body.theme-lemontang .status-badge.wishlist {
   color: #8a6d00;
 }
 
-/* Modals & settings — glass jaune/bleu */
+/* Modals & settings â€” glass jaune/bleu */
 body.theme-lemontang .album-modal,
 body.theme-lemontang .add-modal,
 body.theme-lemontang .settings-panel,
@@ -2405,7 +2405,7 @@ body.theme-lemontang .binder-page-sheet {
 }
 body.theme-lemontang .binder-spine { background: rgba(255,255,255,0.25); }
 
-/* Boutons Spotify / submit — jaune citron pétillant */
+/* Boutons Spotify / submit â€” jaune citron pÃ©tillant */
 body.theme-lemontang .spotify-btn,
 body.theme-lemontang .add-submit-btn {
   background: linear-gradient(135deg, #ffe14d, #ffc832);
@@ -2413,12 +2413,12 @@ body.theme-lemontang .add-submit-btn {
   box-shadow: 0 4px 14px rgba(255,200,50,0.4);
 }
 
-/* Aurora désactivée visuellement par JS, mais sécurité CSS */
+/* Aurora dÃ©sactivÃ©e visuellement par JS, mais sÃ©curitÃ© CSS */
 body.theme-lemontang .apple-aurora { display: none !important; }
 
 /* ==========================================
-   FIX LISIBILITÉ — LIGHTSTICKS & BINDER
-   (thèmes clairs : grid, editorial)
+   FIX LISIBILITÃ‰ â€” LIGHTSTICKS & BINDER
+   (thÃ¨mes clairs : grid, editorial)
    ========================================== */
 
 body.theme-grid .lightstick-name,
@@ -2480,7 +2480,7 @@ body.theme-editorial .binder-add-page-btn:hover {
   color: #0a0a0a;
 }
 
-/* Binder book — page et spine */
+/* Binder book â€” page et spine */
 body.theme-grid .binder-page-sheet,
 body.theme-editorial .binder-page-sheet {
   background: rgba(255,255,255,0.6);
@@ -2508,7 +2508,7 @@ body.theme-editorial .binder-slot.empty:hover .binder-slot-add { color: rgba(0,0
 
 /* Cards photocard remplies */
 body.theme-grid .binder-card-member,
-body.theme-editorial .binder-card-member { color: #fff; } /* reste blanc — fond image sombre via gradient overlay */
+body.theme-editorial .binder-card-member { color: #fff; } /* reste blanc â€” fond image sombre via gradient overlay */
 body.theme-grid .binder-card-artist,
 body.theme-editorial .binder-card-artist { color: rgba(255,255,255,0.7); }
 
@@ -2519,7 +2519,7 @@ body.theme-grid .binder-remove-btn,
 body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
 
 /* ==========================================
-   SIDEBAR TABS — Albums / Photocards / Concerts
+   SIDEBAR TABS â€” Albums / Photocards / Concerts
    ========================================== */
 
 .sidebar-tabs {
@@ -2557,7 +2557,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
 }
 
 /* ==========================================
-   CONCERTS — VUE LISTE
+   CONCERTS â€” VUE LISTE
    ========================================== */
 
 .concerts-grid {
@@ -2633,7 +2633,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
   opacity: 0.7;
 }
 
-/* Étoiles */
+/* Ã‰toiles */
 .stars-row {
   display: inline-flex;
   gap: 2px;
@@ -2653,7 +2653,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
   transform: scale(1.2);
 }
 
-/* État vide */
+/* Ã‰tat vide */
 .concerts-empty-state {
   grid-column: 1 / -1;
   display: flex;
@@ -2669,7 +2669,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
 .concerts-empty-desc { font-size: 0.85rem; color: var(--text-secondary, #808799); margin-bottom: 16px; }
 
 /* ==========================================
-   CONCERTS — MODAL FORMULAIRE
+   CONCERTS â€” MODAL FORMULAIRE
    ========================================== */
 
 .concert-form-modal {
@@ -2733,7 +2733,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
 .concert-media-remove:hover { background: rgba(248,113,113,0.85); }
 
 /* ==========================================
-   CONCERTS — FICHE DÉTAIL
+   CONCERTS â€” FICHE DÃ‰TAIL
    ========================================== */
 
 .concert-detail-modal {
@@ -2796,7 +2796,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
 }
 
 /* ==========================================
-   CONCERTS — CHAMP URL PHOTO
+   CONCERTS â€” CHAMP URL PHOTO
    ========================================== */
 
 .concert-url-input-row {
@@ -2829,7 +2829,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
 }
 
 /* ==========================================
-   ÉTOILE FAVORI SUR LES ALBUMS
+   Ã‰TOILE FAVORI SUR LES ALBUMS
    ========================================== */
 
 .album-fav-btn {
@@ -2880,7 +2880,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
 }
 
 /* ==========================================
-   PROFIL ENRICHI — BIASES & RÉSEAUX
+   PROFIL ENRICHI â€” BIASES & RÃ‰SEAUX
    ========================================== */
 
 .profile-section-label {
@@ -3108,7 +3108,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
 .public-bias-group { font-size: 0.65rem; color: var(--text-secondary, #808799); }
 
 /* ==========================================
-   PROFIL — PAGE PLEIN ÉCRAN
+   PROFIL â€” PAGE PLEIN Ã‰CRAN
    ========================================== */
 
 .profile-page-overlay {
@@ -3129,7 +3129,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
   pointer-events: all;
 }
 
-/* État non connecté — centré */
+/* Ã‰tat non connectÃ© â€” centrÃ© */
 .profile-page-center {
   display: flex;
   flex-direction: column;
@@ -3142,7 +3142,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
   margin: 0 auto;
 }
 
-/* Layout connecté — colonne unique, topbar fixe */
+/* Layout connectÃ© â€” colonne unique, topbar fixe */
 .profile-page-layout {
   display: flex;
   flex-direction: column;
@@ -3216,7 +3216,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
   gap: 20px;
 }
 
-/* Grille de champs — 2 colonnes sur large, 1 sur petit */
+/* Grille de champs â€” 2 colonnes sur large, 1 sur petit */
 .profile-fields-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3258,7 +3258,7 @@ body.theme-editorial .binder-remove-btn { color: rgba(255,255,255,0.6); }
 }
 .profile-public-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-primary, #fff); }
 
-/* Thèmes clairs */
+/* ThÃ¨mes clairs */
 body.theme-grid .profile-page-overlay,
 body.theme-editorial .profile-page-overlay { background: var(--bg, #f7f7f5); }
 body.theme-grid .profile-page-topbar,
@@ -3274,11 +3274,11 @@ body.theme-lemontang .profile-page-topbar {
   backdrop-filter: blur(16px);
 }
 
-/* Gestion visibilité profil */
+/* Gestion visibilitÃ© profil */
 .profile-page-layout.profile-hidden { display: none !important; }
 
 /* ==========================================
-   THÈME CHATGPT — DARK MINIMAL
+   THÃˆME CHATGPT â€” DARK MINIMAL
    ========================================== */
 
 body.theme-chatgpt {
@@ -3394,7 +3394,7 @@ body.theme-chatgpt .lightstick-artist { color: #8e8ea0; }
 body.theme-chatgpt .breadcrumbs { color: #8e8ea0; }
 
 /* ==========================================
-   THÈME KPOPPING — K-POP COLORÉ
+   THÃˆME KPOPPING â€” K-POP COLORÃ‰
    ========================================== */
 
 body.theme-kpopping {
@@ -3412,7 +3412,7 @@ body.theme-kpopping .glass-panel {
 
 body.theme-kpopping .apple-aurora { display: none !important; }
 
-/* Titre avec dégradé bleu→rose comme Kpopping */
+/* Titre avec dÃ©gradÃ© bleuâ†’rose comme Kpopping */
 body.theme-kpopping .sidebar-header h1,
 body.theme-kpopping .welcome-title,
 body.theme-kpopping .artist-main-title {
@@ -3533,7 +3533,7 @@ body.theme-kpopping .concert-card-meta,
 body.theme-kpopping .concert-card-tour { color: #6b7280; }
 
 /* ==========================================
-   FIX LISIBILITÉ KPOPPING — textes blancs restants
+   FIX LISIBILITÃ‰ KPOPPING â€” textes blancs restants
    ========================================== */
 
 body.theme-kpopping .profile-name-label,
@@ -3629,7 +3629,7 @@ body.theme-kpopping .reset-collection-btn { color: #ef4444; background: rgba(239
     overflow: hidden;
   }
 
-  /* ---- SIDEBAR EN MODE ICÔNES ---- */
+  /* ---- SIDEBAR EN MODE ICÃ”NES ---- */
   .sidebar {
     width: 64px;
     padding: 16px 8px;
@@ -3661,12 +3661,12 @@ body.theme-kpopping .reset-collection-btn { color: #ef4444; background: rgba(239
     font-size: 1.1rem;
     display: block;
   }
-  .sidebar-tab-btn:nth-child(1)::before { content: '💿'; }
-  .sidebar-tab-btn:nth-child(2)::before { content: '🎴'; }
-  .sidebar-tab-btn:nth-child(3)::before { content: '🎤'; }
-  .sidebar-tab-btn:nth-child(4)::before { content: '★'; font-size: 1.3rem; }
+  .sidebar-tab-btn:nth-child(1)::before { content: 'ðŸ’¿'; }
+  .sidebar-tab-btn:nth-child(2)::before { content: 'ðŸŽ´'; }
+  .sidebar-tab-btn:nth-child(3)::before { content: 'ðŸŽ¤'; }
+  .sidebar-tab-btn:nth-child(4)::before { content: 'â˜…'; font-size: 1.3rem; }
 
-  .agency-list { display: none; } /* liste d'artistes cachée, navigation via cards principales */
+  .agency-list { display: none; } /* liste d'artistes cachÃ©e, navigation via cards principales */
 
   .add-album-btn-wrap { display: none; }
 
@@ -3681,7 +3681,7 @@ body.theme-kpopping .reset-collection-btn { color: #ef4444; background: rgba(239
   .player-btn { font-size: 0.9rem; }
   .player-btn.play { font-size: 1rem; }
   .spotify-btn { font-size: 0; padding: 8px; }
-  .spotify-btn::before { content: '🎵'; font-size: 1rem; }
+  .spotify-btn::before { content: 'ðŸŽµ'; font-size: 1rem; }
 
   /* ---- MAIN CONTENT ---- */
   .main-content {
@@ -3738,7 +3738,7 @@ body.theme-kpopping .reset-collection-btn { color: #ef4444; background: rgba(239
   /* ---- CONCERTS ---- */
   .concerts-grid { grid-template-columns: 1fr; gap: 16px; }
 
-  /* ---- MODALS : plein écran sur mobile ---- */
+  /* ---- MODALS : plein Ã©cran sur mobile ---- */
   .album-modal {
     max-width: 100%;
     max-height: 92vh;
@@ -3766,7 +3766,7 @@ body.theme-kpopping .reset-collection-btn { color: #ef4444; background: rgba(239
   .concert-detail-modal { max-width: 100%; }
   .concert-gallery-grid { grid-template-columns: repeat(2, 1fr); }
 
-  /* ---- PROFIL PLEIN ÉCRAN ---- */
+  /* ---- PROFIL PLEIN Ã‰CRAN ---- */
   .profile-page-scroll { padding: 20px 16px 60px; }
   .profile-fields-grid { grid-template-columns: 1fr; }
   .profile-page-title { font-size: 1.1rem; }
@@ -3976,7 +3976,7 @@ body.theme-kpopping .reset-collection-btn { color: #ef4444; background: rgba(239
 .google-signin-topbar-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.3); }
 
 /* ==========================================
-   PAGE PROFIL — STYLE KPOPPING
+   PAGE PROFIL â€” STYLE KPOPPING
    ========================================== */
 
 .kprofile-page {
@@ -4004,7 +4004,7 @@ body.theme-kpopping .reset-collection-btn { color: #ef4444; background: rgba(239
   z-index: 0;
 }
 
-/* Bannière adaptative par thème */
+/* BanniÃ¨re adaptative par thÃ¨me */
 body.theme-chatgpt .kprofile-banner { background: linear-gradient(120deg, #10a37f 0%, #2f2f2f 100%); }
 body.theme-kpopping .kprofile-banner { background: linear-gradient(120deg, #4f8ef7 0%, #a855f7 50%, #e040a0 100%); }
 body.theme-lemontang .kprofile-banner { background: linear-gradient(120deg, #4fc3f7 0%, #a3e8c4 50%, #fff176 100%); }
@@ -4262,7 +4262,7 @@ body.theme-editorial .kprofile-banner { background: linear-gradient(120deg, #0a0
 }
 
 /* ==========================================
-   DROPDOWN — THÈMES CLAIRS
+   DROPDOWN â€” THÃˆMES CLAIRS
    ========================================== */
 body.theme-grid .profile-dropdown-menu,
 body.theme-editorial .profile-dropdown-menu,
@@ -4277,7 +4277,7 @@ body.theme-editorial .dropdown-divider,
 body.theme-kpopping .dropdown-divider { background: rgba(0,0,0,0.08); }
 
 /* ==========================================
-   KPROFILE — THÈMES CLAIRS
+   KPROFILE â€” THÃˆMES CLAIRS
    ========================================== */
 body.theme-grid .kprofile-identity-card,
 body.theme-editorial .kprofile-identity-card,
@@ -4335,7 +4335,7 @@ body.theme-editorial .profile-page-overlay { background: var(--bg); }
 body.theme-kpopping .profile-page-overlay { background: #f7f7f8; }
 
 /* ==========================================
-   LIGHTSTICK — bouton suppression
+   LIGHTSTICK â€” bouton suppression
    ========================================== */
 
 .lightstick-img-wrapper { position: relative; }
@@ -4362,7 +4362,7 @@ body.theme-kpopping .profile-page-overlay { background: #f7f7f8; }
 .lightstick-delete-btn:hover { background: rgba(248,113,113,0.85); }
 
 /* ==========================================
-   LIGHTSTICK — lisibilité thèmes clairs
+   LIGHTSTICK â€” lisibilitÃ© thÃ¨mes clairs
    ========================================== */
 
 body.theme-grid .lightstick-name,
@@ -4377,7 +4377,7 @@ body.theme-lemontang .lightstick-name { color: var(--text-primary); }
 body.theme-lemontang .lightstick-artist { color: var(--text-secondary); }
 
 /* ==========================================
-   LANDING PAGE — accueil sans compte
+   LANDING PAGE â€” accueil sans compte
    ========================================== */
 
 .landing-view {
@@ -4475,7 +4475,7 @@ body.theme-lemontang .lightstick-artist { color: var(--text-secondary); }
   margin: 0;
 }
 
-/* Thèmes clairs */
+/* ThÃ¨mes clairs */
 body.theme-grid .landing-feature-card,
 body.theme-editorial .landing-feature-card,
 body.theme-kpopping .landing-feature-card {
@@ -4616,7 +4616,7 @@ body.theme-kpopping .landing-btn-primary { box-shadow: 0 4px 16px rgba(0,0,0,0.1
   display: block;
 }
 
-/* Thèmes clairs */
+/* ThÃ¨mes clairs */
 body.theme-grid .dash-quick-card,
 body.theme-editorial .dash-quick-card,
 body.theme-kpopping .dash-quick-card {
@@ -4789,7 +4789,7 @@ input:focus-visible, textarea:focus-visible, button:focus-visible {
   display: block;
 }
 
-/* Thèmes clairs */
+/* ThÃ¨mes clairs */
 body.theme-grid .dash-quick-card,
 body.theme-editorial .dash-quick-card,
 body.theme-kpopping .dash-quick-card {
@@ -4857,7 +4857,7 @@ button:focus-visible, input:focus-visible, [onclick]:focus-visible {
 }
 
 /* ==========================================
-   PAGE DE CONNEXION — style inspiration
+   PAGE DE CONNEXION â€” style inspiration
    ========================================== */
 
 #profile-logged-out.profile-page-center {
@@ -4942,7 +4942,7 @@ button:focus-visible, input:focus-visible, [onclick]:focus-visible {
   max-width: 300px;
 }
 
-/* Fond adaptatif selon le thème */
+/* Fond adaptatif selon le thÃ¨me */
 body.theme-dark #profile-logged-out.profile-page-center,
 body.theme-lemontang #profile-logged-out.profile-page-center,
 body.theme-chatgpt #profile-logged-out.profile-page-center {
@@ -4978,8 +4978,8 @@ body.theme-kpopping .signin-title {
 }
 
 /* ==========================================
-   FILET DE SÉCURITÉ — THÈMES CLAIRS
-   Attrape tous les textes blancs oubliés
+   FILET DE SÃ‰CURITÃ‰ â€” THÃˆMES CLAIRS
+   Attrape tous les textes blancs oubliÃ©s
    ========================================== */
 
 body.is-light .album-title-text,
@@ -5024,7 +5024,7 @@ body.is-light .profile-modal-sub {
 }
 
 /* Les titres "raw display" (welcome-title, artist-main-title) gardent leur
-   dégradé sur kpopping mais deviennent lisibles sur grid/editorial */
+   dÃ©gradÃ© sur kpopping mais deviennent lisibles sur grid/editorial */
 body.theme-grid .welcome-title,
 body.theme-editorial .welcome-title,
 body.theme-grid .artist-main-title,
@@ -5034,7 +5034,7 @@ body.theme-editorial .artist-main-title {
 }
 
 /* ==========================================
-   MINI-PLAYER — icônes SVG
+   MINI-PLAYER â€” icÃ´nes SVG
    ========================================== */
 
 .player-btn {
@@ -5169,18 +5169,18 @@ body.theme-editorial .artist-main-title {
   right: auto;
 }
 
-/* Décaler l'app sous le header */
+/* DÃ©caler l'app sous le header */
 .app-fullscreen {
   margin-top: 64px;
   height: calc(100vh - 64px);
 }
 
-/* Cacher les onglets et la recherche DANS la sidebar (déplacés dans le header) */
+/* Cacher les onglets et la recherche DANS la sidebar (dÃ©placÃ©s dans le header) */
 .sidebar .sidebar-tabs { display: none; }
 .sidebar .search-box { display: none; }
 .sidebar .sidebar-header { display: none; }
 
-/* Thèmes clairs : header lisible */
+/* ThÃ¨mes clairs : header lisible */
 body.is-light .app-header {
   background: rgba(255,255,255,0.85);
   border-bottom-color: rgba(0,0,0,0.07);
@@ -5202,7 +5202,7 @@ body.theme-kpopping .header-logo {
   -webkit-text-fill-color: transparent;
 }
 
-/* Responsive : sur mobile, onglets en icônes seules + recherche réduite */
+/* Responsive : sur mobile, onglets en icÃ´nes seules + recherche rÃ©duite */
 @media (max-width: 768px) {
   .app-header { padding: 0 14px; gap: 12px; height: 56px; }
   .header-left { gap: 12px; }
@@ -5217,18 +5217,18 @@ body.theme-kpopping .header-logo {
   .app-fullscreen { margin-top: 56px; height: calc(100vh - 56px); }
 }
 
-/* topbar-logged-out intégré dans le header */
+/* topbar-logged-out intÃ©grÃ© dans le header */
 .app-header .topbar-logged-out {
   position: static;
   top: auto;
   right: auto;
 }
 
-/* Titres d'agence : lisibles sur thèmes clairs même sans couleur de marque */
+/* Titres d'agence : lisibles sur thÃ¨mes clairs mÃªme sans couleur de marque */
 body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); }
 
 /* ==========================================
-   MODE ACCUEIL PLEIN ÉCRAN — transition smooth
+   MODE ACCUEIL PLEIN Ã‰CRAN â€” transition smooth
    ========================================== */
 
 /* Transitions de base pour un mouvement fluide */
@@ -5244,7 +5244,7 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
   transition: all 0.55s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-/* Quand le mode home est actif : la sidebar glisse à gauche et disparaît */
+/* Quand le mode home est actif : la sidebar glisse Ã  gauche et disparaÃ®t */
 .app-fullscreen.home-mode .sidebar {
   transform: translateX(-110%);
   opacity: 0;
@@ -5255,13 +5255,13 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
   pointer-events: none;
 }
 
-/* Le contenu s'étend en plein écran */
+/* Le contenu s'Ã©tend en plein Ã©cran */
 .app-fullscreen.home-mode .main-content {
   border-radius: var(--radius-panel, 24px);
 }
 
 /* ==========================================
-   PAGE D'ACCUEIL — contenu
+   PAGE D'ACCUEIL â€” contenu
    ========================================== */
 
 .home-view {
@@ -5324,7 +5324,7 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
   color: var(--text-secondary, #808799);
 }
 
-/* Cartes highlight (artiste top, année top) */
+/* Cartes highlight (artiste top, annÃ©e top) */
 .home-highlights {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -5360,7 +5360,7 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
   color: var(--text-secondary, #808799);
 }
 
-/* Barres de répartition par agence */
+/* Barres de rÃ©partition par agence */
 .home-section { display: flex; flex-direction: column; gap: 14px; }
 
 .home-bars { display: flex; flex-direction: column; gap: 10px; }
@@ -5443,7 +5443,7 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
 }
 
 /* ==========================================
-   ENCADRÉ CRÉDITS — page d'accueil
+   ENCADRÃ‰ CRÃ‰DITS â€” page d'accueil
    ========================================== */
 
 .home-credits {
@@ -5541,7 +5541,7 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
   text-align: center;
 }
 
-/* Popups Leaflet — s'adapter au thème */
+/* Popups Leaflet â€” s'adapter au thÃ¨me */
 .leaflet-popup-content-wrapper {
   border-radius: 12px !important;
 }
@@ -5637,7 +5637,7 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
 }
 
 /* ==========================================
-   STATS D'ÉCOUTE SPOTIFY — façon Wrapped
+   STATS D'Ã‰COUTE SPOTIFY â€” faÃ§on Wrapped
    ========================================== */
 
 .stats-content { display: flex; flex-direction: column; gap: 40px; margin-top: 24px; }
@@ -5651,7 +5651,7 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
   color: var(--text-secondary, #808799);
 }
 
-/* Sélecteur de période */
+/* SÃ©lecteur de pÃ©riode */
 .stats-period-selector {
   display: inline-flex;
   gap: 4px;
@@ -5799,7 +5799,7 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
   flex-shrink: 0;
 }
 
-/* RÉCEMMENT ÉCOUTÉS */
+/* RÃ‰CEMMENT Ã‰COUTÃ‰S */
 .stats-recent-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -5860,15 +5860,15 @@ body.is-light .agency-title:not([style*="color"]) { color: var(--text-primary); 
 }
 
 /* ==========================================
-   VISIBILITÉ DES FONCTIONNALITÉS SPOTIFY
-   Masquées par défaut, révélées seulement si l'email
+   VISIBILITÃ‰ DES FONCTIONNALITÃ‰S SPOTIFY
+   MasquÃ©es par dÃ©faut, rÃ©vÃ©lÃ©es seulement si l'email
    est dans la liste blanche (body.spotify-allowed)
    ========================================== */
 .spotify-feature { display: none !important; }
 body.spotify-allowed .mini-player.spotify-feature { display: flex !important; }
 body.spotify-allowed .header-tab.spotify-feature { display: inline-flex !important; }
 
-/* Bouton danger dans les paramètres (vider la collection) */
+/* Bouton danger dans les paramÃ¨tres (vider la collection) */
 .reset-collection-btn.danger {
   background: rgba(239,68,68,0.1);
   border-color: rgba(239,68,68,0.3);
@@ -5880,7 +5880,7 @@ body.spotify-allowed .header-tab.spotify-feature { display: inline-flex !importa
 }
 
 /* ==========================================
-   ÉDITION D'ALBUM
+   Ã‰DITION D'ALBUM
    ========================================== */
 
 .modal-edit-btn {
@@ -5936,7 +5936,7 @@ body.spotify-allowed .header-tab.spotify-feature { display: inline-flex !importa
   border-color: rgba(239,68,68,0.5);
 }
 
-/* Pseudo cliquable dans les crédits → GitHub */
+/* Pseudo cliquable dans les crÃ©dits â†’ GitHub */
 a.home-credits-author {
   text-decoration: none;
   transition: color 0.2s, opacity 0.2s;
@@ -5949,7 +5949,7 @@ a.home-credits-author:hover {
 }
 
 /* ==========================================
-   ÉCRAN DE CHARGEMENT (SPLASH)
+   Ã‰CRAN DE CHARGEMENT (SPLASH)
    ========================================== */
 
 #splash-screen {
@@ -6041,7 +6041,7 @@ a.home-credits-author:hover {
 .albums-display-grid .album-card:nth-child(7) { animation-delay: 0.26s; }
 .albums-display-grid .album-card:nth-child(8) { animation-delay: 0.30s; }
 
-/* Léger zoom au survol des pochettes */
+/* LÃ©ger zoom au survol des pochettes */
 .album-media-wrapper img,
 .album-cover img {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -6051,7 +6051,7 @@ a.home-credits-author:hover {
   transform: scale(1.04);
 }
 
-/* Respecter les préférences d'accessibilité (pas d'animation si demandé) */
+/* Respecter les prÃ©fÃ©rences d'accessibilitÃ© (pas d'animation si demandÃ©) */
 @media (prefers-reduced-motion: reduce) {
   .splash-logo, .splash-wordmark, .splash-loader,
   .splash-loader-bar, .album-card { animation: none; }
@@ -6059,7 +6059,7 @@ a.home-credits-author:hover {
 }
 
 /* ==========================================
-   ÉTAT VIDE UNIFIÉ — soigné
+   Ã‰TAT VIDE UNIFIÃ‰ â€” soignÃ©
    ========================================== */
 
 .empty-state {
@@ -6086,7 +6086,7 @@ a.home-credits-author:hover {
   border: 1.5px solid color-mix(in srgb, var(--accent, #a855f7) 30%, transparent);
   position: relative;
 }
-/* Halo pulsant autour de l'icône, teinté par l'accent du thème */
+/* Halo pulsant autour de l'icÃ´ne, teintÃ© par l'accent du thÃ¨me */
 .empty-state-icon::before {
   content: "";
   position: absolute;
@@ -6102,7 +6102,7 @@ a.home-credits-author:hover {
   50% { transform: scale(1.15); opacity: 0.04; }
 }
 
-/* Thèmes clairs : icône un peu plus contrastée */
+/* ThÃ¨mes clairs : icÃ´ne un peu plus contrastÃ©e */
 body.is-light .empty-state-icon {
   background: color-mix(in srgb, var(--accent, #a855f7) 12%, transparent);
   border-color: color-mix(in srgb, var(--accent, #a855f7) 35%, transparent);
@@ -6154,7 +6154,7 @@ body.is-light .empty-state-icon {
 }
 
 /* ==========================================
-   RÉGLAGES DE PARTAGE (profil public)
+   RÃ‰GLAGES DE PARTAGE (profil public)
    ========================================== */
 .share-toggle-row {
   display: flex;
@@ -6288,7 +6288,7 @@ body.is-light .empty-state-icon {
 }
 
 /* ==========================================
-   MODAL COMMUNAUTÉ
+   MODAL COMMUNAUTÃ‰
    ========================================== */
 .community-modal { max-width: 460px; }
 
@@ -6381,26 +6381,26 @@ body.is-light .empty-state-icon {
 .pp-follow-guest { background: rgba(255,255,255,0.08); color: #c5cad4; border: 1px solid rgba(255,255,255,0.18); box-shadow: none; }
 .pp-follow-self { font-size: 0.85rem; color: #808799; }
 
-/* ═══════════════════════════════════════════════════════════════
-   K-SHELF — PROFIL V2 (fan card + top 3 + badges)
-   À AJOUTER à la fin de style.css.
-   Utilise les variables de thème existantes (--surface, --accent,
-   --text-primary, --text-secondary) → compatible avec les 6 thèmes.
-   ═══════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   K-SHELF â€” PROFIL V2 (fan card + top 3 + badges)
+   Ã€ AJOUTER Ã  la fin de style.css.
+   Utilise les variables de thÃ¨me existantes (--surface, --accent,
+   --text-primary, --text-secondary) â†’ compatible avec les 6 thÃ¨mes.
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* --- FAN CARD --- */
 .kfc-frame {
   position: relative;
   border-radius: 24px;
   padding: 2px;
-  background: linear-gradient(120deg, #4f8ef7, #e040a0, #f5ff00, #34d399, #4f8ef7);
+  background: linear-gradient(135deg, #8affa0, #f5ff00, #ffb84d, #8affa0);
   background-size: 300% 300%;
   animation: kfcHolo 7s ease infinite;
-  transform: rotate(-1.4deg);
+  transform: perspective(1000px) rotate(-1.6deg);
   transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
-.kfc-frame:hover { transform: rotate(0deg) scale(1.015); }
 @keyframes kfcHolo {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -6456,7 +6456,7 @@ body.is-light .empty-state-icon {
   color: #fbbf24;
 }
 
-/* Photo pleine largeur dans la carte (réutilise .profile-avatar-large) */
+/* Photo pleine largeur dans la carte (rÃ©utilise .profile-avatar-large) */
 .kfc-photo {
   width: 100% !important;
   height: 240px;
@@ -6614,4 +6614,157 @@ body.is-light .empty-state-icon {
 @media (max-width: 700px) {
   .kp2-badges-grid { grid-template-columns: 1fr; }
   .kfc-frame { transform: none; }
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   K-SHELF â€” PROFIL V2.1 (hÃ©ro, rangÃ©es alignÃ©es, add-tile, sÃ©lecteur top3)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+/* --- HÃ©ro banniÃ¨re --- */
+.kprofile-banner { height: 300px; }
+.kp2-hero { max-width: 1140px; margin: 0 auto; padding: 72px 32px 0; }
+.kp2-hero-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.34em; text-transform: uppercase;
+  color: #ffffff; margin-bottom: 14px;
+}
+.kp2-hero-star { color: #f5ff00; }
+.kp2-hero-name {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  font-weight: 800; letter-spacing: -2.5px; line-height: 0.95;
+  color: #ffffff; text-transform: lowercase; word-break: break-word;
+}
+.kp2-hero-dot { color: #f5ff00; }
+body.theme-editorial .kp2-hero-star, body.theme-editorial .kp2-hero-dot { color: #ffffff; }
+body.theme-grid .kp2-hero-star, body.theme-grid .kp2-hero-dot { color: #0a0a0a; }
+body.theme-lemontang .kp2-hero-label, body.theme-lemontang .kp2-hero-name { color: #0d3b52; }
+body.theme-lemontang .kp2-hero-star, body.theme-lemontang .kp2-hero-dot { color: #0d6e9e; }
+
+/* --- Grille en rangÃ©es alignÃ©es --- */
+.kprofile-body { padding-top: 230px; grid-template-columns: 380px minmax(0, 1fr); align-items: start; }
+.kp2-socials-card { grid-column: 1; align-self: stretch; }
+.kp2-biases-card { grid-column: 2; align-self: stretch; min-width: 0; }
+.kp2-badges-card { grid-column: 1 / -1; }
+
+/* --- Biases : grille interne + tuile d'ajout --- */
+.kp2-biases-outer { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kp2-biases-inner { display: contents; }
+.kp2-add-tile {
+  position: relative;
+  border: 1.5px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  min-height: 158px;
+  overflow: hidden;
+  transition: border-color 0.25s;
+}
+.kp2-add-tile:hover { border-color: #ff5c8a; }
+.kp2-add-plus {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; gap: 9px;
+  align-items: center; justify-content: center;
+  color: var(--text-secondary, #808799);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  opacity: 1; transform: scale(1);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s;
+}
+.kp2-add-plus:hover { color: #ff5c8a; }
+.kp2-plus-sign { font-size: 2.2rem; line-height: 1; font-weight: 300; }
+.kp2-plus-label { font-family: 'Space Mono', monospace; font-size: 0.56rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
+.kp2-add-form {
+  position: absolute; inset: 0; padding: 14px;
+  display: flex; flex-direction: column; gap: 7px; justify-content: center;
+  opacity: 0; transform: translateY(12px); pointer-events: none;
+  transition: opacity 0.35s ease 0.12s, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s;
+}
+.kp2-add-tile.kp2-add-open .kp2-add-plus { opacity: 0; transform: scale(0.55); pointer-events: none; }
+.kp2-add-tile.kp2-add-open .kp2-add-form { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.kp2-add-form input {
+  width: 100%; padding: 8px 11px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  color: var(--text-primary, #fff);
+  font-size: 0.76rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.kp2-add-form input:focus { outline: none; border-color: #ff5c8a; }
+.kp2-add-actions { display: flex; gap: 6px; }
+.kp2-add-submit {
+  flex: 1; padding: 8px 12px;
+  background: rgba(255, 92, 138, 0.12);
+  border: 1px solid rgba(255, 92, 138, 0.3);
+  border-radius: 10px; color: #ff5c8a;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.74rem; font-weight: 700; cursor: pointer;
+  transition: background 0.2s;
+}
+.kp2-add-submit:hover { background: rgba(255, 92, 138, 0.22); }
+.kp2-add-cancel {
+  width: 32px; padding: 0; background: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px; color: var(--text-secondary, #808799);
+  font-size: 0.68rem; cursor: pointer; transition: all 0.2s;
+}
+.kp2-add-cancel:hover { color: #f87171; border-color: #f87171; }
+.kp2-add-hint { font-size: 0.58rem; color: var(--text-secondary, #808799); text-align: center; }
+
+/* --- SÃ©lecteur top 3 --- */
+.kp2-picker {
+  margin-top: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px; padding: 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.kp2-picker-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.kp2-picker-title { flex: 1; font-family: 'Space Mono', monospace; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-primary, #fff); }
+.kp2-picker-close {
+  width: 24px; height: 24px; background: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 100px; color: var(--text-secondary, #808799);
+  font-size: 0.6rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; transition: all 0.2s;
+}
+.kp2-picker-close:hover { color: #f87171; border-color: #f87171; }
+.kp2-picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; max-height: 260px; overflow-y: auto; }
+.kp2-pick-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 9px; border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer; min-width: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+.kp2-pick-item:hover { border-color: rgba(255, 255, 255, 0.25); }
+.kp2-pick-item.selected { border-color: rgba(245, 255, 0, 0.35); background: rgba(245, 255, 0, 0.06); }
+.kp2-pick-cover {
+  width: 40px; height: 40px; border-radius: 8px; overflow: hidden;
+  background: rgba(255, 255, 255, 0.06); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  color: var(--text-secondary, #808799);
+}
+.kp2-pick-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kp2-pick-meta { min-width: 0; }
+.kp2-pick-title { font-size: 0.72rem; font-weight: 700; color: var(--text-primary, #fff); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kp2-pick-artist { font-family: 'Space Mono', monospace; font-size: 0.54rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary, #808799); margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* --- Badges pleine largeur --- */
+.kp2-badges-card .kp2-badges-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+
+/* --- ThÃ¨mes clairs --- */
+body.theme-grid .kp2-add-tile, body.theme-editorial .kp2-add-tile, body.theme-kpopping .kp2-add-tile, body.theme-lemontang .kp2-add-tile { border-color: rgba(0, 0, 0, 0.18); }
+body.theme-grid .kp2-add-form input, body.theme-editorial .kp2-add-form input, body.theme-kpopping .kp2-add-form input { background: rgba(0, 0, 0, 0.03); border-color: rgba(0, 0, 0, 0.1); color: #0a0a0a; }
+body.theme-grid .kp2-picker, body.theme-editorial .kp2-picker, body.theme-kpopping .kp2-picker { border-color: rgba(0, 0, 0, 0.08); background: rgba(0, 0, 0, 0.02); }
+body.theme-grid .kp2-pick-item, body.theme-editorial .kp2-pick-item, body.theme-kpopping .kp2-pick-item { border-color: rgba(0, 0, 0, 0.08); }
+body.theme-grid .kp2-pick-item:hover, body.theme-editorial .kp2-pick-item:hover, body.theme-kpopping .kp2-pick-item:hover { border-color: rgba(0, 0, 0, 0.25); }
+body.theme-grid .kp2-picker-title, body.theme-editorial .kp2-picker-title, body.theme-kpopping .kp2-picker-title,
+body.theme-grid .kp2-pick-title, body.theme-editorial .kp2-pick-title, body.theme-kpopping .kp2-pick-title { color: #0a0a0a; }
+
+@media (max-width: 900px) {
+  .kprofile-body { grid-template-columns: 1fr; padding-top: 200px; }
+  .kp2-socials-card, .kp2-biases-card, .kp2-badges-card { grid-column: 1; }
+  .kp2-biases-outer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
