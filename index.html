@@ -259,7 +259,12 @@
   <button class="profile-page-close kprofile-close" onclick="closeProfileModal()"><span data-i18n="profile.close">✕ Fermer</span></button>
 
   <!-- Bannière gradient (adaptative au thème) -->
-  <div class="kprofile-banner"></div>
+  <div class="kprofile-banner">
+    <div class="kp2-hero">
+      <div class="kp2-hero-label"><span class="kp2-hero-star">✦</span>&nbsp;&nbsp;profil de fan</div>
+      <div class="kp2-hero-name" id="kp2-hero-name">profil<span class="kp2-hero-dot">.</span></div>
+    </div>
+  </div>
 
   <div class="kprofile-body">
 
@@ -311,21 +316,6 @@
         Partager ma fan card
       </button>
 
-      <!-- Biases (IDs + rendu existants : renderBiasesGrid) -->
-      <div class="kprofile-card">
-        <div class="kprofile-card-header">
-          <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="#FF5C8A"><path d="M12 21.593c-.525-.445-4.783-4.144-6.622-5.672-1.839-1.529-3.378-3.538-3.378-6.021 0-2.583 2.099-4.5 4.5-4.5 1.485 0 2.886.699 3.5 1.706.614-1.007 2.015-1.706 3.5-1.706 2.401 0 4.5 1.917 4.5 4.5 0 2.483-1.539 4.492-3.378 6.021-1.839 1.528-6.097 5.227-6.622 5.672z"/></svg>
-          <span class="kprofile-card-title">Mes biases</span>
-          <span class="kprofile-card-count" id="biases-count">0/6</span>
-        </div>
-        <div id="biases-grid" class="biases-grid"></div>
-        <div class="bias-add-row">
-          <input type="text" id="bias-name-input" placeholder="Nom (ex: Minji)">
-          <input type="text" id="bias-group-input" placeholder="Groupe (ex: NewJeans)">
-          <button class="concert-add-url-btn" onclick="addBias()">+ Ajouter</button>
-        </div>
-      </div>
-
     </div>
 
     <!-- COLONNE DROITE -->
@@ -345,23 +335,22 @@
         <div class="kprofile-card-header">
           <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="#fbbf24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           <span class="kprofile-card-title">Top 3 albums</span>
-          <span class="kprofile-card-count">favoris ★</span>
+          <span class="kprofile-card-count">clique pour choisir</span>
         </div>
         <div class="kp2-top3-grid" id="kp2-top3-grid"></div>
-      </div>
-
-      <!-- NOUVEAU : Badges de collection -->
-      <div class="kprofile-card">
-        <div class="kprofile-card-header">
-          <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-          <span class="kprofile-card-title">Badges</span>
-          <span class="kprofile-card-count" id="kp2-badges-count">0/12</span>
+        <div class="kp2-picker" id="kp2-picker" style="display:none">
+          <div class="kp2-picker-head">
+            <span class="kp2-picker-title" id="kp2-picker-title">choisir l'album</span>
+            <button class="kp2-picker-close" onclick="closeTop3Picker()">✕</button>
+          </div>
+          <div class="kp2-picker-grid" id="kp2-picker-grid"></div>
         </div>
-        <div class="kp2-badges-grid" id="kp2-badges-grid"></div>
       </div>
 
-      <!-- Réseaux sociaux (IDs existants) -->
-      <div class="kprofile-card">
+    </div>
+
+    <!-- Réseaux sociaux (rangée 2, colonne gauche) -->
+    <div class="kprofile-card kp2-socials-card">
         <div class="kprofile-card-header">
           <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           <span class="kprofile-card-title">Réseaux sociaux</span>
@@ -392,8 +381,43 @@
             <input type="text" id="profile-kpopping" placeholder="nonowarwood">
           </div>
         </div>
-      </div>
+    </div>
 
+    <!-- Mes biases (rangée 2, colonne droite) -->
+    <div class="kprofile-card kp2-biases-card">
+      <div class="kprofile-card-header">
+        <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="#FF5C8A"><path d="M12 21.593c-.525-.445-4.783-4.144-6.622-5.672-1.839-1.529-3.378-3.538-3.378-6.021 0-2.583 2.099-4.5 4.5-4.5 1.485 0 2.886.699 3.5 1.706.614-1.007 2.015-1.706 3.5-1.706 2.401 0 4.5 1.917 4.5 4.5 0 2.483-1.539 4.492-3.378 6.021-1.839 1.528-6.097 5.227-6.622 5.672z"/></svg>
+        <span class="kprofile-card-title">Mes biases</span>
+        <span class="kprofile-card-count" id="biases-count">0/6</span>
+      </div>
+      <div class="kp2-biases-outer">
+        <div id="biases-grid" class="biases-grid kp2-biases-inner"></div>
+        <div class="kp2-add-tile" id="kp2-add-tile">
+          <button class="kp2-add-plus" onclick="openBiasAdd()">
+            <span class="kp2-plus-sign">+</span>
+            <span class="kp2-plus-label">ajouter un bias</span>
+          </button>
+          <div class="kp2-add-form">
+            <input type="text" id="bias-name-input" placeholder="Nom (ex: Minji)">
+            <input type="text" id="bias-group-input" placeholder="Groupe">
+            <div class="kp2-add-actions">
+              <button class="kp2-add-submit" onclick="addBias()">Ajouter</button>
+              <button class="kp2-add-cancel" onclick="closeBiasAdd()">✕</button>
+            </div>
+            <span class="kp2-add-hint">photo trouvée automatiquement ✨</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Badges de collection (pleine largeur) -->
+    <div class="kprofile-card kp2-badges-card">
+      <div class="kprofile-card-header">
+        <svg class="kprofile-card-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        <span class="kprofile-card-title">Badges de collection</span>
+        <span class="kprofile-card-count" id="kp2-badges-count">0/12</span>
+      </div>
+      <div class="kp2-badges-grid" id="kp2-badges-grid"></div>
     </div>
   </div>
 
