@@ -2983,43 +2983,31 @@ function loadProfileExtraIntoForm() {
 }
 window.loadProfileExtraIntoForm = loadProfileExtraIntoForm;
 
-// Chercher une photo de l'artiste via MusicBrainz cover art / last.fm
+// Chercher une photo de l'artiste via le wiki K-pop (fandom) puis Wikipédia
 async function fetchArtistPhoto(name, group) {
-  // 1. Essayer Kpopping via leur URL d'image directe
-  // Format : kpopping.com/idols/{slug} — on construit le slug
-  const slug = (group ? group + "-" + name : name)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-  const kpoppingUrl = `https://kpopping.com/uploads/idols/profile/${slug}.jpg`;
-
-  // 2. Essayer Wikipedia comme fallback
-  try {
-    const wikiTitle = name + (group ? " (" + group + " member)" : "");
-    const wikiRes = await fetch(
-      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(wikiTitle)}&prop=pageimages&format=json&pithumbsize=250&origin=*`
-    );
-    const wikiData = await wikiRes.json();
-    const pages = wikiData.query?.pages;
-    if (pages) {
-      const page = Object.values(pages)[0];
-      if (page?.thumbnail?.source) return page.thumbnail.source;
-    }
-  } catch(e) {}
-
-  // 3. Essayer Wikipedia avec juste le nom
-  try {
-    const wikiRes2 = await fetch(
-      `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(name)}&prop=pageimages&format=json&pithumbsize=250&origin=*`
-    );
-    const wikiData2 = await wikiRes2.json();
-    const pages2 = wikiData2.query?.pages;
-    if (pages2) {
-      const page2 = Object.values(pages2)[0];
-      if (page2?.thumbnail?.source) return page2.thumbnail.source;
-    }
-  } catch(e) {}
-
+  const tryApi = async (base, title) => {
+    try {
+      const res = await fetch(`${base}?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=300&redirects=1&origin=*`);
+      const data = await res.json();
+      const pages = data.query?.pages;
+      if (pages) {
+        const page = Object.values(pages)[0];
+        if (page?.thumbnail?.source) return page.thumbnail.source;
+      }
+    } catch (e) {}
+    return null;
+  };
+  const fandom = "https://kpop.fandom.com/api.php";
+  const wiki = "https://en.wikipedia.org/w/api.php";
+  const tries = [];
+  if (group) tries.push([fandom, `${name} (${group})`]);
+  tries.push([fandom, name]);
+  if (group) tries.push([wiki, `${name} (${group} member)`], [wiki, `${name} (singer)`]);
+  tries.push([wiki, name]);
+  for (const [base, title] of tries) {
+    const url = await tryApi(base, title);
+    if (url) return url;
+  }
   return null; // fallback initiale géré dans le rendu
 }
 
@@ -3050,25 +3038,26 @@ async function addBias() {
   if ((profileExtra.biases || []).length >= 6) { alert("Maximum 6 biases !"); return; }
 
   // Feedback pendant la recherche
-  const addBtn = document.querySelector(".bias-add-row .concert-add-url-btn");
+  const addBtn = document.querySelector(".kp2-add-submit");
   if (addBtn) { addBtn.innerText = "⏳"; addBtn.disabled = true; }
 
   const img = await fetchArtistPhoto(name, group);
 
-  if (addBtn) { addBtn.innerText = "+ Ajouter"; addBtn.disabled = false; }
+  if (addBtn) { addBtn.innerText = "Ajouter"; addBtn.disabled = false; }
 
   if (!profileExtra.biases) profileExtra.biases = [];
   profileExtra.biases.push({ name, group, img: img || "" });
   localStorage.setItem("kshelf_profile_extra", JSON.stringify(profileExtra));
   renderBiasesGrid();
-  if (nameEl) nameEl.value = "";
-  if (groupEl) groupEl.value = "";
+  if (window.renderKp2Badges) renderKp2Badges();
+  closeBiasAdd();
 }
 window.addBias = addBias;
 
 function removeBias(index) {
   profileExtra.biases = (profileExtra.biases || []).filter((_, i) => i !== index);
   renderBiasesGrid();
+  if (window.renderKp2Badges) renderKp2Badges();
 }
 window.removeBias = removeBias;
 
@@ -3215,6 +3204,12 @@ function openProfilePage() {
   setTimeout(() => {
     if (window.loadProfileExtraIntoForm) window.loadProfileExtraIntoForm();
     renderKprofileStats();
+    renderBiasesGrid();
+    renderKp2Top3();
+    renderKp2Badges();
+    initKfcTilt();
+    kp2SyncHeroName();
+    kp2LoadCovers();
   }, 50);
 }
 window.openProfilePage = openProfilePage;
@@ -3238,3 +3233,230 @@ function renderKprofileStats() {
   `;
 }
 window.renderKprofileStats = renderKprofileStats;
+
+// ==========================================
+// PROFIL V2.1 — top 3 + sélecteur, badges, tilt 3D, tuile d'ajout de bias
+// ==========================================
+
+// -- Tuile d'ajout de bias (+ → formulaire) --
+function openBiasAdd() {
+  document.getElementById("kp2-add-tile")?.classList.add("kp2-add-open");
+  setTimeout(() => document.getElementById("bias-name-input")?.focus(), 150);
+}
+window.openBiasAdd = openBiasAdd;
+
+function closeBiasAdd() {
+  document.getElementById("kp2-add-tile")?.classList.remove("kp2-add-open");
+  const n = document.getElementById("bias-name-input");
+  const g = document.getElementById("bias-group-input");
+  if (n) n.value = "";
+  if (g) g.value = "";
+}
+window.closeBiasAdd = closeBiasAdd;
+
+// -- Albums favoris (aplatis, avec clé stable) --
+function kp2FavoriteAlbums() {
+  const out = [];
+  for (const ag in collectionData)
+    for (const ar in collectionData[ag])
+      collectionData[ag][ar].forEach(al => {
+        if (al.status === "favorite") out.push({ title: al.title, img: al.img || "", artist: ar, key: ar + "|" + al.title });
+      });
+  return out;
+}
+
+// -- Pochettes automatiques (iTunes, cache localStorage) --
+let kp2CoverCache = {};
+try { kp2CoverCache = JSON.parse(localStorage.getItem("kshelf_cover_cache") || "{}"); } catch (e) {}
+
+async function kp2FetchCover(artist, title) {
+  try {
+    const q = encodeURIComponent(artist + " " + title.replace(/\(.*?\)/g, "").trim());
+    const res = await fetch("https://itunes.apple.com/search?term=" + q + "&entity=album&limit=1");
+    const d = await res.json();
+    const url = d.results?.[0]?.artworkUrl100;
+    return url ? url.replace("100x100", "400x400") : null;
+  } catch (e) { return null; }
+}
+
+async function kp2LoadCovers() {
+  let changed = false;
+  for (const a of kp2FavoriteAlbums()) {
+    if (a.img || kp2CoverCache[a.key]) continue;
+    const url = await kp2FetchCover(a.artist, a.title);
+    if (url) { kp2CoverCache[a.key] = url; changed = true; renderKp2Top3(); }
+  }
+  if (changed) { try { localStorage.setItem("kshelf_cover_cache", JSON.stringify(kp2CoverCache)); } catch (e) {} }
+}
+
+function kp2CoverFor(a) { return a.img || kp2CoverCache[a.key] || ""; }
+
+// -- Top 3 --
+function kp2Top3Albums() {
+  const favs = kp2FavoriteAlbums();
+  const chosen = (profileExtra.top3 || []).map(k => favs.find(f => f.key === k)).filter(Boolean);
+  for (const f of favs) {
+    if (chosen.length >= 3) break;
+    if (!chosen.includes(f)) chosen.push(f);
+  }
+  return chosen.slice(0, 3);
+}
+
+function renderKp2Top3() {
+  const grid = document.getElementById("kp2-top3-grid");
+  if (!grid) return;
+  const top3 = kp2Top3Albums();
+  if (!top3.length) {
+    grid.innerHTML = `<div class="kp2-top3-empty">Marque des albums en ★ favori pour remplir ton top 3 !</div>`;
+    return;
+  }
+  grid.innerHTML = top3.map((a, i) => {
+    const cover = kp2CoverFor(a);
+    return `
+    <div class="kp2-top3-item" onclick="openTop3Picker(${i})">
+      <span class="kp2-top3-rank kp2-rank-${i + 1}">${i + 1}</span>
+      <div class="kp2-top3-cover">${cover ? `<img src="${cover}" alt="">` : ""}</div>
+      <p class="kp2-top3-title">${a.title}</p>
+      <p class="kp2-top3-artist">${a.artist}</p>
+    </div>`;
+  }).join("");
+}
+window.renderKp2Top3 = renderKp2Top3;
+
+// -- Sélecteur top 3 --
+let kp2PickerIndex = null;
+let _kp2Favs = [];
+
+function openTop3Picker(i) {
+  if (kp2PickerIndex === i) { closeTop3Picker(); return; }
+  kp2PickerIndex = i;
+  const panel = document.getElementById("kp2-picker");
+  const grid = document.getElementById("kp2-picker-grid");
+  const title = document.getElementById("kp2-picker-title");
+  if (!panel || !grid) return;
+  _kp2Favs = kp2FavoriteAlbums();
+  const currentKey = kp2Top3Albums()[i]?.key;
+  if (title) title.innerText = "choisir l'album — position №" + (i + 1);
+  grid.innerHTML = _kp2Favs.map((a, idx) => {
+    const cover = kp2CoverFor(a);
+    return `
+    <div class="kp2-pick-item ${a.key === currentKey ? "selected" : ""}" onclick="pickTop3(${idx})">
+      <div class="kp2-pick-cover">${cover ? `<img src="${cover}" alt="">` : (a.title[0] || "?")}</div>
+      <div class="kp2-pick-meta">
+        <p class="kp2-pick-title">${a.title}</p>
+        <p class="kp2-pick-artist">${a.artist}</p>
+      </div>
+    </div>`;
+  }).join("");
+  panel.style.display = "block";
+}
+window.openTop3Picker = openTop3Picker;
+
+function closeTop3Picker() {
+  kp2PickerIndex = null;
+  const panel = document.getElementById("kp2-picker");
+  if (panel) panel.style.display = "none";
+}
+window.closeTop3Picker = closeTop3Picker;
+
+function pickTop3(favIdx) {
+  if (kp2PickerIndex == null) return;
+  const key = _kp2Favs[favIdx]?.key;
+  if (!key) return;
+  const keys = kp2Top3Albums().map(a => a.key);
+  const j = keys.indexOf(key);
+  if (j !== -1 && j !== kp2PickerIndex) keys[j] = keys[kp2PickerIndex]; // échange de positions
+  keys[kp2PickerIndex] = key;
+  profileExtra.top3 = keys;
+  saveProfileExtra();
+  renderKp2Top3();
+  closeTop3Picker();
+}
+window.pickTop3 = pickTop3;
+
+// -- Badges de collection --
+function renderKp2Badges() {
+  const grid = document.getElementById("kp2-badges-grid");
+  if (!grid) return;
+
+  let totalAlbums = 0, favAlbums = 0;
+  const artists = new Set();
+  for (const ag in collectionData)
+    for (const ar in collectionData[ag]) {
+      totalAlbums += collectionData[ag][ar].length;
+      favAlbums += collectionData[ag][ar].filter(a => a.status === "favorite").length;
+      if (collectionData[ag][ar].length) artists.add(ar);
+    }
+  const s = {
+    albums: totalAlbums,
+    favs: favAlbums,
+    artists: artists.size,
+    biases: (profileExtra.biases || []).length,
+    photocards: photocardsData.length,
+    concerts: concertsData.length,
+    profileComplete: !!(document.getElementById("profile-pseudo-input")?.value && profileExtra.favGroup && profileExtra.favAlbum),
+  };
+  const defs = [
+    { glyph: "✦", name: "Premier album", desc: "Ajouter ton 1er album", ok: s.albums >= 1 },
+    { glyph: "◈", name: "Collectionneur", desc: "10 albums catalogués", ok: s.albums >= 10 },
+    { glyph: "◆", name: "Sérieux", desc: "25 albums catalogués", ok: s.albums >= 25 },
+    { glyph: "❖", name: "Obsédé (avoué)", desc: "50 albums catalogués", ok: s.albums >= 50 },
+    { glyph: "★", name: "Cœur de fan", desc: "5 albums en favori", ok: s.favs >= 5 },
+    { glyph: "♫", name: "Multi-fandom", desc: "5 artistes différents", ok: s.artists >= 5 },
+    { glyph: "♥", name: "Bias confirmé", desc: "Déclarer un bias", ok: s.biases >= 1 },
+    { glyph: "❤", name: "Polyamour", desc: "6 biases (le max !)", ok: s.biases >= 6 },
+    { glyph: "◎", name: "Photocard hunter", desc: "10 photocards", ok: s.photocards >= 10 },
+    { glyph: "♪", name: "Concert-goer", desc: "1er concert vécu", ok: s.concerts >= 1 },
+    { glyph: "✧", name: "Tour de chauffe", desc: "5 concerts vécus", ok: s.concerts >= 5 },
+    { glyph: "✪", name: "Profil complet", desc: "Pseudo, groupe et album favoris", ok: s.profileComplete },
+  ];
+  let earned = 0;
+  grid.innerHTML = defs.map(b => {
+    if (b.ok) earned++;
+    return `
+    <div class="kp2-badge ${b.ok ? "unlocked" : "locked"}">
+      <span class="kp2-badge-icon" style="background:${b.ok ? "rgba(245,255,0,0.12)" : "rgba(128,135,153,0.1)"}; color:${b.ok ? "#f5ff00" : "#808799"};">${b.glyph}</span>
+      <div style="min-width:0;">
+        <p class="kp2-badge-name">${b.name}</p>
+        <p class="kp2-badge-desc">${b.desc}</p>
+      </div>
+    </div>`;
+  }).join("");
+  const countEl = document.getElementById("kp2-badges-count");
+  if (countEl) countEl.innerText = earned + "/" + defs.length;
+}
+window.renderKp2Badges = renderKp2Badges;
+
+// -- Tilt 3D sur la fan card --
+function initKfcTilt() {
+  const el = document.querySelector(".kfc-frame");
+  if (!el || el._tiltBound) return;
+  el._tiltBound = true;
+  el.addEventListener("mousemove", (e) => {
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    el.style.transition = "transform 0.08s ease-out";
+    el.style.transform = `perspective(1000px) rotateY(${(px * 10).toFixed(2)}deg) rotateX(${(-py * 10).toFixed(2)}deg)`;
+  });
+  el.addEventListener("mouseleave", () => {
+    el.style.transition = "transform 0.6s cubic-bezier(0.16,1,0.3,1)";
+    el.style.transform = "perspective(1000px) rotate(-1.6deg)";
+  });
+}
+window.initKfcTilt = initKfcTilt;
+
+// -- Pseudo géant du héro --
+function kp2SyncHeroName() {
+  const heroEl = document.getElementById("kp2-hero-name");
+  const input = document.getElementById("profile-pseudo-input");
+  if (!heroEl) return;
+  const pseudo = (input?.value || "").trim() || "profil";
+  heroEl.textContent = pseudo;
+  const dot = document.createElement("span");
+  dot.className = "kp2-hero-dot";
+  dot.textContent = ".";
+  heroEl.appendChild(dot);
+}
+window.kp2SyncHeroName = kp2SyncHeroName;
+document.getElementById("profile-pseudo-input")?.addEventListener("input", kp2SyncHeroName);
